@@ -1,29 +1,27 @@
-import { useState } from 'react'
-import viteLogo from '/vite.svg'
+import { BrowserRouter, Route, Routes } from 'react-router'
 import './App.css'
+import { Home } from './components/Home'
+import { Documents } from './pages/documents/Documents'
+import { Music } from './pages/music/Music'
+import { Food } from './pages/food/Food'
+import { Health } from './pages/health/Health'
+import { Water } from './pages/water/Water'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>Vite + React 2</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<Home></Home>}></Route>
+          <Route path='/documentos' element={<Documents></Documents>}></Route>
+          <Route path='/musica' element={<Music></Music>}></Route>
+          <Route path='/alimentos' element={<Food></Food>}></Route>
+          <Route path='/salud' element={<Health></Health>}></Route>
+          <Route path='/agua' element={<Water></Water>}></Route>
+        </Routes>
+      </BrowserRouter>
+
     </>
   )
 }
