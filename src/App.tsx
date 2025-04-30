@@ -6,6 +6,7 @@ import { Music } from './pages/music/Music'
 import { Food } from './pages/food/Food'
 import { Health } from './pages/health/Health'
 import { Water } from './pages/water/Water'
+import { Login } from './pages/auth/login/Login'
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
+          <Route path='/login' element={<Login></Login>}></Route>
           <Route path='/' element={<Home></Home>}></Route>
           <Route path='/documentos' element={<Documents></Documents>}></Route>
           <Route path='/musica' element={<Music></Music>}></Route>
