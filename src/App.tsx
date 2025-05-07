@@ -7,6 +7,9 @@ import { Food } from './pages/food/Food'
 import { Health } from './pages/health/Health'
 import { Water } from './pages/water/Water'
 import { Login } from './pages/auth/login/Login'
+import { Events } from './pages/documents/events/Events'
+import { People } from './pages/documents/people/People'
+import { Doc } from './pages/documents/doc/Doc'
 
 function App() {
 
@@ -14,13 +17,19 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path='/login' element={<Login></Login>}></Route>
-          <Route path='/' element={<Home></Home>}></Route>
-          <Route path='/documentos' element={<Documents></Documents>}></Route>
-          <Route path='/musica' element={<Music></Music>}></Route>
-          <Route path='/alimentos' element={<Food></Food>}></Route>
-          <Route path='/salud' element={<Health></Health>}></Route>
-          <Route path='/agua' element={<Water></Water>}></Route>
+          <Route path='/login' element={<Login />}></Route>
+
+          <Route path='/' element={<Home />}></Route>
+
+          <Route path='/documentos' element={<Documents />}></Route>
+          <Route path='/documentos/personas' element={<People />}></Route>
+          <Route path='/documentos/eventos' element={<Events />}></Route>
+          <Route path='/documentos/documentos' element={<Doc />}></Route>
+
+          <Route path='/musica' element={<Music />}></Route>
+          <Route path='/alimentos' element={<Food />}></Route>
+          <Route path='/salud' element={<Health />}></Route>
+          <Route path='/agua' element={<Water />}></Route>
         </Routes>
       </BrowserRouter>
 
