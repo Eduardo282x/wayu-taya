@@ -3,7 +3,7 @@ import { IoIosMusicalNotes, IoIosWater } from "react-icons/io"
 import { IoDocument, IoFastFood } from "react-icons/io5"
 import { MdOutlineHealthAndSafety } from "react-icons/md"
 
-export const Home = () => {
+export const HomeOld = () => {
     return (
         <div className='bg-gray-300 w-screen h-screen p-4'>
             <p className="text-3xl font-semibold text-black">Sistema de Gestión de Documentos para la fundación Wayu Taya</p>

@@ -1,9 +1,10 @@
 import { Column } from "@/interfaces/table.interface";
+import { formatDate } from "@/utils/formatters";
 
 interface Events {
     name: string;
     time: string;
-    date: string;
+    date: Date;
     location: string;
 }
 
@@ -22,7 +23,7 @@ export const columnEvents: Column[] = [
     },
     {
         label: 'Fecha',
-        element: (data: Events) => data.date
+        element: (data: Events) => formatDate(data.date)
     }
 ]
 
@@ -31,42 +32,42 @@ export const dataEvents: Events[] = [
         name: 'Eventos 1',
         location: 'Raul leoin',
         time: '09:00 AM',
-        date: '02 Mayo 2025'
+        date: new Date()
     },
     {
         name: 'Eventos 1',
         location: 'Raul leoin',
         time: '09:00 AM',
-        date: '02 Mayo 2025'
+        date: new Date()
     },
     {
         name: 'Eventos 1',
         location: 'Raul leoin',
         time: '09:00 AM',
-        date: '02 Mayo 2025'
+        date: new Date()
     },
     {
         name: 'Eventos 1',
         location: 'Raul leoin',
         time: '09:00 AM',
-        date: '02 Mayo 2025'
+        date: new Date()
     },
     {
         name: 'Eventos 1',
         location: 'Raul leoin',
         time: '09:00 AM',
-        date: '02 Mayo 2025'
+        date: new Date()
     },
     {
         name: 'Eventos 1',
         location: 'Raul leoin',
         time: '09:00 AM',
-        date: '02 Mayo 2025'
+        date: new Date()
     },
     {
         name: 'Eventos 1',
         location: 'Raul leoin',
         time: '09:00 AM',
-        date: '02 Mayo 2025'
+        date: new Date()
     },
 ]

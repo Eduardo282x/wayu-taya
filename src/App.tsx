@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import './App.css'
-import { Home } from './components/Home'
 import { Documents } from './pages/documents/Documents'
 import { Music } from './pages/music/Music'
 import { Food } from './pages/food/Food'
@@ -13,6 +12,7 @@ import { Doc } from './pages/documents/doc/Doc'
 import { Layout } from './pages/layout/Layout'
 import { Communities } from './pages/documents/communities/Communities'
 import { Activities } from './pages/documents/activities/Activities'
+import { Home } from './pages/home/Home'
 
 function App() {
 
