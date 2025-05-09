@@ -33,7 +33,7 @@ export const Sidebar = () => {
                             onClick={() => navigate(me.url)}
                             className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg border-[#4498b8] border shadow-lg w-full p-2 ${me.active && 'bg-[#4498b8] text-white font-medium'} hover:bg-[#4498b8] hover:text-white transition-all`}
                         >
-                            <me.icon className=' text-2xl' /> {me.label}
+                            <me.icon className='text-2xl' /> {me.label}
                         </div>
                     ))}
                 </div>
@@ -42,7 +42,7 @@ export const Sidebar = () => {
                     onClick={() => navigate('/login')}
                     className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg border-[#4498b8] border shadow-lg w-full p-2 hover:bg-[#4498b8] hover:text-white transition-all`}
                 >
-                    <TbLogout2  className=' text-2xl' /> Cerrar Sesión
+                    <TbLogout2 className='text-2xl' /> Cerrar Sesión
                 </div>
             </div>
         </div>

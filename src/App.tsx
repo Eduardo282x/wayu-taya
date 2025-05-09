@@ -37,6 +37,7 @@ function App() {
             <Route path='/salud' element={<Health />}></Route>
             <Route path='/agua' element={<Water />}></Route>
           </Route>
+          
         </Routes>
       </BrowserRouter>
 
