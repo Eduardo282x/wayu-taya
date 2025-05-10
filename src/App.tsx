@@ -13,6 +13,7 @@ import { Layout } from './pages/layout/Layout'
 import { Communities } from './pages/documents/communities/Communities'
 import { Activities } from './pages/documents/activities/Activities'
 import { Home } from './pages/home/Home'
+import { EventForm } from './pages/documents/events/EventForm'
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
             <Route path='/documentos/comunidades' element={<Communities />}></Route>
             <Route path='/documentos/actividades' element={<Activities />}></Route>
             <Route path='/documentos/eventos' element={<Events />}></Route>
+            <Route path='/documentos/eventos/formulario' element={<EventForm />}></Route>
             <Route path='/documentos/documentos' element={<Doc />}></Route>
 
             <Route path='/musica' element={<Music />}></Route>
