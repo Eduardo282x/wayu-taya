@@ -19,10 +19,10 @@ export const Sidebar = () => {
     }, [location.pathname])
 
     return (
-        <div className='w-full h-full bg-[#afdced] p-4'>
-            <div className='flex items-center justify-center border-b-4 border-solid border-white cursor-pointer w-full mb-6'>
-                <img src={logo} alt="" className='w-20' />
-                <h2 className='text-3xl text-[#34a8d5]'>WAYUU TAYA</h2>
+        <div className='w-full h-full bg-transparent py-4'>
+            <div className='flex items-center justify-center cursor-pointer w-full mb-6'>
+                <img src={logo} alt="" className='w-16' />
+                <h2 className='text-lg text-white font-medium'>WAYUU TAYA</h2>
             </div>
 
             <div className='flex flex-col items-start justify-between h-[83%] w-full'>
@@ -31,16 +31,16 @@ export const Sidebar = () => {
                         <div
                             key={index}
                             onClick={() => navigate(me.url)}
-                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg border-[#4498b8] border shadow-lg w-full p-2 ${me.active && 'bg-[#4498b8] text-white font-medium'} hover:bg-[#4498b8] hover:text-white transition-all`}
+                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 ${me.active && '  font-medium '} transition-all`}
                         >
-                            <me.icon className='text-2xl' /> {me.label}
+                            <me.icon className='text-3xl' /> {me.label}
                         </div>
                     ))}
                 </div>
 
                 <div
                     onClick={() => navigate('/login')}
-                    className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg border-[#4498b8] border shadow-lg w-full p-2 hover:bg-[#4498b8] hover:text-white transition-all`}
+                    className={`flex items-center justify-start gap-3 cursor-pointer text-white w-full p-2  transition-all`}
                 >
                     <TbLogout2 className='text-2xl' /> Cerrar Sesión
                 </div>

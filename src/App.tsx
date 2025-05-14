@@ -14,18 +14,20 @@ import { Communities } from './pages/documents/communities/Communities'
 import { Activities } from './pages/documents/activities/Activities'
 import { Home } from './pages/home/Home'
 import { EventForm } from './pages/documents/events/EventForm'
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 
   return (
     <>
+      <Toaster />
       <BrowserRouter>
         <Routes>
           <Route path='/login' element={<Login />}></Route>
 
           <Route path='/' element={<Home />}></Route>
 
-          <Route element={<Layout/>}>
+          <Route element={<Layout />}>
             <Route path='/documentos' element={<Documents />}></Route>
             <Route path='/documentos/personas' element={<People />}></Route>
             <Route path='/documentos/comunidades' element={<Communities />}></Route>
@@ -39,7 +41,7 @@ function App() {
             <Route path='/salud' element={<Health />}></Route>
             <Route path='/agua' element={<Water />}></Route>
           </Route>
-          
+
         </Routes>
       </BrowserRouter>
 
