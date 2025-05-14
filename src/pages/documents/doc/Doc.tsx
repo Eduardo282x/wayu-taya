@@ -1,7 +1,10 @@
-import React from 'react'
+import { HeaderPages } from '@/pages/layout/Header'
+import { IoDocumentTextOutline } from 'react-icons/io5'
 
 export const Doc = () => {
     return (
-        <div>Documentos</div>
+        <div>
+            <HeaderPages title='Documentos' Icon={IoDocumentTextOutline}/>
+        </div>
     )
 }

@@ -1,5 +1,10 @@
+import { HeaderPages } from "@/pages/layout/Header"
+import { MdAccessTime } from "react-icons/md"
+
 export const Activities = () => {
     return (
-        <div>Actividades</div>
+        <div>
+            <HeaderPages title='Actividades' Icon={MdAccessTime} />
+        </div>
     )
 }
