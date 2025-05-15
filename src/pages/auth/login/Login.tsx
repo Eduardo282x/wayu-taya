@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import logo from "../../../assets/img/logo .png"
 import { LoginForm } from "./LoginForm"
