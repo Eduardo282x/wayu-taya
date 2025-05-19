@@ -6,6 +6,8 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
 import { useNavigate } from "react-router"
 import { Snackbar } from "@/components/snackbar/Snackbar"
 import toast from "react-hot-toast"
+import { authLogin } from "@/services/auth/auth"
+import { SnackbarProps } from "@/components/snackbar/Snackbar"
 
 // Definir la interfaz para las props
 interface LoginFormProps {
@@ -28,15 +30,21 @@ export const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
     resolver: zodResolver(userSchema),
   })
 
-  const onSubmit = (data: Login) => {
+  const onSubmit = async (data: Login) => {
     console.log(data);
-    toast.custom(<Snackbar success={true} message={'Bienvenido.'} />, {
-      duration: 1500,
-      position: 'bottom-center'
-    });
-    setTimeout(() => {
-      navigate('/')
-    }, 1500);
+
+    await authLogin(data).then((res: SnackbarProps) => {
+      toast.custom(<Snackbar success={res.success} message={res.message} />, {
+        duration: 1500,
+        position: 'bottom-center'
+      });
+
+      if (res.success) {
+        setTimeout(() => {
+          navigate('/')
+        }, 1500);
+      }
+    })
   }
 
   return (
