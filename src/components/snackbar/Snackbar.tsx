@@ -1,7 +1,7 @@
 import { Check, X } from "lucide-react";
 import { FC } from "react"
 
-interface SnackbarProps {
+export interface SnackbarProps {
     success: boolean;
     message: string;
 }
