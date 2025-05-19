@@ -12,7 +12,7 @@ import { Doc } from './pages/documents/doc/Doc'
 import { Layout } from './pages/layout/Layout'
 import { Communities } from './pages/documents/communities/Communities'
 import { Activities } from './pages/documents/activities/Activities'
-import { Home } from './pages/home/Home'
+import  Home  from './pages/home/Home'
 
 function App() {
 
