@@ -11,7 +11,7 @@ export const Events = () => {
     <div>
       <HeaderPages title='Eventos' Icon={FaRegCalendarAlt} />
 
-      <Button onClick={() => navigate('formulario')}>Agregar evento</Button>
+      <Button onClick={() => navigate('formulario')} className='mb-2'>Agregar evento</Button>
       <TableComponents column={columnEvents} data={dataEvents} />
     </div>
   )

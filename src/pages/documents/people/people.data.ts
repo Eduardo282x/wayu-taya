@@ -1,60 +1,102 @@
-import { Column } from "@/interfaces/table.interface";
+import { Column } from "@/interfaces/table.interface"; // Importa la interfaz Column, probablemente define la estructura de las columnas de la tabla.
+import "./styledat.css"; // Importa un archivo CSS para aplicar estilos a la tabla.
 
+// Define la interfaz People que representa la estructura de los datos de cada persona en la tabla.
 interface People {
-    name: string;
-    lastname: string;
-    address: string;
-    phone: string
+  name: string; // Propiedad para el nombre de la persona.
+  lastname: string; // Propiedad para el apellido de la persona.
+  address: string; // Propiedad para la dirección de la persona.
+  phone: string; // Propiedad para el número de teléfono de la persona.
+  dni: string; // Propiedad para el documento de identidad (cédula) de la persona.
 }
 
+// Define un array de objetos Column que configuran las columnas de la tabla.
 export const columnPeople: Column[] = [
-    {
-        label: 'Nombre',
-        element: (data: People) => data.name
-    },
-    {
-        label: 'Apellido',
-        element: (data: People) => data.lastname
-    },
-    {
-        label: 'Direction',
-        element: (data: People) => data.address
-    },
-    {
-        label: 'Teléfono',
-        element: (data: People) => data.phone
-    }
-]
+  {
+    label: 'Nombre', // Etiqueta que se mostrará en la cabecera de la columna.
+    element: (data: People) => data.name // Función que recibe un objeto People y devuelve el valor que se mostrará en esta columna (en este caso, el nombre).
+  },
+  {
+    label: 'Apellido', // Etiqueta para la columna de apellido.
+    element: (data: People) => data.lastname // Función para obtener el apellido de cada persona.
+  },
+  {
+    label: 'Cédula', // Etiqueta para la columna de cédula.
+    element: (data: People) => data.dni // Función para obtener la cédula de cada persona.
+  },
+  {
+    label: 'Dirección', // Etiqueta para la columna de dirección.
+    element: (data: People) => data.address // Función para obtener la dirección de cada persona.
+  },
+  {
+    label: 'Teléfono', // Etiqueta para la columna de teléfono.
+    element: (data: People) => data.phone // Función para obtener el teléfono de cada persona.
+  }
+];
 
+// Define un array de objetos People que contiene los datos que se mostrarán en la tabla.
 export const dataPeople: People[] = [
-    {
-        name: 'Juan',
-        lastname: 'Perez',
-        address: 'Casa',
-        phone: '1234567'
-    },
-    {
-        name: 'Angel',
-        lastname: 'Perez',
-        address: 'Casa',
-        phone: '1234567'
-    },
-    {
-        name: 'Maria',
-        lastname: 'Perez',
-        address: 'Casa',
-        phone: '1234567'
-    },
-    {
-        name: 'Isaac',
-        lastname: 'Perez',
-        address: 'Casa',
-        phone: '1234567'
-    },
-    {
-        name: 'Luis',
-        lastname: 'Perez',
-        address: 'Casa',
-        phone: '1234567'
-    },
-]
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+  {
+    name: 'Juan',
+    lastname: 'Perez',
+    dni: '12345678',
+    address: 'Casa',
+    phone: '1234567'
+  },
+];
