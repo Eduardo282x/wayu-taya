@@ -81,15 +81,15 @@ export const Login = () => {
           {/* Solo mostrar en móvil o en desktop cuando showLoginForm es true */}
           {(isMobile && showLoginForm) || !isMobile ? (
             <div className={`${!isMobile && !showLoginForm ? "invisible" : "visible"}`}>
-              <div className="flex items-center w-full cursor-default -mb-3">
-                <img
+              <div className="flex items-center w-full cursor-default mb-14">
+                {/* <img
                   src={logo || "/placeholder.svg"}
                   alt="logo"
                   className="w-12 m-2 lg:w-20 lg:h-20 drop-shadow-gray-500 drop-shadow-lg"
                 />
                 <div className="lg:ml-2 text-[1rem] mr-2 julius-sans-one-regular lg:text-[2.5rem] text-[#34A8D5] text-shadow2">
                   WAYUU TAYA
-                </div>
+                </div> */}
               </div>
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
@@ -138,9 +138,9 @@ export const Login = () => {
             <img
               src={logo || "/placeholder.svg"}
               alt=""
-              className="w-20 h-20 mt-[3rem] drop-shadow-black drop-shadow-lg"
+              className="w-80 h-80 absolute top-12 left-0 right-0 bottom-0 m-auto opacity-20"
             />
-            <div className="flex flex-col text-center cursor-default">
+            <div className="flex flex-col text-center cursor-default w-full ">
               <span className="oswald font-normal text-4xl">FUNDACIÓN</span>
               <span className="julius-sans-one-regular text-[2.5rem] border-y-2 border-black">WAYUU TAYA</span>
             </div>
@@ -151,15 +151,15 @@ export const Login = () => {
         {!isMobile && (
           <div className="w-1/2 ml-auto bg-gray-100 p-4">
             <div className={`${!isMobile && showLoginForm ? "invisible" : "visible"}`}>
-              <div className="flex items-center w-full cursor-default -mb-3">
-                <img
+              <div className="flex items-center w-full cursor-default mt-14">
+                {/* <img
                   src={logo || "/placeholder.svg"}
                   alt="logo"
                   className="w-12 m-2 lg:w-20 lg:h-20 drop-shadow-gray-500 drop-shadow-lg"
                 />
                 <div className="lg:ml-2 text-[1rem] mr-2 julius-sans-one-regular lg:text-[2.5rem] text-[#34A8D5] text-shadow2">
                   WAYUU TAYA
-                </div>
+                </div> */}
               </div>
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
