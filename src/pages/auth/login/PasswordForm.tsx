@@ -33,7 +33,7 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
   return (
     <form className="lg:space-y-6 lg:px-6 h-full w-full flex flex-col lg:items-center" onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col relative justify-center lg:w-[70%]">
-        <label className="text-[0.8rem] ml-1 text-[#34A8D5] lg:text-[1rem] manrope">Correo Electrónico</label>
+        <label className="text-[0.8rem] ml-1 text-[#34A8D5] lg:text-[1rem] manrope selection:bg-transparent">Correo Electrónico</label>
         <input
           type="email"
           placeholder="Correo Electrónico"
@@ -52,12 +52,12 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
 
 
       <div className='lg:self-center lg:w-[70%]'>
-      <label className='text-[0.8rem] ml-1 text-[#34A8D5] lg:text-[1rem] manrope'>Contraseña</label>
-            <div className='flex  border border-gray-300 rounded-xl shadow-2xl'>
+      <label className='text-[0.8rem] ml-1 text-[#34A8D5] lg:text-[1rem] manrope selection:bg-transparent'>Contraseña</label>
+            <div className='flex  border border-gray-300 rounded-xl shadow-2xl focus-within:border-[#34A8D5]'>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder="Contraseña"
-                                    className="lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 text-[0.7rem] placeholder:text-[0.7rem] w-full p-[0.5rem] pb-1 pl-2 scope-one lg:px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#34A8D5] placeholder:opacity-80 lg:pr-10 lg:mb-0"
+                                    className="lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 text-[0.7rem] placeholder:text-[0.7rem] w-full p-[0.5rem] pb-1 pl-2 scope-one lg:px-4 rounded-xl focus:outline-none placeholder:opacity-80 lg:pr-0 lg:mb-0"
                                     {...register('password')}
                                 />
             
@@ -78,12 +78,12 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       </div>
       
               <div className='lg:self-center lg:w-[70%]'>
-              <label className='text-[0.8rem] ml-1 text-[#34A8D5] lg:text-[1rem] manrope'>Confirmar Contraseña</label>
-              <div className='flex w-full border border-gray-300 rounded-xl shadow-2xl'>
+              <label className='text-[0.8rem] ml-1 text-[#34A8D5] lg:text-[1rem] manrope selection:bg-transparent'>Confirmar Contraseña</label>
+              <div className='flex w-full border border-gray-300 rounded-xl shadow-2xl focus-within:border-[#34A8D5]'>
                                 <input
                                     type={showPasswordConfirm ? 'text' : 'password'}
                                     placeholder="Contraseña"
-                                    className="lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 text-[0.7rem] placeholder:text-[0.7rem] w-full p-[0.5rem] pb-1 pl-2 scope-one lg:px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#34A8D5] placeholder:opacity-80 lg:pr-10 lg:mb-0"
+                                    className="lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 text-[0.7rem] placeholder:text-[0.7rem] w-full p-[0.5rem] pb-1 pl-2 scope-one lg:px-4 rounded-xl focus:outline-none  placeholder:opacity-80 lg:pr-0 lg:mb-0"
                                     {...register('confirmPassword')}
                                 />
             
@@ -117,7 +117,7 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       
 
       <div
-          className="text-[#34A8D5] scope-one lg:text-[0.75rem] cursor-pointer hover:underline text-[0.54rem] self-center ml-1 lg:text-nowrap"
+          className="text-[#34A8D5] scope-one lg:text-[0.75rem] cursor-pointer hover:underline text-[0.54rem] self-center ml-1 lg:text-nowrap selection:bg-transparent"
           onClick={onBackToLogin}>
           Volver al inicio de sesión
         </div>
