@@ -14,6 +14,7 @@ import { Communities } from './pages/documents/communities/Communities'
 import { Activities } from './pages/documents/activities/Activities'
 import { Home } from './pages/home/Home'
 import { EventForm } from './pages/documents/events/EventForm'
+import { Users } from './pages/users/users'
 
 function App() {
 
@@ -25,7 +26,7 @@ function App() {
 
           <Route path='/' element={<Home />}></Route>
 
-          <Route element={<Layout/>}>
+          <Route element={<Layout />}>
             <Route path='/documentos' element={<Documents />}></Route>
             <Route path='/documentos/personas' element={<People />}></Route>
             <Route path='/documentos/comunidades' element={<Communities />}></Route>
@@ -38,8 +39,9 @@ function App() {
             <Route path='/alimentos' element={<Food />}></Route>
             <Route path='/salud' element={<Health />}></Route>
             <Route path='/agua' element={<Water />}></Route>
+            <Route path='/usuario' element={<Users />}></Route>
           </Route>
-          
+
         </Routes>
       </BrowserRouter>
 
