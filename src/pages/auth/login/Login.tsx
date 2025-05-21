@@ -74,7 +74,7 @@ export const Login = () => {
   }, [showLoginForm, isMobile])
 
   return (
-    <div className="bg-gradient-to-tr from-[#3449D5] to-[#34A8D5] h-screen flex items-center justify-center font-sans">
+    <div className="bg-gradient-to-tr from-blue-800 to-blue-400 h-screen flex items-center justify-center font-sans">
       <div className="bg-white rounded-2xl shadow-2xl lg:w-full lg:max-w-4xl w-65 h-[23rem] lg:h-[32rem] flex overflow-hidden relative ">
         {/* Contenedor para el formulario de login (siempre presente en desktop) */}
         <div className="lg:w-1/2 w-full bg-gray-100 p-4">
