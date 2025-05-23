@@ -1,10 +1,13 @@
-"use client"
-
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { type Login, userSchema } from "./login.data"
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
+import { useNavigate } from "react-router"
+import { Snackbar } from "@/components/snackbar/Snackbar"
+import toast from "react-hot-toast"
+import { authLogin } from "@/services/auth/auth"
+import { SnackbarProps } from "@/components/snackbar/Snackbar"
 
 // Definir la interfaz para las props
 interface LoginFormProps {
@@ -13,7 +16,8 @@ interface LoginFormProps {
 
 
 export const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -26,8 +30,21 @@ export const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
     resolver: zodResolver(userSchema),
   })
 
-  const onSubmit = (data: Login) => {
-    console.log(data)
+  const onSubmit = async (data: Login) => {
+    console.log(data);
+
+    await authLogin(data).then((res: SnackbarProps) => {
+      toast.custom(<Snackbar success={res.success} message={res.message} />, {
+        duration: 1500,
+        position: 'bottom-center'
+      });
+
+      if (res.success) {
+        setTimeout(() => {
+          navigate('/')
+        }, 1500);
+      }
+    })
   }
 
   return (

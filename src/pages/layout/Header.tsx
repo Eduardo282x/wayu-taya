@@ -9,6 +9,7 @@ import {
 import { FaRegUser } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
+import { FC } from 'react';
 
 export const Header = () => {
     return (
@@ -36,6 +37,19 @@ export const Header = () => {
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
+        </div>
+    )
+}
+
+interface HeaderPageProps {
+    title: string;
+    Icon: React.ComponentType<{ className?: string }>;
+}
+
+export const HeaderPages: FC<HeaderPageProps> = ({ title, Icon }) => {
+    return (
+        <div className='mb-2 bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-full w-full flex items-center justify-start px-4 py-2 text-2xl gap-2 text-white'>
+            <Icon className='text-2xl'/> {title}
         </div>
     )
 }

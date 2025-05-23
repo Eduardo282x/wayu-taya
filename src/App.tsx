@@ -12,14 +12,16 @@ import { Doc } from './pages/documents/doc/Doc'
 import { Layout } from './pages/layout/Layout'
 import { Communities } from './pages/documents/communities/Communities'
 import { Activities } from './pages/documents/activities/Activities'
-import { Home } from './pages/home/Home'
+import Home from './pages/home/Home'
 import { EventForm } from './pages/documents/events/EventForm'
-import { Users } from './pages/users/users'
+import { Toaster } from 'react-hot-toast';
+import { Users } from './pages/users/Users'
 
 function App() {
 
   return (
     <>
+      <Toaster />
       <BrowserRouter>
         <Routes>
           <Route path='/login' element={<Login />}></Route>
@@ -39,7 +41,7 @@ function App() {
             <Route path='/alimentos' element={<Food />}></Route>
             <Route path='/salud' element={<Health />}></Route>
             <Route path='/agua' element={<Water />}></Route>
-            <Route path='/usuario' element={<Users />}></Route>
+            <Route path='/usuarios' element={<Users />}></Route>
           </Route>
 
         </Routes>

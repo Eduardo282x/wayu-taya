@@ -27,7 +27,7 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
         resolver: zodResolver(passwordSchema),
       })
     
-      const onSubmit = (data: passwordform) => {
+      const onSubmit = async (data: passwordform) => {
         console.log(data)
       }
   return (
