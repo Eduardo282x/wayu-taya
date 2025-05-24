@@ -1,189 +1,140 @@
-"use client"
+import React from 'react'
+import { PiUsersThree } from "react-icons/pi";
+import { Button } from '@/components/ui/button';
+import { TiUserAddOutline } from "react-icons/ti";
+import { TableComponents } from '@/components/table/TableComponents';
+import UserTable from "./UserTable";
+import { User } from "./types";
+import{ useState, useMemo } from "react";
+import EditUserForm from "./EditUserForm";
+import CreateUserForm from './CreateUserForm';
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
+import AlertDialog from "./AlertDialog";
 
-import { useState, useEffect } from "react"
-import { IoIosAdd } from "react-icons/io"
-import type { Account } from "./columns"
-import { createColumns } from "./columns"
-import { DataTable } from "./data-table"
-import { UserFormModal, DeleteConfirmationModal } from "./UserFormModal"
+
+const initialUsers: User[] = [
+  { id: 1, nombre: "Juan Pérez", usuario: "juanp", correo: "juanp@mail.com" },
+  { id: 2, nombre: "María López", usuario: "marial", correo: "marial@mail.com" },
+];
 
 export const Users = () => {
-  // Estado para los usuarios
-  const [users, setUsers] = useState<Account[]>([])
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
-  // Estados para los modales
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [currentUser, setCurrentUser] = useState<Account | null>(null)
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm) return users;
+    const lowerSearch = searchTerm.toLowerCase();
+    return users.filter(
+      (user) =>
+        user.nombre.toLowerCase().includes(lowerSearch) ||
+        user.usuario.toLowerCase().includes(lowerSearch) ||
+        user.correo.toLowerCase().includes(lowerSearch)
+    );
+  }, [searchTerm, users]);
 
-  // Estado para la búsqueda
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filteredUsers, setFilteredUsers] = useState<Account[]>([])
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  // Cargar datos iniciales
-  useEffect(() => {
-    // Simular la obtención de datos
-    const initialUsers: Account[] = [
-      {
-        name: "José Pérez",
-        user: "parmesano",
-        email: "parmesano@gmail.com",
-      },
-      {
-        name: "María López",
-        user: "maria123",
-        email: "maria@gmail.com",
-      },
-      {
-        name: "Carlos Rodríguez",
-        user: "carlos_dev",
-        email: "carlos@gmail.com",
-      },
-      
-    ]
-    setUsers(initialUsers)
-  }, [])
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setIsEditDialogOpen(true);
+  };
 
-  // Filtrar usuarios cuando cambia la búsqueda o los usuarios
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredUsers(users)
-    } else {
-      const filtered = users.filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-      setFilteredUsers(filtered)
-    }
-  }, [searchTerm, users])
+  const handleSave = (updatedUser: User) => {
+    setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+    setIsEditDialogOpen(false);
+    setEditingUser(null);
+  };
 
-  // Función para validar usuarios duplicados
-  const validateUser = (userData: Account, isEditing = false): string | null => {
-    // Si estamos editando, excluir el usuario actual de la validación
-    const usersToCheck = isEditing ? users.filter((user) => user.email !== currentUser?.email) : users
+  const handleCreate = (newUserData: Omit<User, "id">) => {
+    const usuarioExistente = users.some(
+      (u) =>
+        u.usuario.toLowerCase() === newUserData.usuario.toLowerCase() ||
+        u.correo.toLowerCase() === newUserData.correo.toLowerCase()
+    );
 
-    // Verificar email duplicado
-    const emailExists = usersToCheck.some((user) => user.email.toLowerCase() === userData.email.toLowerCase())
-    if (emailExists) {
-      return "Ya existe un usuario con este correo electrónico"
+    if (usuarioExistente) {
+      setAlertMessage("El usuario o correo ya está registrado.");
+      setAlertOpen(true);
+      return;
     }
 
-    // Verificar username duplicado
-    const userExists = usersToCheck.some((user) => user.user.toLowerCase() === userData.user.toLowerCase())
-    if (userExists) {
-      return "Ya existe un usuario con este nombre de usuario"
-    }
+    const newUser: User = {
+      id: users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1,
+      ...newUserData,
+    };
+    setUsers([...users, newUser]);
+    setIsCreateDialogOpen(false);
+  };
 
-    return null // No hay errores
-  }
 
-  // Manejadores para abrir modales
-  const handleAddUser = () => {
-    setCurrentUser(null)
-    setIsAddModalOpen(true)
-  }
 
-  const handleEditUser = (user: Account) => {
-    setCurrentUser(user)
-    setIsEditModalOpen(true)
-  }
-
-  const handleDeleteUser = (user: Account) => {
-    setCurrentUser(user)
-    setIsDeleteModalOpen(true)
-  }
-
-  // Manejadores para acciones CRUD
-  const handleSaveNewUser = (user: Account) => {
-    const validationError = validateUser(user, false)
-    if (validationError) {
-      alert(validationError) // En una app real, usarías un toast o modal de error
-      return false
-    }
-    setUsers((prev) => [...prev, user])
-    setIsAddModalOpen(false)
-    return true
-  }
-
-  const handleUpdateUser = (updatedUser: Account) => {
-    const validationError = validateUser(updatedUser, true)
-    if (validationError) {
-      alert(validationError) // En una app real, usarías un toast o modal de error
-      return false
-    }
-    setUsers((prev) => prev.map((user) => (user.email === currentUser?.email ? updatedUser : user)))
-    setIsEditModalOpen(false)
-    return true
-  }
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
 
   const handleConfirmDelete = () => {
-    if (currentUser) {
-      setUsers((prev) => prev.filter((user) => user.email !== currentUser.email))
-      setIsDeleteModalOpen(false)
+    if (userToDelete) {
+      setUsers(users.filter((u) => u.id !== userToDelete.id));
+      setUserToDelete(null);
     }
-  }
+  };
 
-  // Crear columnas con los manejadores
-  const columns = createColumns(handleEditUser, handleDeleteUser)
 
   return (
-    <div className="manrope h-[90vh] w-[79.8vw] relative">
-      <div className="absolute top-0 left-0 right-0 h-[15%] flex items-center justify-between m-1 rounded-xl bg-gradient-to-br from-[#3449D5] to-[#34A8D5] z-10">
-        <h1 className="text-2xl text-white mx-4">Usuarios</h1>
-        <div className="text-[1rem]">
-          <input
-            type="search"
-            placeholder="Buscar..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-gray-100 lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 placeholder:text-[0.7rem] text-[0.7rem] w-full p-[0.5rem] pb-1 lg:px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-800 placeholder:opacity-80 shadow-2xl lg:mb-0"
-          />
-        </div>
-
-        <button
-          onClick={handleAddUser}
-          className="bg-blue-700 rounded-2xl p-2 text-[#ffffff] h-[50%] w-[14%] cursor-pointer flex text-center transition 100ms ease-in hover:bg-blue-800 shadow-xl mx-2"
-        >
-          <IoIosAdd className="text-2xl" />
-          Añadir Usuario
-        </button>
+    <div className='h-[90vh] w-[79.5vw]'>
+      <div className='w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between'>
+          <div className='flex p-2 items-center '>
+            <h2 className='manrope text-3xl mx-2 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent '>Usuarios</h2>
+            <PiUsersThree className='text-3xl text-[#34A8D5]'/>
+          </div>
+          <input type='search' value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)} placeholder='Buscar...' className='focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s w-[30%]'/>
+          <Button className='text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] h-[90%]' onClick={() => setIsCreateDialogOpen(true)}><TiUserAddOutline className='size-6 '/>Crear Usuario</Button>
       </div>
-
-      <div className="absolute top-[15%] left-1 right-1 bottom-1 ">
-        <div className="h-full px-4 pt-4 overflow-auto">
-          <DataTable columns={columns} data={filteredUsers} />
-        </div>
-      </div>
-
-      {/* Modal para añadir usuario */}
-      <UserFormModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={handleSaveNewUser}
-        title="Añadir Usuario"
+      <div>
+      <UserTable
+        users={filteredUsers}
+        onEdit={handleEdit}
+        onDelete={(userId) => {
+          const user = users.find((u) => u.id === userId);
+          if (user) handleDeleteClick(user);
+        }}
       />
 
-      {/* Modal para editar usuario */}
-      <UserFormModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSave={handleUpdateUser}
-        initialData={currentUser}
-        title="Editar Usuario"
+      <EditUserForm
+        user={editingUser}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSave={handleSave}
+      />
+      <CreateUserForm
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onCreate={handleCreate}
       />
 
-      {/* Modal para confirmar eliminación */}
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        <ConfirmDeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
-        userName={currentUser?.name || ""}
-      />
+        userName={userToDelete?.nombre}
+        />
+
+        <AlertDialog
+        open={alertOpen}
+        onOpenChange={setAlertOpen}
+        title="Error"
+        description={alertMessage}
+        />
+    </div>
     </div>
   )
 }
 
-export default Users
