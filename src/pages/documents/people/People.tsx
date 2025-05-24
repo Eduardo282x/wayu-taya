@@ -1,44 +1,35 @@
 import { TableComponents } from "@/components/table/TableComponents";
-import { columnPeople, dataPeople } from "./people.data";
-import "./style.css";
-import { useState } from 'react';
+import { columnPeople, dataPeople } from "./people.data"; // importamos la tabla y los datos de la tabla
+import { useState } from "react";
+import { HeaderPages } from "@/pages/layout/Header"; // importamos el header de la pagina que esta en src pages layout
+import { BsFillPersonLinesFill } from "react-icons/bs"; // importamos el icono de persona
+import { Button } from "@/components/ui/button"; // importamoes el boton que esta en src ui button
+import { IoPersonAddOutline } from "react-icons/io5"; // importamos el icono de agregar persona
+import "@/styles/people.css"; // importamos el css de la tabla
+import "@/styles/peopledata.css"; // importamos el css de la tabla
+import { Input } from "@/components/ui/input";
 
 export const People = () => {
-  const [inputValue, setInputValue] = useState('');
-
-  const handleInputChange = (event: any) => {
-    setInputValue(event.target.value);
-  };
-
-  const handleButtonClick = () => {
-    // Aquí puedes agregar la lógica que se ejecutará al hacer clic en el botón de búsqueda
-    alert(`Buscando cédula: ${inputValue}`);
-  };
-
-  const handleAddPerson = () => {
-    // ... tu lógica para agregar persona ...
-  };
-
+  const [inputValue, setInputValue] = useState("");
   return (
     <div>
-      <div className="people-controls-container">
-        <button className="people-add-button" onClick={handleAddPerson}> Agregar persona</button>
-        <div className="search-container">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            placeholder="Ingrese cedula"
-            className="search-input"
-            style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
-          />
-          <button onClick={handleButtonClick} className="search-button" style={{ marginLeft: '10px' }}>
-            Buscar
-          </button>
-        </div>
+      {/*className='flex justify-end mb-3'     es para que los elementos tengas una separacion*/}
+      <div className="flex justify-end mb-3">
+        <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />
+      </div>{" "}
+      {/*este es el header de la pagina*/}
+      <div className="flex justify-end gap-2 mb-2">
+        <Input className="w-60" placeholder="Buscar..." />
+        <Button className="mb-2">
+          <IoPersonAddOutline />
+          Agregar evento
+        </Button>
       </div>
-
-      <TableComponents column={columnPeople} data={dataPeople} />
+      {/*este es el comando del boton*/}
+      <div>
+        <TableComponents column={columnPeople} data={dataPeople} />
+      </div>
+      {/*este es la tabla importada de people.data*/}
     </div>
   );
 };

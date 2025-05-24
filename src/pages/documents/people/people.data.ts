@@ -1,5 +1,4 @@
 import { Column } from "@/interfaces/table.interface"; // Importa la interfaz Column, probablemente define la estructura de las columnas de la tabla.
-import "./styledat.css"; // Importa un archivo CSS para aplicar estilos a la tabla.
 
 // Define la interfaz People que representa la estructura de los datos de cada persona en la tabla.
 interface People {
@@ -99,4 +98,5 @@ export const dataPeople: People[] = [
     address: 'Casa',
     phone: '1234567'
   },
+  
 ];

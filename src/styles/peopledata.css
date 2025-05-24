@@ -1,0 +1,5 @@
+.table-users thead {
+    background: linear-gradient(to right, var(--color-primary-dark), var(--color-primary-medium)) !important; /* Añadido !important */
+    color: var(--color-text-light) !important; /* Añadido !important */
+    /* ... otras propiedades */
+}
