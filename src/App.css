@@ -46,3 +46,11 @@
     opacity: 1;
   }
 }
+
+.spaceEvents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 31rem;
+  overflow-y: auto;
+}

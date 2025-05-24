@@ -1,73 +1,52 @@
-import { Column } from "@/interfaces/table.interface";
-import { formatDate } from "@/utils/formatters";
-
-interface Events {
-    name: string;
-    time: string;
-    date: Date;
-    location: string;
+export interface NewEvents {
+    mes: string;
+    fecha: string;
+    dia: string;
+    nombre: string;
+    hora: string;
 }
 
-export const columnEvents: Column[] = [
+export const eventos: NewEvents[] = [
     {
-        label: 'Nombre evento',
-        element: (data: Events) => data.name
+        mes: 'Feb',
+        fecha: '03',
+        dia: 'Sab',
+        nombre: 'Gala Benéfica',
+        hora: '8:00am a 11:00am'
     },
     {
-        label: 'Ubicacion',
-        element: (data: Events) => data.location
+        mes: 'Feb',
+        fecha: '14',
+        dia: 'Lun',
+        nombre: 'Donaciones',
+        hora: '8:00am a 11:00am'
     },
     {
-        label: 'Hora',
-        element: (data: Events) => data.time
+        mes: 'Feb',
+        fecha: '21',
+        dia: 'Jue',
+        nombre: 'Comunidad',
+        hora: '8:00am a 11:00am'
     },
     {
-        label: 'Fecha',
-        element: (data: Events) => formatDate(data.date)
-    }
-]
-
-export const dataEvents: Events[] = [
-    {
-        name: 'Eventos 1',
-        location: 'Raul leoin',
-        time: '09:00 AM',
-        date: new Date()
+        mes: 'Feb',
+        fecha: '23',
+        dia: 'Sab',
+        nombre: 'Actividades',
+        hora: '8:00am a 11:00am'
     },
     {
-        name: 'Eventos 1',
-        location: 'Raul leoin',
-        time: '09:00 AM',
-        date: new Date()
+        mes: 'Feb',
+        fecha: '21',
+        dia: 'Sab',
+        nombre: 'Salud',
+        hora: '8:00am a 11:00am'
     },
     {
-        name: 'Eventos 1',
-        location: 'Raul leoin',
-        time: '09:00 AM',
-        date: new Date()
-    },
-    {
-        name: 'Eventos 1',
-        location: 'Raul leoin',
-        time: '09:00 AM',
-        date: new Date()
-    },
-    {
-        name: 'Eventos 1',
-        location: 'Raul leoin',
-        time: '09:00 AM',
-        date: new Date()
-    },
-    {
-        name: 'Eventos 1',
-        location: 'Raul leoin',
-        time: '09:00 AM',
-        date: new Date()
-    },
-    {
-        name: 'Eventos 1',
-        location: 'Raul leoin',
-        time: '09:00 AM',
-        date: new Date()
+        mes: 'Feb',
+        fecha: '27',
+        dia: 'Dom',
+        nombre: 'Donaciones',
+        hora: '8:00am a 11:00am'
     },
 ]
