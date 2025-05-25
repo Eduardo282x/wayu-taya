@@ -1,4 +1,4 @@
-import { TableComponents } from "@/components/table/TableComponents";
+import { TableComponents } from "@/components/table/TableComponents"; // importamos el componente de la tabla
 import { columnPeople, dataPeople } from "./people.data"; // importamos la tabla y los datos de la tabla
 import { useState } from "react";
 import { HeaderPages } from "@/pages/layout/Header"; // importamos el header de la pagina que esta en src pages layout
@@ -6,8 +6,8 @@ import { BsFillPersonLinesFill } from "react-icons/bs"; // importamos el icono d
 import { Button } from "@/components/ui/button"; // importamoes el boton que esta en src ui button
 import { IoPersonAddOutline } from "react-icons/io5"; // importamos el icono de agregar persona
 import "@/styles/people.css"; // importamos el css de la tabla
-import "@/styles/peopledata.css"; // importamos el css de la tabla
-import { Input } from "@/components/ui/input";
+
+import { Input } from "@/components/ui/input"; // importamos el input que esta en src ui input
 
 export const People = () => {
   const [inputValue, setInputValue] = useState("");
@@ -15,21 +15,23 @@ export const People = () => {
     <div>
       {/*className='flex justify-end mb-3'     es para que los elementos tengas una separacion*/}
       <div className="flex justify-end mb-3">
-        <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />
+        <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />{" "}
+        {/* esto agrega el header a la pagina azul*/}
       </div>{" "}
       {/*este es el header de la pagina*/}
       <div className="flex justify-end gap-2 mb-2">
-        <Input className="w-60" placeholder="Buscar..." />
+        <Input className="w-60" placeholder="Buscar..." /> {/*input*/}
         <Button className="mb-2">
           <IoPersonAddOutline />
-          Agregar evento
-        </Button>
-      </div>
-      {/*este es el comando del boton*/}
+          Agregar persona
+        </Button>{" "}
+        {/*boton*/}
+      </div>{" "}
+      {/*este es el div del comando del boton y del imput */}
       <div>
-        <TableComponents column={columnPeople} data={dataPeople} />
+        <TableComponents column={columnPeople} data={dataPeople} />{" "}
+        {/*este es la tabla importada de people.data*/}
       </div>
-      {/*este es la tabla importada de people.data*/}
     </div>
   );
 };
