@@ -22,7 +22,7 @@ export const Sidebar = () => {
         <div className='w-full h-full bg-transparent py-4'>
             <div className='flex items-center justify-center cursor-pointer w-full mb-6'>
                 <img src={logo} alt="" className='w-16' />
-                <h2 className='text-lg text-white font-medium'>WAYUU TAYA</h2>
+                <h2 className='text-lg text-white font-medium julius-sans-one-regular'>WAYUU TAYA</h2>
             </div>
 
             <div className='flex flex-col items-start justify-between h-[83%] w-full'>
@@ -31,7 +31,7 @@ export const Sidebar = () => {
                         <div
                             key={index}
                             onClick={() => navigate(me.url)}
-                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 ${me.active && '  font-medium '} transition-all`}
+                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope ${me.active && '  font-medium '} transition-all`}
                         >
                             <me.icon className='text-3xl' /> {me.label}
                         </div>
@@ -40,9 +40,9 @@ export const Sidebar = () => {
 
                 <div
                     onClick={() => navigate('/login')}
-                    className={`flex items-center justify-start gap-3 cursor-pointer text-white w-full p-2  transition-all`}
+                    className={`flex items-center justify-start gap-3 cursor-pointer text-white w-full p-2  transition-all manrope`}
                 >
-                    <TbLogout2 className='text-2xl' /> Cerrar Sesión
+                    <TbLogout2 className='text-2xl ' /> Cerrar Sesión
                 </div>
             </div>
         </div>
