@@ -2,7 +2,8 @@ import React from "react";
 import "./UserTable.css";
 import { User } from "./types";
 import { FaRegEdit } from "react-icons/fa";
-import { TiDeleteOutline } from "react-icons/ti";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
 
 interface UserTableProps {
   users: User[];
@@ -19,7 +20,8 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
             <th>Nombre</th>
             <th>Usuario</th>
             <th>Correo</th>
-            <th></th>
+            <th>Editar</th>
+            <th>Eliminar</th>
           </tr>
         </thead>
         <tbody>
@@ -28,21 +30,23 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
               <td>{nombre}</td>
               <td>{usuario}</td>
               <td>{correo}</td>
-              <td className="actions-cell flex justify-evenly">
-                <button
-                  className="btn edit-btn flex justify-center items-center gap-2"
+              <td className="actions-cell">
+                <Button size={"icon"}
+                className="py-[0.4rem] pl-[0.2rem] "
+                 variant={'edit'}
                   onClick={() => onEdit({ id, nombre, usuario, correo })}
                   aria-label={`Editar usuario ${usuario}`}
-                ><FaRegEdit className="size-[1.3rem]" />
-                  Editar
-                </button>
-                <button
-                  className="btn delete-btn flex justify-center items-center gap-2"
+                ><FaRegEdit className="size-4.5"/>
+                </Button>
+              </td>
+              <td>
+              <Button className="rounded-xl py-[0.4rem] px-[0.2rem]" size={'icon'}
+                  variant={'delete'}
                   onClick={() => onDelete(id)}
                   aria-label={`Eliminar usuario ${usuario}`}
                 >
-                  Eliminar <TiDeleteOutline className="size-[1.4rem]"/>
-                </button>
+                <FaRegTrashAlt className="size-5 "/>
+                </Button>
               </td>
             </tr>
           ))}

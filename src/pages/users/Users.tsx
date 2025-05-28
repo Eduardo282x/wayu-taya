@@ -91,12 +91,12 @@ export const Users = () => {
     <div className='h-[90vh] w-[79.5vw]'>
       <div className='w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between'>
           <div className='flex p-2 items-center '>
+            <PiUsersThree className='text-3xl text-blue-800'/>
             <h2 className='manrope text-3xl mx-2 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent '>Usuarios</h2>
-            <PiUsersThree className='text-3xl text-[#34A8D5]'/>
           </div>
           <input type='search' value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)} placeholder='Buscar...' className='focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s w-[30%]'/>
-          <Button className='text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] h-[90%]' onClick={() => setIsCreateDialogOpen(true)}><TiUserAddOutline className='size-6 '/>Crear Usuario</Button>
+          <Button variant={'usuarioForm'} className='h-[90%]' onClick={() => setIsCreateDialogOpen(true)}><TiUserAddOutline className='size-6 '/>Crear Usuario</Button>
       </div>
       <div>
       <UserTable
