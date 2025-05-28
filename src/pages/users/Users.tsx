@@ -1,8 +1,6 @@
-import React from 'react'
 import { PiUsersThree } from "react-icons/pi";
 import { Button } from '@/components/ui/button';
 import { TiUserAddOutline } from "react-icons/ti";
-import { TableComponents } from '@/components/table/TableComponents';
 import UserTable from "./UserTable";
 import { User } from "./types";
 import{ useState, useMemo } from "react";
