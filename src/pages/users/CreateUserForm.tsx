@@ -43,7 +43,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
     },
   });
 
- 
+
   useEffect(() => {
     if (open) {
       reset({
@@ -70,64 +70,64 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4 manrope">
-        <div>
-          <StyledInput
-            label="Nombre"
-            id="nombre"
-            autoFocus
-            {...register("nombre", {
-              required: "El nombre es obligatorio",
-              pattern: {
-                value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/, // Solo letras y espacios (incluye acentos y ñ)
-                message: "El nombre no puede contener números ni caracteres especiales",
-              },
-            })}
-          />
-          {errors.nombre && (
-            <p className="text-sm text-red-600 mt-1">{errors.nombre.message}</p>
-          )}
-        </div>
+          <div>
+            <StyledInput
+              label="Nombre"
+              id="nombre"
+              autoFocus
+              {...register("nombre", {
+                required: "El nombre es obligatorio",
+                pattern: {
+                  value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/, // Solo letras y espacios (incluye acentos y ñ)
+                  message: "El nombre no puede contener números ni caracteres especiales",
+                },
+              })}
+            />
+            {errors.nombre && (
+              <p className="text-sm text-red-600 mt-1">{errors.nombre.message}</p>
+            )}
+          </div>
 
 
-      <div>
-        <StyledInput
-          label="Usuario"
-          id="usuario"
-          {...register("usuario", { required: "El usuario es obligatorio" })}
-        />
-        {errors.usuario && (
-          <p className="text-sm text-red-600 mt-1">{errors.usuario.message}</p>
-        )}
-      </div>
+          <div>
+            <StyledInput
+              label="Usuario"
+              id="usuario"
+              {...register("usuario", { required: "El usuario es obligatorio" })}
+            />
+            {errors.usuario && (
+              <p className="text-sm text-red-600 mt-1">{errors.usuario.message}</p>
+            )}
+          </div>
 
-      <div>
-        <StyledInput
-          label="Correo"
-          id="correo"
-          type="email"
-          {...register("correo", {
-            required: "El correo es obligatorio",
-            pattern: {
-              value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-              message: "Correo inválido",
-            },
-          })}
-        />
-        {errors.correo && (
-          <p className="text-sm text-red-600 mt-1">{errors.correo.message}</p>
-        )}
-      </div>
+          <div>
+            <StyledInput
+              label="Correo"
+              id="correo"
+              type="email"
+              {...register("correo", {
+                required: "El correo es obligatorio",
+                pattern: {
+                  value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                  message: "Correo inválido",
+                },
+              })}
+            />
+            {errors.correo && (
+              <p className="text-sm text-red-600 mt-1">{errors.correo.message}</p>
+            )}
+          </div>
 
-      <div className="flex justify-end space-x-2 pt-4">
-        <Button
-          variant="usuarioForm"
-          className="p-3 w-[22%] h-[90%] bg-gradient-to-r from-blue-800 to-[#3da6cf]"
-          type="submit"
-        >
-          <TiUserAddOutline className="self-center size-5" />
-          Crear
-        </Button>
-      </div>
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button
+              variant="usuarioForm"
+              className="p-3 w-[22%] h-[90%] bg-gradient-to-r from-blue-800 to-[#3da6cf]"
+              type="submit"
+            >
+              <TiUserAddOutline className="self-center size-5" />
+              Crear
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

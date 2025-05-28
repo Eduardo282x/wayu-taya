@@ -1,4 +1,3 @@
-import React from "react";
 
 interface StyledInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;

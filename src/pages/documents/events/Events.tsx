@@ -73,7 +73,7 @@ export const Events = () => {
       <HeaderPages title='Eventos' Icon={FaRegCalendarAlt} />
       <div className='flex justify-between p-4'>
         <DatePickerWithRange/>
-        <Button variant={'agregaricon'} onClick={() => navigate('formulario')}><FaRegCircleCheck/> Agendar evento</Button>
+        <Button onClick={() => navigate('formulario')}><FaRegCircleCheck/> Agendar evento</Button>
       </div>
       
 
