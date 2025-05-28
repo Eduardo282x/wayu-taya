@@ -13,7 +13,7 @@ const buttonVariants = cva(
         default:
           "bg-linear-to-r from-[#024dae] to-[#5cdee5] cursor-pointer text-primary-foreground shadow-xs",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "bg-destructive/90 text-white shadow-xs hover:bg-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 cursor-pointer",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
@@ -21,6 +21,13 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        edit:
+        "bg-blue-800 cursor-pointer text-white hover:bg-gradient-to-r from-blue-800 to-[#34A8D5] flex rounded-xl",
+        delete:"flex justify-center items-center gap-2 bg-[#f44336] text-white hover:bg-red-600 cursor-pointer"
+        ,
+
+        usuarioForm:'bg-linear-to-r from-blue-800 to-[#5cdee5] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] '
+
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

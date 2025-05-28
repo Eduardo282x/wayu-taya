@@ -8,6 +8,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 
 interface AlertDialogProps {
@@ -32,7 +33,7 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
         </DialogHeader>
         <DialogFooter className="flex justify-end">
           <DialogClose asChild>
-            <button className='bg-[#1d31b1] p-3 w-[25%] text-white rounded-2xl hover:bg-gradient-to-r from-blue-800 to-[#34A8D5] cursor-pointer flex justify-evenly' type="submit">OK</button>
+            <Button variant={'usuarioForm'} className='p-3 w-[17%] rounded-2xl justify-evenly' type="submit">OK</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
