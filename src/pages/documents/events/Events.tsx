@@ -10,6 +10,7 @@ import { CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
+import { FaRegCircleCheck } from "react-icons/fa6";
 import {
   Popover,
   PopoverContent,
@@ -70,10 +71,13 @@ export const Events = () => {
   return (
     <div>
       <HeaderPages title='Eventos' Icon={FaRegCalendarAlt} />
+      <div className='flex justify-between p-4'>
+        <DatePickerWithRange/>
+        <Button variant={'agregaricon'} onClick={() => navigate('formulario')}><FaRegCircleCheck/> Agendar evento</Button>
+      </div>
+      
 
-      <Button onClick={() => navigate('formulario')} className='mb-2'>Agregar evento</Button>
-
-      <DatePickerWithRange />
+      
 
       {/* <TableComponents column={columnEvents} data={dataEvents} /> */}
 
