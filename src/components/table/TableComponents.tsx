@@ -8,11 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Column } from "@/interfaces/table.interface";
-import { FC, useState } from "react";
+import { FC } from "react";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -25,8 +24,8 @@ interface TableProps {
 }
 
 export const TableComponents: FC<TableProps> = ({ column, data }) => {
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  // const [page, setPage] = useState(1);
+  // const [rowsPerPage, setRowsPerPage] = useState(10);
 
   return (
     <div className="w-full">
