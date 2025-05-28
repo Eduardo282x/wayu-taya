@@ -6,8 +6,6 @@ import { PasswordForm } from "./PasswordForm"
 export const Login = () => {
   // Estado para controlar qué formulario mostrar
   const [showLoginForm, setShowLoginForm] = useState(true)
-  // Estado para controlar la animación
-  const [isAnimating, setIsAnimating] = useState(false)
   // Estado para detectar si estamos en versión móvil
   const [isMobile, setIsMobile] = useState(true)
 
@@ -34,8 +32,6 @@ export const Login = () => {
       // En móvil, simplemente cambiamos el formulario
       setShowLoginForm(false)
     } else {
-      // En desktop, activamos la animación
-      setIsAnimating(true)
       // Después de un breve retraso, cambiamos el formulario
       setTimeout(() => {
         setShowLoginForm(false)
@@ -49,29 +45,23 @@ export const Login = () => {
       // En móvil, simplemente cambiamos el formulario
       setShowLoginForm(true)
     } else {
-      // En desktop, activamos la animación de vuelta
-      setIsAnimating(true)
       // Después de un breve retraso, cambiamos el formulario
       setTimeout(() => {
         setShowLoginForm(true)
       }, 300) // Mitad del tiempo de la transición
 
-      // Desactivamos la animación después de completarse
-      setTimeout(() => {
-        setIsAnimating(false)
-      }, 600) // Tiempo completo de la transición
     }
   }
 
   // Cuando la animación termina y volvemos al login, resetear el estado
-  useEffect(() => {
-    if (showLoginForm && !isMobile) {
-      const timer = setTimeout(() => {
-        setIsAnimating(false)
-      }, 600)
-      return () => clearTimeout(timer)
-    }
-  }, [showLoginForm, isMobile])
+  // useEffect(() => {
+  //   if (showLoginForm && !isMobile) {
+  //     const timer = setTimeout(() => {
+  //       setIsAnimating(false)
+  //     }, 600)
+  //     return () => clearTimeout(timer)
+  //   }
+  // }, [showLoginForm, isMobile])
 
   return (
     <div className="bg-gradient-to-tr from-blue-800 to-blue-400 h-screen flex items-center justify-center font-sans">
@@ -82,14 +72,6 @@ export const Login = () => {
           {(isMobile && showLoginForm) || !isMobile ? (
             <div className={`${!isMobile && !showLoginForm ? "invisible" : "visible"}`}>
               <div className="flex items-center w-full cursor-default mb-14">
-                {/* <img
-                  src={logo || "/placeholder.svg"}
-                  alt="logo"
-                  className="w-12 m-2 lg:w-20 lg:h-20 drop-shadow-gray-500 drop-shadow-lg"
-                />
-                <div className="lg:ml-2 text-[1rem] mr-2 julius-sans-one-regular lg:text-[2.5rem] text-[#34A8D5] text-shadow2">
-                  WAYUU TAYA
-                </div> */}
               </div>
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
@@ -129,10 +111,8 @@ export const Login = () => {
           <div
             className={`
               w-1/2 p-8 bg-[#3449D5] rounded-xl flex flex-wrap items-center justify-start text-black
-              absolute h-full z-10 transition-all duration-600 ease-in-out 
-              ${showLoginForm ? "right-0 translate-x-0" : "left-0 translate-x-[-100]"}
-              ${isAnimating && showLoginForm ? "animate-slide-right" : ""}
-              ${isAnimating && !showLoginForm ? "animate-slide-left" : ""}
+              absolute h-full z-10 transition-all duration-600 ease-in-out  
+              ${showLoginForm ? 'right-0 animate-slide-left' : 'right-0 animate-slide-right'}
             `}
           >
             <img
@@ -146,6 +126,7 @@ export const Login = () => {
             </div>
           </div>
         )}
+        
 
         {/* En desktop: Contenedor para el formulario de recuperación (siempre presente) */}
         {!isMobile && (

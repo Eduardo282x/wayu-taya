@@ -1,6 +1,6 @@
 import { Column } from "@/interfaces/table.interface"; // Importa la interfaz Column, probablemente define la estructura de las columnas de la tabla.
-import "./styledat.css"; // Importa un archivo CSS para aplicar estilos a la tabla.
-
+ // importamos el css de la tabla
+import "@/styles/peopledata.css";
 // Define la interfaz People que representa la estructura de los datos de cada persona en la tabla.
 interface People {
   name: string; // Propiedad para el nombre de la persona.
@@ -8,7 +8,7 @@ interface People {
   address: string; // Propiedad para la dirección de la persona.
   phone: string; // Propiedad para el número de teléfono de la persona.
   dni: string; // Propiedad para el documento de identidad (cédula) de la persona.
-}
+} 
 
 // Define un array de objetos Column que configuran las columnas de la tabla.
 export const columnPeople: Column[] = [
@@ -31,14 +31,18 @@ export const columnPeople: Column[] = [
   {
     label: 'Teléfono', // Etiqueta para la columna de teléfono.
     element: (data: People) => data.phone // Función para obtener el teléfono de cada persona.
-  }
+  },
+  {
+    label: 'Editar', // Etiqueta para la columna de teléfono.
+    element: (data: People) => data.phone // Función para obtener el teléfono de cada persona.
+  },
+
 ];
 
 // Define un array de objetos People que contiene los datos que se mostrarán en la tabla.
 export const dataPeople: People[] = [
   {
-    name: 'Juan',
-    lastname: 'Perez',
+    name: 'Juan', lastname: 'Perez',
     dni: '12345678',
     address: 'Casa',
     phone: '1234567'
@@ -99,4 +103,5 @@ export const dataPeople: People[] = [
     address: 'Casa',
     phone: '1234567'
   },
+  
 ];

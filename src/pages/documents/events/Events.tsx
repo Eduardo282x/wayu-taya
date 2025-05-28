@@ -4,14 +4,80 @@ import { HeaderPages } from '@/pages/layout/Header';
 import { FaRegCalendarAlt } from 'react-icons/fa';
 import { FaArrowCircleDown } from "react-icons/fa";
 import { eventos } from './events.data';
+import * as React from "react"
+import { addDays, format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import { FaRegCircleCheck } from "react-icons/fa6";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
 export const Events = () => {
   const navigate = useNavigate();
+
+  function DatePickerWithRange({ className, }: React.HTMLAttributes<HTMLDivElement>) {
+    const [date, setDate] = React.useState<DateRange | undefined>({
+      from: new Date(2022, 0, 20),
+      to: addDays(new Date(2022, 0, 20), 20),
+    })
+
+    return (
+      <div className={cn("grid gap-2", className)}>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id="date"
+              variant={"outline"}
+              className={cn(
+                "w-[300px] justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon />
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd, y")} -{" "}
+                    {format(date.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd, y")
+                )
+              ) : (
+                <span>Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={setDate}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
 
   return (
     <div>
       <HeaderPages title='Eventos' Icon={FaRegCalendarAlt} />
+      <div className='flex justify-between p-4'>
+        <DatePickerWithRange/>
+        <Button onClick={() => navigate('formulario')}><FaRegCircleCheck/> Agendar evento</Button>
+      </div>
+      
 
-      <Button onClick={() => navigate('formulario')} className='mb-2'>Agregar evento</Button>
+      
 
       {/* <TableComponents column={columnEvents} data={dataEvents} /> */}
 

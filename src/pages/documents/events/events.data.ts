@@ -37,7 +37,7 @@ export const eventos: NewEvents[] = [
     },
     {
         mes: 'Feb',
-        fecha: '21',
+        fecha: '25',
         dia: 'Sab',
         nombre: 'Salud',
         hora: '8:00am a 11:00am'
