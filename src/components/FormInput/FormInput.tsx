@@ -1,11 +1,12 @@
 import React from "react";
 
-interface StyledInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   id: string;
+  error?: string; // <-- Agregamos la prop error opcional
 }
 
-const StyledInput: React.FC<StyledInputProps> = ({ label, id, ...inputProps }) => {
+const FormInput: React.FC<FormInputProps> = ({ label, id, error, ...inputProps }) => {
   return (
     <div>
       <label
@@ -19,8 +20,13 @@ const StyledInput: React.FC<StyledInputProps> = ({ label, id, ...inputProps }) =
         className="w-full rounded focus:outline-1 focus:outline-blue-800 px-3 py-2 bg-white shadow-xl border border-gray-400"
         {...inputProps}
       />
+      {error && (
+        <p className="text-sm text-red-600 mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 };
 
-export default StyledInput;
+export default FormInput;
