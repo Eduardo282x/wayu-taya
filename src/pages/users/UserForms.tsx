@@ -100,7 +100,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button
-              variant="usuarioForm"
+              variant="animated"
               className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
               type="submit"
             >
