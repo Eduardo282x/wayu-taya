@@ -17,6 +17,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
         <thead className="bg-gradient-to-r from-blue-800 to-[#34A8D5] pointer-events-none">
           <tr>
             <th>Nombre</th>
+            <th>Apellido</th>
             <th>Usuario</th>
             <th>Correo</th>
             <th>Editar</th>
@@ -24,16 +25,17 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {users.map(({ id, nombre, usuario, correo }) => (
+          {users.map(({ id, nombre,apellido, usuario, correo }) => (
             <tr key={id}>
               <td>{nombre}</td>
+              <td>{apellido}</td>
               <td>{usuario}</td>
               <td>{correo}</td>
               <td className="actions-cell">
                 <Button size={"icon"}
                 className="py-[0.4rem] pl-[0.2rem] "
                  variant={'edit'}
-                  onClick={() => onEdit({ id, nombre, usuario, correo })}
+                  onClick={() => onEdit({ id, nombre,apellido , usuario, correo })}
                   aria-label={`Editar usuario ${usuario}`}
                 ><FaRegEdit className="size-4.5"/>
                 </Button>
