@@ -10,27 +10,20 @@ import "@/styles/people.css"; // importamos el css de la tabla
 import { Input } from "@/components/ui/input"; // importamos el input que esta en src ui input
 
 export const People = () => {
-  // const [inputValue, setInputValue] = useState("");
   return (
     <div>
-      {/*className='flex justify-end mb-3'     es para que los elementos tengas una separacion*/}
       <div className="flex justify-end mb-3">
-        <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />{" "}
-        {/* esto agrega el header a la pagina azul*/}
-      </div>{" "}
-      {/*este es el header de la pagina*/}
+        <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />
+      </div>
       <div className="flex justify-end gap-2 mb-2">
-        <Input className="w-60" placeholder="Buscar..." /> {/*input*/}
-        <Button className="mb-2">
+        <Input className="w-60" placeholder="Buscar..." />
+        <Button variant='animated' className="mb-2">
           <IoPersonAddOutline />
           Agregar persona
-        </Button>{" "}
-        {/*boton*/}
-      </div>{" "}
-      {/*este es el div del comando del boton y del imput */}
+        </Button>
+      </div>
       <div>
-        <TableComponents column={columnPeople} data={dataPeople} />{" "}
-        {/*este es la tabla importada de people.data*/}
+        <TableComponents column={columnPeople} data={dataPeople} />
       </div>
     </div>
   );

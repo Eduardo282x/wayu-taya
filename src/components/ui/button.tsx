@@ -9,7 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        agregaricon:"bg-blue-500 text-white cursor-pointer ",
+        agregaricon: "bg-blue-500 text-white cursor-pointer ",
+        normal: 'border rounded-lg text-white',
         default:
           "bg-linear-to-r from-[#024dae] to-[#5cdee5] cursor-pointer text-primary-foreground shadow-xs",
         destructive:
@@ -20,14 +21,14 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        link:
+          "text-primary underline-offset-4 hover:underline",
         edit:
-        "bg-blue-800 cursor-pointer text-white hover:bg-gradient-to-r from-blue-800 to-[#34A8D5] flex rounded-xl",
-        delete:"flex justify-center items-center gap-2 bg-[#f44336] text-white hover:bg-red-600 cursor-pointer"
-        ,
-
-        usuarioForm:'bg-linear-to-r from-blue-800 to-[#5cdee5] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] '
-
+          "bg-blue-800 cursor-pointer text-white hover:bg-gradient-to-r from-blue-800 to-[#34A8D5] flex rounded-xl",
+        delete:
+          "flex justify-center items-center gap-2 bg-[#f44336] text-white hover:bg-red-600 cursor-pointer",
+        animated:
+          'bg-linear-to-r from-blue-800 to-[#5cdee5] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] '
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

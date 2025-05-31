@@ -31,7 +31,7 @@ export const Sidebar = () => {
                         <div
                             key={index}
                             onClick={() => navigate(me.url)}
-                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope ${me.active && '  font-medium '} transition-all`}
+                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope ${me.active && ' border shadow-2xl font-medium '} transition-all`}
                         >
                             <me.icon className='text-3xl' /> {me.label}
                         </div>
