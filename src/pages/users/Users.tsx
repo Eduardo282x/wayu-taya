@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { TiUserAddOutline } from "react-icons/ti";
 import UserTable from "./UserTable";
 import { User } from "./types";
-import{ useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import EditUserForm from "./EditUserForm";
 import CreateUserForm from './CreateUserForm';
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
@@ -88,50 +88,50 @@ export const Users = () => {
   return (
     <div className='h-[90vh] w-[79.5vw]'>
       <div className='w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between'>
-          <div className='flex p-2 items-center '>
-            <PiUsersThree className='text-3xl text-blue-800'/>
-            <h2 className='manrope text-3xl mx-2 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent '>Usuarios</h2>
-          </div>
-          <input type='search' value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)} placeholder='Buscar...' className='focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s w-[30%]'/>
-          <Button variant={'usuarioForm'} className='h-[90%]' onClick={() => setIsCreateDialogOpen(true)}><TiUserAddOutline className='size-6 '/>Crear Usuario</Button>
+        <div className='flex p-2 items-center '>
+          <PiUsersThree className='text-3xl text-blue-800' />
+          <h2 className='manrope text-3xl mx-2 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent '>Usuarios</h2>
+        </div>
+        <input type='search' value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)} placeholder='Buscar...' className='focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s w-[30%]' />
+        <Button variant={'usuarioForm'} className='h-[90%]' onClick={() => setIsCreateDialogOpen(true)}><TiUserAddOutline className='size-6 ' />Crear Usuario</Button>
       </div>
       <div>
-      <UserTable
-        users={filteredUsers}
-        onEdit={handleEdit}
-        onDelete={(userId) => {
-          const user = users.find((u) => u.id === userId);
-          if (user) handleDeleteClick(user);
-        }}
-      />
+        <UserTable
+          users={filteredUsers}
+          onEdit={handleEdit}
+          onDelete={(userId) => {
+            const user = users.find((u) => u.id === userId);
+            if (user) handleDeleteClick(user);
+          }}
+        />
 
-      <EditUserForm
-        user={editingUser}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onSave={handleSave}
-      />
-      <CreateUserForm
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        onCreate={handleCreate}
-      />
+        <EditUserForm
+          user={editingUser}
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onSave={handleSave}
+        />
+        <CreateUserForm
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+          onCreate={handleCreate}
+        />
 
         <ConfirmDeleteDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={handleConfirmDelete}
-        userName={userToDelete?.nombre}
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          onConfirm={handleConfirmDelete}
+          userName={userToDelete?.nombre}
         />
 
         <AlertDialog
-        open={alertOpen}
-        onOpenChange={setAlertOpen}
-        title="Error"
-        description={alertMessage}
+          open={alertOpen}
+          onOpenChange={setAlertOpen}
+          title="Error"
+          description={alertMessage}
         />
-    </div>
+      </div>
     </div>
   )
 }

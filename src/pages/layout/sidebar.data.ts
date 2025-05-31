@@ -1,4 +1,4 @@
-import { PiUserList } from "react-icons/pi";
+import { PiUserList, PiUsersThree } from "react-icons/pi";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { MdAccessTime } from "react-icons/md";
 import { FaBuilding } from "react-icons/fa";
@@ -41,5 +41,11 @@ export const menu: IMenu[] = [
         active: false,
         url: '/documentos/documentos',
         icon: IoDocumentTextOutline    
+    },
+    {
+        label: 'Usuarios',
+        active: false,
+        url: '/usuarios',
+        icon: PiUsersThree    
     },
 ]

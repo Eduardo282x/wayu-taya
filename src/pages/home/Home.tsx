@@ -4,16 +4,16 @@ import { CategoryCardProps, optionsMenu } from "./menu.data";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#d9d9d9]">
+    <div className="min-h-screen bg-linear-to-r from-[#024dae] to-[#5cdee5]">
       {/* Header with logo */}
-      <header className="w-full bg-[#5498b0] p-4">
+      <header className="w-full p-4">
         <div className="mx-auto max-w-6xl">
-          <div className="rounded-lg bg-[#6bb8d6] p-8 text-center">
+          <div className="rounded-lg bg-[#0355b2] p-8 text-center">
             <div className="flex items-center justify-center">
               <img src={logo} alt="Fundación Wayuu Taya Logo" width={80} height={80} className="mr-4" />
-              <h1 className="text-2xl font-bold text-[#333333] md:text-4xl">
+              <h1 className="text-2xl font-bold text-[#fff] md:text-4xl">
                 FUNDACIÓN
-                <div className="mt-1 border-b-2 border-t-2 border-[#333333] text-3xl md:text-5xl">WAYUU TAYA</div>
+                <div className="mt-1 border-b-2 border-t-2 border-[#fff] text-3xl md:text-5xl">WAYUU TAYA</div>
               </h1>
             </div>
           </div>
@@ -43,11 +43,12 @@ export default function Home() {
 
 function CategoryCard({ title, description, icon: Icon, buttonText, url }: CategoryCardProps) {
   return (
-    <div className={`rounded-lg bg-[#85c5de] w-80 p-6`}>
-      <div className="mb-4 flex items-start justify-between">
+    <div className={`rounded-lg shadow-xl bg-linear-to-br to-[#024dae] from-[#5cdee5] w-80 h-48 p-6`}>
+      <div className="mb-4 flex items-start justify-between gap-4">
         <Icon className="text-white size-14" />
+
         <div>
-          <h2 className="text-3xl font-light text-white">{title}</h2>
+          <h2 className="text-3xl text-white font-semibold">{title}</h2>
           <p className="text-sm text-white">{description}</p>
         </div>
       </div>
