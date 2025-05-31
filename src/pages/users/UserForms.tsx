@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { FaRegSave } from "react-icons/fa";
 import { TiUserAddOutline } from "react-icons/ti";
-import FormInput from '@/components/formInput/FormInput';
+import { FormInputCustoms } from '@/components/formInput/FormInputCustom';
 
 export interface User {
   id: number;
@@ -43,7 +43,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Nombre"
               id="nombre"
               autoFocus
@@ -59,7 +59,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Apellido"
               id="apellido"
               {...register("apellido", {
@@ -74,7 +74,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Usuario"
               id="usuario"
               {...register("usuario", { required: "El usuario es obligatorio" })}
@@ -83,7 +83,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Correo"
               id="correo"
               type="email"

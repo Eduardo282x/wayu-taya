@@ -5,7 +5,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string; // <-- Agregamos la prop error opcional
 }
 
-const FormInput: React.FC<FormInputProps> = ({ label, id, error, ...inputProps }) => {
+export const FormInputCustoms: React.FC<FormInputProps> = ({ label, id, error, ...inputProps }) => {
   return (
     <div>
       <label
@@ -27,5 +27,3 @@ const FormInput: React.FC<FormInputProps> = ({ label, id, error, ...inputProps }
     </div>
   );
 };
-
-export default FormInput;
