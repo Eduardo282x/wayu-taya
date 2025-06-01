@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Column {
-    label: string;
-    element: (data: any) => string;
+    label: Text;
+    element: (data: any) => Text;
 }
