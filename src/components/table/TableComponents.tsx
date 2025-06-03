@@ -14,8 +14,8 @@ interface TableProps {
 }
 
 export const TableComponents: FC<TableProps> = ({ column, data }) => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<string>('10');
 
   return (
     <div className="w-full">
@@ -29,7 +29,7 @@ export const TableComponents: FC<TableProps> = ({ column, data }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data && data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index: number) => (
+            {data && data.slice(page * Number(rowsPerPage), page * Number(rowsPerPage) + Number(rowsPerPage)).map((item, index: number) => (
               <TableRow key={index}>
                 {column.map((col: Column, index: number) => (
                   <TableCell key={index}>{col.element(item)}</TableCell>
@@ -54,14 +54,12 @@ export const TableComponents: FC<TableProps> = ({ column, data }) => {
 interface PaginationTableProps {
   page: number;
   setPage: (page: number) => void;
-  rowsPerPage: number;
-  setRowsPerPage: (rowsPerPage: number) => void;
+  rowsPerPage: string;
+  setRowsPerPage: (rowsPerPage: string) => void;
   totalElements: number
 }
 
 const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElements }: PaginationTableProps) => {
-  // const [pages, setPages] = useState<PagesInterface[]>(pagesData);
-
   return (
     <div className="flex items-center justify-between w-full mt-2">
       <p><span className="font-semibold">Total de elementos:</span> {totalElements}</p>
@@ -71,14 +69,14 @@ const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElem
           <span className="font-semibold text-gray-700">
             Elementos por página:
           </span>
-          <Select value={rowsPerPage} onValueChange={setRowsPerPage}>
+          <Select value={rowsPerPage.toString()} onValueChange={setRowsPerPage}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {[10, 20, 50, 100].map((value) => (
-                  <SelectItem key={value} value={value}>
+                  <SelectItem key={value} value={value.toString()}>
                     {value}
                   </SelectItem>
                 ))}
