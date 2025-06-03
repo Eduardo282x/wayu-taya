@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface Column {
+export interface gColumn {
     label: string;
     element: (data: any) => string;
 }
