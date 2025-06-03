@@ -12,11 +12,12 @@ import { SnackbarProps } from "@/components/snackbar/Snackbar"
 // Definir la interfaz para las props
 interface LoginFormProps {
   onForgotPassword: () => void
+  setLoading: (loader: boolean) => void
 }
 
 
-export const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
-  const [showPassword, setShowPassword] = useState(false);
+export const LoginForm = ({ onForgotPassword, setLoading }: LoginFormProps) => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
   const {
     register,
@@ -31,8 +32,7 @@ export const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
   })
 
   const onSubmit = async (data: Login) => {
-    console.log(data);
-
+    setLoading(true)
     await authLogin(data).then((res: SnackbarProps) => {
       toast.custom(<Snackbar success={res.success} message={res.message} />, {
         duration: 1500,
@@ -40,11 +40,13 @@ export const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
       });
 
       if (res.success) {
+        localStorage.setItem('token', String(res.token))
         setTimeout(() => {
           navigate('/')
         }, 1500);
       }
     })
+    setLoading(false)
   }
 
   return (

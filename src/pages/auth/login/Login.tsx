@@ -2,8 +2,11 @@ import { useState, useEffect } from "react"
 import logo from "@/assets/img/logo.png"
 import { LoginForm } from "./LoginForm"
 import { PasswordForm } from "./PasswordForm"
+import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 
 export const Login = () => {
+  const [loading, setLoading] = useState<boolean>(false)
+
   // Estado para controlar qué formulario mostrar
   const [showLoginForm, setShowLoginForm] = useState(true)
   // Estado para detectar si estamos en versión móvil
@@ -65,6 +68,10 @@ export const Login = () => {
 
   return (
     <div className="bg-gradient-to-tr from-blue-800 to-blue-400 h-screen flex items-center justify-center font-sans">
+
+      {loading && (
+        <ScreenLoader />
+      )}
       <div className="bg-white rounded-2xl shadow-2xl lg:w-full lg:max-w-4xl w-65 h-[23rem] lg:h-[32rem] flex overflow-hidden relative ">
         {/* Contenedor para el formulario de login (siempre presente en desktop) */}
         <div className="lg:w-1/2 w-full bg-gray-100 p-4">
@@ -79,7 +86,7 @@ export const Login = () => {
                 <div className="text-gray-500 manrope lg:text-xl opacity-70 ml-1">Ingresa tus datos....</div>
               </div>
 
-              <LoginForm onForgotPassword={handleForgotPassword} />
+              <LoginForm onForgotPassword={handleForgotPassword} setLoading={setLoading}/>
             </div>
           ) : null}
 
@@ -126,7 +133,7 @@ export const Login = () => {
             </div>
           </div>
         )}
-        
+
 
         {/* En desktop: Contenedor para el formulario de recuperación (siempre presente) */}
         {!isMobile && (

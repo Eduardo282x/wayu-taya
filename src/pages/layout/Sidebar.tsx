@@ -20,6 +20,11 @@ export const Sidebar = () => {
         }))
     }, [location.pathname])
 
+    const logout = () => {
+        localStorage.removeItem('token');
+        navigate('/login')
+    }
+
     return (
         <div className='w-full h-full bg-transparent py-4'>
             <div className='flex items-center justify-center cursor-pointer w-full mb-6' onClick={() => navigate('/')}>
@@ -41,7 +46,7 @@ export const Sidebar = () => {
                 </div>
 
                 <div
-                    onClick={() => navigate('/login')}
+                    onClick={logout}
                     className={`flex items-center justify-start gap-3 cursor-pointer text-white w-full p-2  transition-all manrope`}
                 >
                     <TbLogout2 className='text-2xl ' /> Cerrar Sesión

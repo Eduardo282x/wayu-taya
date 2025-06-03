@@ -1,8 +1,18 @@
-import { Outlet } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Sidebar } from './Sidebar';
 import { HeaderMobile } from './HeaderMobile';
+import { useEffect } from 'react';
 
 export const Layout = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!localStorage.getItem('token')) {
+            navigate('/login')
+        }
+    }, [location])
+
     return (
         <div className=' w-screen h-screen overflow-hidden bg-linear-to-r from-[#024dae] to-[#5cdee5] flex items-center justify-around'>
             <div className='hidden lg:block w-[15%] h-screen'>
