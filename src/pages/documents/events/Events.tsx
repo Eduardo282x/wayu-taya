@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button';
 import { HeaderPages } from '@/pages/layout/Header';
 import { FaRegCalendarAlt } from 'react-icons/fa';
@@ -16,74 +15,24 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { EventForm } from './EventForm';
+import { useState } from 'react';
 
 export const Events = () => {
-  const navigate = useNavigate();
-
-  function DatePickerWithRange({ className, }: React.HTMLAttributes<HTMLDivElement>) {
-    const [date, setDate] = React.useState<DateRange | undefined>({
-      from: new Date(2022, 0, 20),
-      to: addDays(new Date(2022, 0, 20), 20),
-    })
-
-    return (
-      <div className={cn("grid gap-2", className)}>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              id="date"
-              variant={"outline"}
-              className={cn(
-                "w-[300px] justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon />
-              {date?.from ? (
-                date.to ? (
-                  <>
-                    {format(date.from, "LLL dd, y")} -{" "}
-                    {format(date.to, "LLL dd, y")}
-                  </>
-                ) : (
-                  format(date.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Pick a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              initialFocus
-              mode="range"
-              defaultMonth={date?.from}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={2}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-    );
-  }
+  const [open, setOpen] = useState<boolean>(false);
 
   return (
     <div>
       <HeaderPages title='Eventos' Icon={FaRegCalendarAlt} />
       <div className='flex justify-between p-4'>
-        <DatePickerWithRange/>
-        <Button onClick={() => navigate('formulario')}><FaRegCircleCheck/> Agendar evento</Button>
+        <DatePickerWithRange />
+        <Button onClick={() => setOpen(true)}><FaRegCircleCheck /> Agendar evento </Button>
       </div>
-      
-
-      
-
-      {/* <TableComponents column={columnEvents} data={dataEvents} /> */}
 
       <div className='spaceEvents'>
         {eventos && eventos.map(eve => (
-          <div className='flex items-center justify-between w-full p-4 rounded-4xl bg-blue-500'>
+          <div className='flex items-center justify-between w-full p-4 rounded-2xl bg-blue-500'>
             <div className='flex gap-2'>
               <div className='bg-white rounded-2xl p-1 text-center w-20 h-20'>
                 <p className='bg-blue-500 text-white rounded-full px-2'>{eve.mes}</p>
@@ -99,6 +48,85 @@ export const Events = () => {
           </div>
         ))}
       </div>
+
+      <DialogEvents open={open} setOpen={setOpen} />
     </div>
+  )
+}
+
+function DatePickerWithRange({ className, }: React.HTMLAttributes<HTMLDivElement>) {
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(2022, 0, 20),
+    to: addDays(new Date(2022, 0, 20), 20),
+  })
+
+  return (
+    <div className={cn("grid gap-2", className)}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            id="date"
+            variant={"outline"}
+            className={cn(
+              "w-[300px] justify-start text-left font-normal",
+              !date && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon />
+            {date?.from ? (
+              date.to ? (
+                <>
+                  {format(date.from, "LLL dd, y")} -{" "}
+                  {format(date.to, "LLL dd, y")}
+                </>
+              ) : (
+                format(date.from, "LLL dd, y")
+              )
+            ) : (
+              <span>Pick a date</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            initialFocus
+            mode="range"
+            defaultMonth={date?.from}
+            selected={date}
+            onSelect={setDate}
+            numberOfMonths={2}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+interface DialogEventsProps {
+  open: boolean
+  setOpen: (active: boolean) => void
+}
+
+const DialogEvents = ({ open, setOpen }: DialogEventsProps) => {
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="w-full max-w-xs rounded-[20px] p-4 bg-[#3b7ac9] border border-[#2e5ea8] text-white font-sans">
+        <DialogHeader>
+          <DialogTitle>Editar evento</DialogTitle>
+          <DialogDescription className="text-white text-xs mb-4">
+            A continuación introduce la información del evento
+          </DialogDescription>
+        </DialogHeader>
+
+        <EventForm />
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" className='text-black'>Cancelar</Button>
+          </DialogClose>
+          <Button type="submit">Guardar cambios</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

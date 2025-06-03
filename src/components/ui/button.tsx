@@ -11,6 +11,8 @@ const buttonVariants = cva(
       variant: {
         agregaricon: "bg-blue-500 text-white cursor-pointer ",
         normal: 'border rounded-lg text-white',
+        noDefault:
+          "cursor-pointer text-primary-foreground shadow-xs",
         default:
           "bg-linear-to-r from-[#024dae] to-[#5cdee5] cursor-pointer text-primary-foreground shadow-xs",
         destructive:
