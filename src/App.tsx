@@ -15,7 +15,11 @@ import { Activities } from './pages/documents/activities/Activities'
 import Home from './pages/home/Home'
 import { EventForm } from './pages/documents/events/EventForm'
 import { Toaster } from 'react-hot-toast';
-import { Users } from './pages/users/Users'
+import { Users } from './pages/users/Users';
+
+import "@/styles/people.css";
+import "@/styles/user.css";
+
 
 function App() {
 

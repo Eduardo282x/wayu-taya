@@ -9,8 +9,6 @@ export const Layout = () => {
                 <Sidebar />
             </div>
 
-
-
             <div className='w-[90%] px-4 h-full lg:w-[82%] lg:h-[95%] lg:bg-gray-100 rounded-2xl'>
                 {/* <Header /> */}
                 <div className='block lg:hidden'>

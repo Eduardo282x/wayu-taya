@@ -8,15 +8,19 @@ export interface IMenu {
     label: string;
     url: string;
     active: boolean;
+    section: Sections[];
     icon: React.ComponentType<{ className?: string }>;
 }
+
+export type Sections = 'documentos' | 'salud' | 'agua' | 'musica' | 'alimentos' | '' | 'usuarios';
 
 export const menu: IMenu[] = [
     {
         label: 'Personas',
         active: false,
         url: '/documentos/personas',
-        icon: PiUserList 
+        icon: PiUserList,
+        section: ['alimentos', 'documentos', 'salud']
     },
     // {
     //     label: 'Comunidades',
@@ -28,7 +32,8 @@ export const menu: IMenu[] = [
         label: 'Eventos',
         active: false,
         url: '/documentos/eventos',
-        icon: FaRegCalendarAlt  
+        icon: FaRegCalendarAlt,
+        section: ['documentos', 'salud']
     },
     // {
     //     label: 'Actividades',
@@ -40,12 +45,14 @@ export const menu: IMenu[] = [
         label: 'Documentos',
         active: false,
         url: '/documentos/documentos',
-        icon: IoDocumentTextOutline    
+        icon: IoDocumentTextOutline,
+        section: ['documentos']
     },
     {
         label: 'Usuarios',
         active: false,
         url: '/usuarios',
-        icon: PiUsersThree    
+        icon: PiUsersThree,
+        section: ['documentos', 'salud', 'musica', 'usuarios']
     },
 ]

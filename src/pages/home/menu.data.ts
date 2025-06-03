@@ -33,7 +33,7 @@ export const optionsMenu: CategoryCardProps[] = [
         description: "Administración de archivos de la fundación",
         icon: FileText,
         buttonText: "Documentos",
-        url: '/documentos'
+        url: '/documentos/documentos'
     },
     {
         title: "Musica",
