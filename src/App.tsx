@@ -19,6 +19,7 @@ import { Users } from './pages/users/Users';
 
 import "@/styles/people.css";
 import "@/styles/user.css";
+import { Inventory } from './pages/inventory/inventory'
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
             <Route path='/documentos/documentos' element={<Doc />}></Route>
             <Route path='/usuarios' element={<Users />}></Route>
 
+            <Route path='/salud/inventario' element={<Inventory />}></Route>
             <Route path='/musica' element={<Music />}></Route>
             <Route path='/alimentos' element={<Food />}></Route>
             <Route path='/salud' element={<Health />}></Route>
