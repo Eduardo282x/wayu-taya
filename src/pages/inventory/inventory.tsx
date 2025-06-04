@@ -127,7 +127,7 @@ export const Inventory = () => {
           placeholder="Buscar medicina..."
           className="focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s w-[30%]"
         />
-        <Button variant={"usuarioForm"} className="h-[90%]" onClick={openCreateForm}>
+        <Button variant={"animated"} className="h-[90%]" onClick={openCreateForm}>
           <MdOutlineAddShoppingCart className="size-6" />
           Agregar Medicina
         </Button>

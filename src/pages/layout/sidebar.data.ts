@@ -3,6 +3,7 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 // import { MdAccessTime } from "react-icons/md";
 // import { FaBuilding } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
+import { MdOutlineInventory2 } from "react-icons/md";
 
 export interface IMenu {
     label: string;
@@ -47,6 +48,13 @@ export const menu: IMenu[] = [
         url: '/documentos/documentos',
         icon: IoDocumentTextOutline,
         section: ['documentos']
+    },
+    {
+        label: 'Inventario',
+        active: false,
+        url: '/salud/inventario',
+        icon: MdOutlineInventory2 ,
+        section: ['salud']
     },
     {
         label: 'Usuarios',
