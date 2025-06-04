@@ -1,6 +1,7 @@
 import { Button } from '../ui/button';
 import { useState } from "react"
 import { addDays, format } from "date-fns"
+import { es } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 import { cn } from "@/lib/utils"
@@ -10,8 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popove
 export const DatePickerRange = ({ className, }: React.HTMLAttributes<HTMLDivElement>) => {
 
     const [date, setDate] = useState<DateRange | undefined>({
-        from: new Date(2022, 0, 20),
-        to: addDays(new Date(2022, 0, 20), 20),
+        from: new Date(),
+        to: addDays(new Date(), 20),
     })
 
     return (
@@ -29,11 +30,11 @@ export const DatePickerRange = ({ className, }: React.HTMLAttributes<HTMLDivElem
                         {date?.from ? (
                             date.to ? (
                                 <>
-                                    {format(date.from, "LLL dd, y")} -{" "}
-                                    {format(date.to, "LLL dd, y")}
+                                    {format(date.from, "PPP", { locale: es })} - {" "}
+                                    {format(date.to, "PPP", { locale: es })}
                                 </>
                             ) : (
-                                format(date.from, "LLL dd, y")
+                                format(date.from, "PPP", { locale: es })
                             )
                         ) : (
                             <span>Pick a date</span>
@@ -46,6 +47,7 @@ export const DatePickerRange = ({ className, }: React.HTMLAttributes<HTMLDivElem
                         mode="range"
                         defaultMonth={date?.from}
                         selected={date}
+                        locale={es}
                         onSelect={setDate}
                         numberOfMonths={1}
                     />
