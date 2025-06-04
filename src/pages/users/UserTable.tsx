@@ -1,4 +1,3 @@
-import "./UserTable.css";
 import { User } from "./types";
 import { FaRegEdit } from "react-icons/fa";
 import { FaRegTrashAlt } from "react-icons/fa";

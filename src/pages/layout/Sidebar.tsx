@@ -10,6 +10,8 @@ export const Sidebar = () => {
     const [menuData, setMenuData] = useState<IMenu[]>(menu);
 
     useEffect(() => {
+        // const getSection = location.pathname.split('/')
+        // const menuFilter = menu.filter(item => item.section.includes(getSection[1] as Sections))
         setMenuData((prev) => prev.map(me => {
             return {
                 ...me,
@@ -18,9 +20,14 @@ export const Sidebar = () => {
         }))
     }, [location.pathname])
 
+    const logout = () => {
+        localStorage.removeItem('token');
+        navigate('/login')
+    }
+
     return (
         <div className='w-full h-full bg-transparent py-4'>
-            <div className='flex items-center justify-center cursor-pointer w-full mb-6'>
+            <div className='flex items-center justify-center cursor-pointer w-full mb-6' onClick={() => navigate('/')}>
                 <img src={logo} alt="" className='w-16' />
                 <h2 className='text-lg text-white font-medium julius-sans-one-regular'>WAYUU TAYA</h2>
             </div>
@@ -31,7 +38,7 @@ export const Sidebar = () => {
                         <div
                             key={index}
                             onClick={() => navigate(me.url)}
-                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope ${me.active && '  font-medium '} transition-all`}
+                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
                         >
                             <me.icon className='text-3xl' /> {me.label}
                         </div>
@@ -39,7 +46,7 @@ export const Sidebar = () => {
                 </div>
 
                 <div
-                    onClick={() => navigate('/login')}
+                    onClick={logout}
                     className={`flex items-center justify-start gap-3 cursor-pointer text-white w-full p-2  transition-all manrope`}
                 >
                     <TbLogout2 className='text-2xl ' /> Cerrar Sesión
