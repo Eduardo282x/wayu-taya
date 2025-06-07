@@ -2,7 +2,7 @@ import type React from "react"
 import type { Medicine } from "./types"
 import { FaRegEdit, FaRegTrashAlt } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
-import { CustomTable, CustomTableRow, CustomTableCell } from "././custom-table"
+import { CustomTable, CustomTableRow, CustomTableCell } from "./custom-table"
 
 interface InventoryTableProps {
   medicines: Medicine[]
