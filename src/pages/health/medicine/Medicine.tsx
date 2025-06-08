@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { HeaderPages } from "@/pages/layout/Header";
 import { FaPills } from "react-icons/fa";
 import { medicineColumns } from "./medicine.data";

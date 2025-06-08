@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Column } from "@/interfaces/table.interface";
 import "@/styles/medicine.css"; // Asegúrate de que este CSS esté correctamente configurado
 import {
@@ -19,13 +20,10 @@ export const MedicineTable: React.FC<MedicineTableProps> = ({
   data,
 }) => (
   <div className="custom-table-container">
-    {" "}
-    {/* Contenedor para la sombra y bordes redondeados */}
     <Table className="custom-table">
       <TableHeader>
         <TableRow>
           {columns.map((col) => (
-            // `key` para cada `TableHead`
             <TableHead key={col.column}>{col.label}</TableHead>
           ))}
         </TableRow>
@@ -34,7 +32,6 @@ export const MedicineTable: React.FC<MedicineTableProps> = ({
         {data.map((row, idx) => (
           <TableRow key={idx}>
             {columns.map((col) => (
-              // `key` para cada `TableCell`
               <TableCell key={col.column}>{col.element(row)}</TableCell>
             ))}
           </TableRow>
