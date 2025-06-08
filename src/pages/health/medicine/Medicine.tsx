@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { HeaderPages } from "@/pages/layout/Header";
 import { FaPills } from "react-icons/fa";
 import {
@@ -15,10 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  MedicineForm,
-  MedicineData,
-} from "@/pages/health/medicine/medicineform";
+import { MedicineForm, MedicineData } from "./MedicineForm";
 
 export const Medicine = () => {
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
@@ -32,6 +29,8 @@ export const Medicine = () => {
 
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const displayedColumns = medicineColumns.filter(
     (col) => visibleColumns[col.column]
   );
@@ -44,6 +43,14 @@ export const Medicine = () => {
     setMedicines((prevMedicines) => [...prevMedicines, newMedicine]);
     setIsAddFormOpen(false);
   };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredMedicines = medicines.filter((medicine) =>
+    medicine.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -87,6 +94,8 @@ export const Medicine = () => {
             type="search"
             placeholder="Buscar medicamentos..."
             className="w-[250px] focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s"
+            value={searchTerm}
+            onChange={handleSearchChange}
           />
           <Button
             variant={"animated"}
@@ -94,12 +103,12 @@ export const Medicine = () => {
             onClick={openAddForm}
           >
             <GiMedicines className="size-6" />
-            Agregar Medicamentos
+            Registrar Medicamentos
           </Button>
         </div>
       </div>
       <div>
-        <MedicineTable columns={displayedColumns} data={medicines} />
+        <MedicineTable columns={displayedColumns} data={filteredMedicines} />
       </div>
 
       <MedicineForm

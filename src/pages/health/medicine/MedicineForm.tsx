@@ -8,7 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MdOutlineAddShoppingCart } from "react-icons/md";
+import { BiCartAdd } from "react-icons/bi";
 import FormInput from "@/components/formInput/FormInputCustom";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -59,9 +59,8 @@ const categoryOptions = [
   "Vitaminas",
   "Higiene Personal",
   "Cuidado de la Piel",
-  "Alimentos",
-  "Bebidas",
-  "Limpieza del Hogar",
+  "Cuidado Dental",
+  "Suplementos Nutricionales",
   "Accesorios Médicos",
   "Material de Curación",
   "Otros",
@@ -150,7 +149,6 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value as "medicamento" | "producto");
-
     setValue("medicina", value === "medicamento");
   };
 
@@ -196,14 +194,24 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
         </DialogHeader>
 
         <Tabs
-          defaultValue="medicamento" //
+          defaultValue="medicamento"
           className="w-full"
           onValueChange={handleTabChange}
           value={currentTab}
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="medicamento">Medicamento</TabsTrigger>
-            <TabsTrigger value="producto">Producto</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-200 rounded-lg p-1">
+            <TabsTrigger
+              value="medicamento"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
+            >
+              Medicamento
+            </TabsTrigger>
+            <TabsTrigger
+              value="producto"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
+            >
+              Producto
+            </TabsTrigger>
           </TabsList>
 
           <form
@@ -265,148 +273,158 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
               )}
             />
 
-            <TabsContent value="medicamento" className="mt-0">
-              <input type="hidden" {...register("medicina")} />
+            {currentTab === "medicamento" && (
+              <TabsContent value="medicamento" className="mt-0">
+                <input type="hidden" {...register("medicina")} />
 
-              <FormInput
-                label="Temperatura de Almacenamiento"
-                id="temperatura"
-                {...register("temperatura", {
-                  required:
-                    currentTab === "medicamento"
-                      ? "La temperatura es obligatoria"
-                      : false,
-                })}
-                error={errors.temperatura?.message}
-              />
-              <FormInput
-                label="Manufactura"
-                id="manufactura"
-                {...register("manufactura", {
-                  required:
-                    currentTab === "medicamento"
-                      ? "La manufactura es obligatoria"
-                      : false,
-                })}
-                error={errors.manufactura?.message}
-              />
-              <FormInput
-                label="Principio Activo"
-                id="principio_activo"
-                {...register("principio_activo", {
-                  required:
-                    currentTab === "medicamento"
-                      ? "El principio activo es obligatorio"
-                      : false,
-                })}
-                error={errors.principio_activo?.message}
-              />
+                <FormInput
+                  label="Temperatura de Almacenamiento"
+                  id="temperatura"
+                  {...register("temperatura", {
+                    required:
+                      currentTab === "medicamento"
+                        ? "La temperatura es obligatoria"
+                        : false,
+                  })}
+                  error={errors.temperatura?.message}
+                />
+                <FormInput
+                  label="Manufactura"
+                  id="manufactura"
+                  {...register("manufactura", {
+                    required:
+                      currentTab === "medicamento"
+                        ? "La manufactura es obligatoria"
+                        : false,
+                  })}
+                  error={errors.manufactura?.message}
+                />
+                <FormInput
+                  label="Principio Activo"
+                  id="principio_activo"
+                  {...register("principio_activo", {
+                    required:
+                      currentTab === "medicamento"
+                        ? "El principio activo es obligatorio"
+                        : false,
+                  })}
+                  error={errors.principio_activo?.message}
+                />
 
-              <Controller
-                name="forma"
-                control={control}
-                rules={{
-                  required:
-                    currentTab === "medicamento"
-                      ? "La forma es obligatoria"
-                      : false,
-                }}
-                render={({ field }) => (
-                  <div className="space-y-1">
-                    <label
-                      htmlFor="forma-select"
-                      className="text-sm font-medium leading-none"
-                    >
-                      Forma
-                    </label>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full" id="forma-select">
-                        <SelectValue placeholder="Selecciona una forma" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Formas de Medicamentos</SelectLabel>
-                          {formaOptions.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {errors.forma && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.forma.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-              />
-            </TabsContent>
+                <Controller
+                  name="forma"
+                  control={control}
+                  rules={{
+                    required:
+                      currentTab === "medicamento"
+                        ? "La forma es obligatoria"
+                        : false,
+                  }}
+                  render={({ field }) => (
+                    <div className="space-y-1">
+                      <label
+                        htmlFor="forma-select"
+                        className="text-sm font-medium leading-none"
+                      >
+                        Forma
+                      </label>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full" id="forma-select">
+                          <SelectValue placeholder="Selecciona una forma" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Formas de Medicamentos</SelectLabel>
+                            {formaOptions.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {errors.forma && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.forma.message}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent value="producto" className="mt-0">
-              <input type="hidden" {...register("medicina")} />
+            {currentTab === "producto" && (
+              <TabsContent value="producto" className="mt-0">
+                <input type="hidden" {...register("medicina")} />
 
-              <Controller
-                name="unidad"
-                control={control}
-                rules={{
-                  required:
-                    currentTab === "producto"
-                      ? "La unidad es obligatoria"
-                      : false,
-                }}
-                render={({ field }) => (
-                  <div className="space-y-1">
-                    <label
-                      htmlFor="unidad-select"
-                      className="text-sm font-medium leading-none"
-                    >
-                      Unidad
-                    </label>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full" id="unidad-select">
-                        <SelectValue placeholder="Selecciona una unidad" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Unidades</SelectLabel>
-                          {unitOptions.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {errors.unidad && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.unidad.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-              />
+                <Controller
+                  name="unidad"
+                  control={control}
+                  rules={{
+                    required:
+                      currentTab === "producto"
+                        ? "La unidad es obligatoria"
+                        : false,
+                  }}
+                  render={({ field }) => (
+                    <div className="space-y-1">
+                      <label
+                        htmlFor="unidad-select"
+                        className="text-sm font-medium leading-none"
+                      >
+                        Unidad
+                      </label>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full" id="unidad-select">
+                          <SelectValue placeholder="Selecciona una unidad" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Unidades</SelectLabel>
+                            {unitOptions.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {errors.unidad && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.unidad.message}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                />
 
-              <FormInput
-                label="Cantidad"
-                id="cantidad"
-                type="number"
-                min="0"
-                {...register("cantidad", {
-                  required:
-                    currentTab === "producto"
-                      ? "La cantidad es obligatoria"
-                      : false,
-                  min: {
-                    value: 0,
-                    message: "La cantidad no puede ser negativa",
-                  },
-                  valueAsNumber: true,
-                })}
-                error={errors.cantidad?.message}
-              />
-            </TabsContent>
+                <FormInput
+                  label="Cantidad"
+                  id="cantidad"
+                  type="number"
+                  min="0"
+                  {...register("cantidad", {
+                    required:
+                      currentTab === "producto"
+                        ? "La cantidad es obligatoria"
+                        : false,
+                    min: {
+                      value: 0,
+                      message: "La cantidad no puede ser negativa",
+                    },
+                    valueAsNumber: true,
+                  })}
+                  error={errors.cantidad?.message}
+                />
+              </TabsContent>
+            )}
 
             <div className="flex justify-end space-x-2 pt-4">
               <Button
@@ -414,8 +432,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                 className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
                 type="submit"
               >
-                <MdOutlineAddShoppingCart className="self-center size-5" />{" "}
-                Agregar
+                <BiCartAdd className="self-center size-5" /> Agregar
               </Button>
             </div>
           </form>
