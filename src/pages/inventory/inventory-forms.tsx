@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { FaRegSave } from "react-icons/fa"
 import { MdOutlineAddShoppingCart } from "react-icons/md"
-import FormInput from "../../components/FormInput/FormInput"
+import {FormInputCustoms} from "../../components/formInput/FormInputCustom"
 
 export interface Medicine {
   id: number
@@ -71,7 +71,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Medicina"
               id="medicina"
               autoFocus
@@ -87,7 +87,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Cantidad"
               id="cantidad"
               type="number"
@@ -105,7 +105,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Fecha de Llegada"
               id="fechaLlegada"
               type="date"
@@ -118,7 +118,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustoms
               label="Fecha de Expiración"
               id="fechaExpiracion"
               type="date"
@@ -132,7 +132,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button
-              variant="usuarioForm"
+              variant="animated"
               className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
               type="submit"
             >

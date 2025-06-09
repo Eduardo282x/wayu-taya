@@ -27,7 +27,7 @@ const AlertDialog: React.FC<AlertDialogProps> = ({ open, onOpenChange, title = "
         </DialogHeader>
         <DialogFooter className="flex justify-end">
           <DialogClose asChild>
-            <Button variant={"usuarioForm"} className="p-3 w-[17%] rounded-2xl justify-evenly" type="submit">
+            <Button variant={"animated"} className="p-3 w-[17%] rounded-2xl justify-evenly" type="submit">
               OK
             </Button>
           </DialogClose>

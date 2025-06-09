@@ -7,6 +7,7 @@ import { useState, useMemo } from "react";
 import UsersForm from "./UserForms"; 
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import AlertDialog from "./AlertDialog";
+import { HeaderPages } from "../layout/Header"
 
 const initialUsers: User[] = [
   { id: 1, nombre: "Juan", apellido:"Pérez", usuario: "juanp", correo: "juanp@mail.com" },
@@ -93,12 +94,9 @@ export const Users = () => {
   };
 
   return (
-    <div className='h-[90vh] w-[79.5vw]'>
+    <div className='h-[90vh] w-[79.5vw] pr-7'>
+      <HeaderPages title="Usuarios" Icon={PiUsersThree}/>
       <div className='w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between'>
-        <div className='flex p-2 items-center '>
-          <PiUsersThree className='text-3xl text-blue-800'/>
-          <h2 className='manrope text-3xl mx-2 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent '>Usuarios</h2>
-        </div>
         <input
           type='search'
           value={searchTerm}

@@ -16,6 +16,7 @@ import Home from './pages/home/Home'
 import { EventForm } from './pages/documents/events/EventForm'
 import { Toaster } from 'react-hot-toast';
 import { Users } from './pages/users/Users';
+import { Inventory } from './pages/inventory/inventory'
 
 import "@/styles/people.css";
 import "@/styles/user.css";
@@ -41,7 +42,7 @@ function App() {
             <Route path='/documentos/eventos/formulario' element={<EventForm />}></Route>
             <Route path='/documentos/documentos' element={<Doc />}></Route>
             <Route path='/usuarios' element={<Users />}></Route>
-
+            <Route path='/documentos/inventario' element={<Inventory />}></Route>
             <Route path='/musica' element={<Music />}></Route>
             <Route path='/alimentos' element={<Food />}></Route>
             <Route path='/salud' element={<Health />}></Route>
