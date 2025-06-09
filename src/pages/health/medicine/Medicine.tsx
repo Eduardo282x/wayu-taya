@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { HeaderPages } from "@/pages/layout/Header";
 import { FaPills } from "react-icons/fa";
-import { medicineColumns } from "./medicine.data";
-import { MedicineTable } from "./medicine.data";
+import {
+  medicineColumns,
+  MedicineTable,
+  dataMedicamentos,
+} from "./medicine.data";
 import { Button } from "@/components/ui/button";
 import { GiMedicines } from "react-icons/gi";
-
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -13,68 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const dataMedicamentos = [
-  {
-    nombre: "Paracetamol",
-    descripcion: "Analgésico y antipirético",
-    categoria: "Analgésico",
-    medicina: true,
-    unidad: "Tableta",
-    cantidad: 20,
-    temperatura: "Ambiente",
-    manufactura: "Genérico",
-    principio_activo: "Paracetamol",
-    forma: "Sólido",
-  },
-  {
-    nombre: "Ibuprofeno",
-    descripcion: "Antiinflamatorio no esteroideo",
-    categoria: "Antiinflamatorio",
-    medicina: true,
-    unidad: "Cápsula",
-    cantidad: 15,
-    temperatura: "Ambiente",
-    manufactura: "Bayer",
-    principio_activo: "Ibuprofeno",
-    forma: "Sólido",
-  },
-  {
-    nombre: "Amoxicilina",
-    descripcion: "Antibiótico de amplio espectro",
-    categoria: "Antibiótico",
-    medicina: true,
-    unidad: "Tableta",
-    cantidad: 10,
-    temperatura: "Ambiente",
-    manufactura: "Pfizer",
-    principio_activo: "Amoxicilina",
-    forma: "Sólido",
-  },
-  {
-    nombre: "Loratadina",
-    descripcion: "Antihistamínico para alergias",
-    categoria: "Antihistamínico",
-    medicina: true,
-    unidad: "Tableta",
-    cantidad: 30,
-    temperatura: "Ambiente",
-    manufactura: "Genérico",
-    principio_activo: "Loratadina",
-    forma: "Líquido",
-  },
-  {
-    nombre: "Suero Oral",
-    descripcion: "Solución para rehidratación oral",
-    categoria: "Electrolito",
-    medicina: false,
-    unidad: "Botella",
-    cantidad: 5,
-    temperatura: "Refrigerado",
-    manufactura: "Genérico",
-    principio_activo: "Electrolitos",
-    forma: "Líquido",
-  },
-];
+import { MedicineForm, MedicineData } from "./MedicineForm";
 
 export const Medicine = () => {
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
@@ -84,8 +25,31 @@ export const Medicine = () => {
     }, {} as Record<string, boolean>)
   );
 
+  const [medicines, setMedicines] = useState<MedicineData[]>(dataMedicamentos);
+
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
   const displayedColumns = medicineColumns.filter(
     (col) => visibleColumns[col.column]
+  );
+
+  const openAddForm = () => {
+    setIsAddFormOpen(true);
+  };
+
+  const handleAddMedicineSubmit = (newMedicine: MedicineData) => {
+    setMedicines((prevMedicines) => [...prevMedicines, newMedicine]);
+    setIsAddFormOpen(false);
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredMedicines = medicines.filter((medicine) =>
+    medicine.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -130,16 +94,28 @@ export const Medicine = () => {
             type="search"
             placeholder="Buscar medicamentos..."
             className="w-[250px] focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s"
+            value={searchTerm}
+            onChange={handleSearchChange}
           />
-          <Button variant={"animated"} className="h-[90%]">
+          <Button
+            variant={"animated"}
+            className="h-[90%]"
+            onClick={openAddForm}
+          >
             <GiMedicines className="size-6" />
-            Agregar Medicamentos
+            Registrar Medicamentos
           </Button>
         </div>
       </div>
       <div>
-        <MedicineTable columns={displayedColumns} data={dataMedicamentos} />
+        <MedicineTable columns={displayedColumns} data={filteredMedicines} />
       </div>
+
+      <MedicineForm
+        open={isAddFormOpen}
+        onOpenChange={setIsAddFormOpen}
+        onSubmit={handleAddMedicineSubmit}
+      />
     </>
   );
 };
