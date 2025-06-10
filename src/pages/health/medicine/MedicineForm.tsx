@@ -290,7 +290,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                 />
                 <FormInput
                   label="Manufactura"
-                  id="manufactura"
+                  id="manufactura" 
                   {...register("manufactura", {
                     required:
                       currentTab === "medicamento"

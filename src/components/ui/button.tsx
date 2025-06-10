@@ -16,7 +16,7 @@ const buttonVariants = cva(
         default:
           "bg-linear-to-r from-[#024dae] to-[#5cdee5] cursor-pointer text-primary-foreground shadow-xs",
         destructive:
-          "bg-destructive/90 text-white shadow-xs hover:bg-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 cursor-pointer",
+          "bg-destructive/85 text-white shadow-xs hover:bg-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 cursor-pointer",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:

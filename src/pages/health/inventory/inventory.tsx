@@ -1,12 +1,13 @@
 import { MdOutlineProductionQuantityLimits } from "react-icons/md"
 import { Button } from "@/components/ui/button"
-import { MdOutlineAddShoppingCart } from "react-icons/md"
+import { TbMedicineSyrup } from "react-icons/tb";
 import InventoryTable from "./inventory-table"
 import type { Medicine } from "./types"
 import { useState, useMemo } from "react"
 import InventoryForm from "./inventory-forms"
 import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
+import { HeaderPages } from "@/pages/layout/Header";
 
 const initialMedicines: Medicine[] = [
   {
@@ -14,7 +15,7 @@ const initialMedicines: Medicine[] = [
     medicina: "Paracetamol 500mg",
     cantidad: 100,
     fechaLlegada: "2024-01-15",
-    fechaExpiracion: "2025-01-15",
+    fechaExpiracion: "2026-01-15",
   },
   {
     id: 2,
@@ -28,7 +29,7 @@ const initialMedicines: Medicine[] = [
     medicina: "Amoxicilina 250mg",
     cantidad: 50,
     fechaLlegada: "2024-03-05",
-    fechaExpiracion: "2024-09-05",
+    fechaExpiracion: "2025-07-01",
   },
 ]
 
@@ -112,14 +113,9 @@ export const Inventory = () => {
   }
 
   return (
-    <div className="h-[90vh] w-[79.5vw]">
+    <div className="h-[90vh] w-[79.5vw] pr-7">
+      <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits}/>
       <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between">
-        <div className="flex p-2 items-center">
-          <MdOutlineProductionQuantityLimits className="text-3xl text-blue-800" />
-          <h2 className="manrope text-3xl mx-2 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">
-            Inventario
-          </h2>
-        </div>
         <input
           type="search"
           value={searchTerm}
@@ -128,7 +124,7 @@ export const Inventory = () => {
           className="focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s w-[30%]"
         />
         <Button variant={"animated"} className="h-[90%]" onClick={openCreateForm}>
-          <MdOutlineAddShoppingCart className="size-6" />
+          <TbMedicineSyrup className="size-6" />
           Agregar Medicina
         </Button>
       </div>

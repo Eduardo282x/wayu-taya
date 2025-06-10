@@ -99,9 +99,9 @@
 }
 
 .expired-row:hover {
-  background-color: #fecaca !important;
+  background-color: #ea8e8e !important;
 }
 
 .expiring-soon-row:hover {
-  background-color: #fed7aa !important;
+  background-color: #f8c58a !important;
 }

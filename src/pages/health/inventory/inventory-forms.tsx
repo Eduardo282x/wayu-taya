@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { FaRegSave } from "react-icons/fa"
 import { MdOutlineAddShoppingCart } from "react-icons/md"
-import FormInput from "@/components/formInput/FormInputCustom"
+import FormInputCustom  from "@/components/formInput/FormInputCustom"
+// import FormInput from "@/components/formInput/FormInputCustom"
 
 export interface Medicine {
   id: number
@@ -71,7 +72,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div>
-            <FormInput
+            <FormInputCustom
               label="Medicina"
               id="medicina"
               autoFocus
@@ -87,7 +88,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustom
               label="Cantidad"
               id="cantidad"
               type="number"
@@ -105,7 +106,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustom
               label="Fecha de Llegada"
               id="fechaLlegada"
               type="date"
@@ -118,7 +119,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustom
               label="Fecha de Expiración"
               id="fechaExpiracion"
               type="date"
