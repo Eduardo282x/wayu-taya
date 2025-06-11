@@ -19,6 +19,8 @@ import { Users } from './pages/users/Users';
 
 import "@/styles/people.css";
 import "@/styles/user.css";
+import { Inventory } from './pages/health/inventory/inventory'
+import { Medicine } from './pages/health/medicine/Medicine'
 
 
 function App() {
@@ -41,6 +43,10 @@ function App() {
             <Route path='/documentos/eventos/formulario' element={<EventForm />}></Route>
             <Route path='/documentos/documentos' element={<Doc />}></Route>
             <Route path='/usuarios' element={<Users />}></Route>
+            <Route path='/documentos/inventario' element={<Inventory />}></Route>
+
+            <Route path='/salud/inventario' element={<Inventory />}></Route>
+            <Route path='/salud/medicamentos' element={<Medicine />}></Route>
 
             <Route path='/musica' element={<Music />}></Route>
             <Route path='/alimentos' element={<Food />}></Route>

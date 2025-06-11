@@ -6,6 +6,9 @@ const peopleUrl = "/people";
 export const getPeople = async () => {
     return await getDataApi(peopleUrl);
 }
+export const postPeopleNormal = async (data: PeopleBody) => {
+    return await postDataApi(`${peopleUrl}/normal`, data)
+}
 export const postPeople = async (data: PeopleBody) => {
     return await postDataApi(peopleUrl, data)
 }
