@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Column } from '@/interfaces/table.interface';
+import { Column } from '@/components/table/table.interface';
 import { debounce } from '@/lib/debounce';
-import { X } from 'lucide-react';
+// import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { CiSearch } from 'react-icons/ci';
 
 interface FilterProps {
     data: any[];
     setDataFilter: (value: any) => void;
     columns: Column[];
+    placeholder: string;
 }
 
-export const FilterComponent = ({ data, setDataFilter, columns }: FilterProps) => {
+export const FilterComponent = ({ data, setDataFilter, columns, placeholder }: FilterProps) => {
     const [filter, setFilter] = useState<string>('');
 
     useEffect(() => {
@@ -51,26 +51,25 @@ export const FilterComponent = ({ data, setDataFilter, columns }: FilterProps) =
         debouncedFilter(value)
     }
 
-    const clearFilter = () => {
-        setDataFilter(data);
-        setFilter('')
-    }
+    // const clearFilter = () => {
+    //     setDataFilter(data);
+    //     setFilter('')
+    // }
 
     return (
-        <div className="flex items-center justify-between w-60 border rounded-lg px-3 h-9">
-            <CiSearch
-                className=" text-gray-400" // Posiciona el icono
-                size={20}
-            />
+        <div className="flex items-center justify-between px-2 h-full">
             <input
-                className="outline-none text-gray-600 text-sm"
-                placeholder="Buscar..."
-                onChange={onChange}
+                type="search"
+                placeholder={placeholder}
+                className="w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
                 value={filter}
+                onChange={onChange}
             />
-            <span onClick={clearFilter} className='cursor-pointer'>
-                <X size={12} className='text-gray-400' />
-            </span>
+            {/* {filter !== '' && (
+                <span onClick={clearFilter} className='cursor-pointer'>
+                    <X size={12} className='text-gray-400' />
+                </span>
+            )} */}
         </div>
     )
 }

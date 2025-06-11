@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { menu, IMenu } from './sidebar.data';
+import { menuDocuments, menuHealth, menuMusic, menuWater, menuFeed, IMenu, Sections, menu } from './sidebar.data';
 import { TbLogout2 } from "react-icons/tb";
 import logo from '@/assets/images/logo1.png';
 
@@ -10,8 +10,32 @@ export const Sidebar = () => {
     const [menuData, setMenuData] = useState<IMenu[]>(menu);
 
     useEffect(() => {
-        // const getSection = location.pathname.split('/')
-        // const menuFilter = menu.filter(item => item.section.includes(getSection[1] as Sections))
+        const getMenuLocalStorage: Sections = localStorage.getItem('menu') as Sections;
+        if (getMenuLocalStorage) {
+            switch (getMenuLocalStorage) {
+                case 'documentos':
+                    setMenuData(menuDocuments);
+                    break;
+                case 'salud':
+                    setMenuData(menuHealth);
+                    break;
+                case 'musica':
+                    setMenuData(menuMusic);
+                    break;
+                case 'agua':
+                    setMenuData(menuWater);
+                    break;
+                case 'alimentos':
+                    setMenuData(menuFeed);
+                    break;
+                default:
+                    setMenuData(menu);
+                    break;
+            }
+        }
+    }, [])
+
+    useEffect(() => {
         setMenuData((prev) => prev.map(me => {
             return {
                 ...me,

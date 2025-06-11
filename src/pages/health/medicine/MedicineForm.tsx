@@ -1,27 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { BiCartAdd } from "react-icons/bi";
 import FormInput from "@/components/formInput/FormInputCustom";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
 
 export interface BaseItemData {
   nombre: string;
@@ -183,7 +169,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg manrope bg-gray-300">
+      <DialogContent className="sm:max-w-lg manrope max-h-[95vh] overflow-y-auto bg-gray-300">
         <DialogHeader>
           <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
             Agregar Nuevo Elemento
@@ -195,11 +181,11 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
 
         <Tabs
           defaultValue="medicamento"
-          className="w-full"
+          className="w-full gap-2"
           onValueChange={handleTabChange}
           value={currentTab}
         >
-          <TabsList className="grid w-full grid-cols-2 bg-gray-200 rounded-lg p-1">
+          <TabsList className="w-full flex gap-1 bg-gray-200 rounded-lg p-1">
             <TabsTrigger
               value="medicamento"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
@@ -290,7 +276,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                 />
                 <FormInput
                   label="Manufactura"
-                  id="manufactura" 
+                  id="manufactura"
                   {...register("manufactura", {
                     required:
                       currentTab === "medicamento"

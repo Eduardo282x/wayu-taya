@@ -16,16 +16,20 @@ import { ScreenLoader } from '@/components/loaders/ScreenLoader';
 export const Events = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [events, setEvents] = useState<GroupEvents>({ allEvents: [], events: [] });
-
   const [loading, setLoading] = useState<boolean>(false);
+  
   useEffect(() => {
     getEventsApi()
   }, [])
 
   const getEventsApi = async () => {
     setLoading(true)
-    const response: IEvents[] = await getEvents();
-    setEvents({ allEvents: response, events: response })
+    try {
+      const response: IEvents[] = await getEvents();
+      setEvents({ allEvents: response, events: response })
+    } catch (err) {
+      console.log(err)
+    }
     setLoading(false)
   }
 

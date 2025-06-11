@@ -9,7 +9,6 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        agregaricon: "bg-blue-500 text-white cursor-pointer ",
         normal: 'border rounded-lg text-white',
         noDefault:
           "cursor-pointer text-primary-foreground shadow-xs",
@@ -23,6 +22,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        icon:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 rounded-full",
         link:
           "text-primary underline-offset-4 hover:underline",
         edit:
@@ -30,6 +31,8 @@ const buttonVariants = cva(
         delete:
           "flex justify-center items-center gap-2 bg-[#f44336] text-white hover:bg-red-600 cursor-pointer",
         animated:
+          'bg-linear-to-r from-blue-800 to-[#5cdee5] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200',
+        animated_old:
           'bg-linear-to-r from-blue-800 to-[#5cdee5] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] '
       },
       size: {

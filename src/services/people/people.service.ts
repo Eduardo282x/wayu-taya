@@ -12,6 +12,9 @@ export const postPeopleNormal = async (data: PeopleBody) => {
 export const postPeople = async (data: PeopleBody) => {
     return await postDataApi(peopleUrl, data)
 }
+export const putPeopleNormal = async (id: number, data: PeopleBody) => {
+    return await putDataApi(`${peopleUrl}/normal/${id}`, data)
+}
 export const putPeople = async (id: number, data: PeopleBody) => {
     return await putDataApi(`${peopleUrl}/${id}`, data)
 }

@@ -6,7 +6,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto rounded-xl"
+      className="relative w-full max-h-[24.5rem] overflow-auto rounded-xl"
     >
       <table
         data-slot="table"
@@ -21,7 +21,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b bg-gradient-to-r from-blue-800 to-[#34A8D5] pointer-events-none", className)}
+      className={cn("[&_tr]:border-b bg-gradient-to-r from-blue-800 to-[#34A8D5] pointer-events-none sticky top-0 z-20", className)}
       {...props}
     />
   )

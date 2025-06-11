@@ -1,15 +1,17 @@
 import { useForm } from "react-hook-form"
 
 import { Input } from "@/components/ui/input"
-import { PeopleBody } from "@/services/people/people.interface"
+import { IPeople, PeopleBody } from "@/services/people/people.interface"
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 interface PeopleFormProps {
-    addPeople: (data: PeopleBody) => void
+    people: IPeople | null;
+    addPeople: (data: PeopleBody) => void;
 }
 
-export const PeopleForm = ({ addPeople }: PeopleFormProps) => {
-    const { register, handleSubmit } = useForm<PeopleBody>({
+export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
+    const { register, handleSubmit, reset } = useForm<PeopleBody>({
         defaultValues: {
             id_parroquia: 1,
             name: '',
@@ -22,6 +24,23 @@ export const PeopleForm = ({ addPeople }: PeopleFormProps) => {
             birthdate: new Date(),
         }
     })
+
+    useEffect(() => {
+        if (people) {
+            const setPeopleForm = {
+                id_parroquia: people.parishId,
+                name: people.name,
+                lastName: people.lastName,
+                address: people.address,
+                email: people.email,
+                phone: people.phone,
+                identification: people.identification,
+                sex: people.sex,
+                birthdate: new Date(),
+            }
+            reset(setPeopleForm)
+        }
+    }, [people])
 
     const onSubmit = (data: PeopleBody) => {
         addPeople(data)
