@@ -1,22 +1,59 @@
-// import { useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 
 import { Input } from "@/components/ui/input"
+import { IPeople, PeopleBody } from "@/services/people/people.interface"
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
-export const PeopleForm = () => {
-    // const {register, handleSubmit} = useForm({
-    //     defaultValues: {
+interface PeopleFormProps {
+    people: IPeople | null;
+    addPeople: (data: PeopleBody) => void;
+}
 
-    //     }
-    // })
+export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
+    const { register, handleSubmit, reset } = useForm<PeopleBody>({
+        defaultValues: {
+            id_parroquia: 1,
+            name: '',
+            lastName: '',
+            address: '',
+            email: '',
+            phone: '',
+            identification: '',
+            sex: '',
+            birthdate: new Date(),
+        }
+    })
+
+    useEffect(() => {
+        if (people) {
+            const setPeopleForm = {
+                id_parroquia: people.parishId,
+                name: people.name,
+                lastName: people.lastName,
+                address: people.address,
+                email: people.email,
+                phone: people.phone,
+                identification: people.identification,
+                sex: people.sex,
+                birthdate: new Date(),
+            }
+            reset(setPeopleForm)
+        }
+    }, [people])
+
+    const onSubmit = (data: PeopleBody) => {
+        addPeople(data)
+    }
 
     return (
         <>
-            <div className="grid gap-4 py-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                     <label htmlFor="name" className="text-left">
                         Nombre
                     </label>
-                    <Input id="name" placeholder="Juan" className="col-span-3" />
+                    <Input id="name" placeholder="Juan" {...register('name')} className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <label htmlFor="lastname" className="text-left">
@@ -24,6 +61,7 @@ export const PeopleForm = () => {
                     </label>
                     <Input
                         id="lastname"
+                        {...register('lastName')}
                         placeholder="Pérez"
                         className="col-span-3"
                     />
@@ -33,6 +71,7 @@ export const PeopleForm = () => {
                         Cédula
                     </label>
                     <Input
+                        {...register('identification')}
                         id="identification"
                         placeholder="V-12345678"
                         className="col-span-3"
@@ -44,6 +83,7 @@ export const PeopleForm = () => {
                     </label>
                     <Input
                         id="sex"
+                        {...register('sex')}
                         placeholder="Masculino/Femenino"
                         className="col-span-3"
                     />
@@ -54,6 +94,7 @@ export const PeopleForm = () => {
                     </label>
                     <Input
                         id="address"
+                        {...register('address')}
                         placeholder="Calle Principal, Casa #1"
                         className="col-span-3"
                     />
@@ -62,7 +103,7 @@ export const PeopleForm = () => {
                     <label htmlFor="birthdate" className="text-left">
                         F. Nacimiento
                     </label>
-                    <Input id="birthdate" type="date" className="col-span-3" />
+                    <Input id="birthdate" {...register('birthdate')} type="date" className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <label htmlFor="phone" className="text-left">
@@ -70,6 +111,7 @@ export const PeopleForm = () => {
                     </label>
                     <Input
                         id="phone"
+                        {...register('phone')}
                         placeholder="0414-1234567"
                         className="col-span-3"
                     />
@@ -81,11 +123,17 @@ export const PeopleForm = () => {
                     <Input
                         id="email"
                         type="email"
+                        {...register('email')}
                         placeholder="ejemplo@dominio.com"
                         className="col-span-3"
                     />
                 </div>
-            </div>
+
+                <div className="flex items-center justify-end gap-2 w-full">
+                    <Button type="submit">Guardar</Button>
+                    <Button variant="outline">Cancelar</Button>
+                </div>
+            </form>
         </>
     )
 }

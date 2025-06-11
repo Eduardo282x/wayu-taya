@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 export const api = axios.create({
-    baseURL: `${import.meta.env.VITE_BASE_URL_API}/api`
+    baseURL: `${import.meta.env.VITE_BASE_URL_API || 'https://wayu-taya-api.onrender.com'}/api`
 })
 
 export const getDataApi = async (url: string) => {
@@ -27,7 +27,7 @@ export const postDataApi = async (url: string, body: any) => {
 
 export const putDataApi = async (url: string, body: any) => {
     try {
-        return await api.post(url, body).then(res => {
+        return await api.put(url, body).then(res => {
             return res.data
         })
     } catch (err) {

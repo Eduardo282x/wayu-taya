@@ -8,8 +8,8 @@ export interface PeopleBody {
     identification: string;
     sex: string;
     birthdate: Date;
-    id_programa: number[];
-    cambioPersona?: boolean;
+    // id_programa: number[];
+    // cambioPersona?: boolean;
 }
 
 export interface GroupPeople {
