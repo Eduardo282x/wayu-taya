@@ -24,7 +24,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {users.map(({ id, nombre,apellido, usuario, correo }) => (
+          {users.map(({ id, nombre, apellido, usuario, correo }) => (
             <tr key={id}>
               <td>{nombre}</td>
               <td>{apellido}</td>
@@ -32,20 +32,20 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
               <td>{correo}</td>
               <td className="actions-cell">
                 <Button size={"icon"}
-                className="py-[0.4rem] pl-[0.2rem] "
-                 variant={'edit'}
-                  onClick={() => onEdit({ id, nombre,apellido , usuario, correo })}
+                  className="py-[0.4rem] pl-[0.2rem] "
+                  variant={'edit'}
+                  onClick={() => onEdit({ id, nombre, apellido, usuario, correo })}
                   aria-label={`Editar usuario ${usuario}`}
-                ><FaRegEdit className="size-4.5"/>
+                ><FaRegEdit className="size-4.5" />
                 </Button>
               </td>
               <td>
-              <Button className="rounded-xl py-[0.4rem] px-[0.2rem]" size={'icon'}
+                <Button className="rounded-xl py-[0.4rem] px-[0.2rem]" size={'icon'}
                   variant={'delete'}
                   onClick={() => onDelete(id)}
                   aria-label={`Eliminar usuario ${usuario}`}
                 >
-                <FaRegTrashAlt className="size-5 "/>
+                  <FaRegTrashAlt className="size-5 " />
                 </Button>
               </td>
             </tr>

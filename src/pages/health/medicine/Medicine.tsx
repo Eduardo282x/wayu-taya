@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HeaderPages } from "@/pages/layout/Header";
-import { FaPills } from "react-icons/fa";
+import { FaFilter, FaPills } from "react-icons/fa";
 import {
   medicineColumns,
-  MedicineTable,
-  dataMedicamentos,
 } from "./medicine.data";
 import { Button } from "@/components/ui/button";
 import { GiMedicines } from "react-icons/gi";
@@ -16,8 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { MedicineForm, MedicineData } from "./MedicineForm";
+import { getMedicine } from "@/services/medicine/medicine.service";
+import { GroupMedicine, IMedicine } from "@/services/medicine/medicine.interface";
+import { TableComponents } from "@/components/table/TableComponents";
 
 export const Medicine = () => {
+
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
     medicineColumns.reduce((acc, col) => {
       acc[col.column] = true;
@@ -25,7 +27,19 @@ export const Medicine = () => {
     }, {} as Record<string, boolean>)
   );
 
-  const [medicines, setMedicines] = useState<MedicineData[]>(dataMedicamentos);
+  const [medicines, setMedicines] = useState<GroupMedicine>({allMedicine: [], medicine:[]});
+
+  useEffect(() => {
+    getMedicineApi();
+  }, [])
+
+  const getMedicineApi = async () => {
+    const response: IMedicine[] = await getMedicine();
+    setMedicines({
+      allMedicine: response,
+      medicine: response
+    })
+  }
 
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
@@ -40,7 +54,9 @@ export const Medicine = () => {
   };
 
   const handleAddMedicineSubmit = (newMedicine: MedicineData) => {
-    setMedicines((prevMedicines) => [...prevMedicines, newMedicine]);
+    // setMedicines((prevMedicines) => [...prevMedicines, newMedicine]);
+    console.log(newMedicine);
+    
     setIsAddFormOpen(false);
   };
 
@@ -48,9 +64,6 @@ export const Medicine = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredMedicines = medicines.filter((medicine) =>
-    medicine.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <>
@@ -61,12 +74,13 @@ export const Medicine = () => {
       <div className="flex justify-between items-center mt-4 px-2">
         <div>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Button
                 variant="outline"
-                className="bg-white text-[#5cdee5] border border-[#5cdee5] hover:bg-[#e6fafd] hover:text-[#24b3c6]"
+                className="bg-white text-[#0350af] border border-[#0350af] hover:bg-[#e6fafd] hover:text-[#0350af]"
               >
-                Ver Columnas
+                {/* Ver Columnas */}
+                <FaFilter />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -107,8 +121,8 @@ export const Medicine = () => {
           </Button>
         </div>
       </div>
-      <div>
-        <MedicineTable columns={displayedColumns} data={filteredMedicines} />
+      <div className="">
+        <TableComponents column={displayedColumns} data={medicines.medicine} />
       </div>
 
       <MedicineForm

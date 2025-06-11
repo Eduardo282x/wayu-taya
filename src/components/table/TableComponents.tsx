@@ -3,8 +3,8 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Column } from "@/interfaces/table.interface";
-import { FC, useState } from "react";
-import { pagesData } from "./table.data";
+import { FC, useEffect, useState } from "react";
+import { PagesInterface } from "./table.data";
 import { Button } from "../ui/button";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
@@ -61,6 +61,24 @@ interface PaginationTableProps {
 }
 
 const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElements }: PaginationTableProps) => {
+  const [numberPage, setNumberPerPage] = useState<PagesInterface[]>([])
+
+  useEffect(() => {
+    const totalPaginate = Math.ceil(totalElements / Number(rowsPerPage))
+    const arrayPage = Array.from(
+      { length: totalPaginate },
+      (_, i) => 1 + i * 1,
+    )
+
+    const parseArray = arrayPage.map(item => {
+      return {
+        value: item - 1,
+        page: item
+      }
+    })
+    setNumberPerPage(parseArray)
+  }, [totalElements, rowsPerPage])
+
   return (
     <div className="flex items-center justify-between w-full mt-4">
       <p><span className="font-semibold">Total de elementos:</span> {totalElements}</p>
@@ -99,7 +117,7 @@ const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElem
               </Button>
             </PaginationItem>
 
-            {pagesData.map((item) => (
+            {numberPage.map((item) => (
               <PaginationItem key={item.value}>
                 <PaginationLink className={`${page == item.value ? 'border bg-[#193db9] text-white' : ''} hover:bg-[#193db9] hover:text-white cursor-pointer`} onClick={() => setPage(item.value)}>{item.page}</PaginationLink>
               </PaginationItem>

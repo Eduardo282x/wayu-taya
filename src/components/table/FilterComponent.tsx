@@ -31,7 +31,7 @@ export const FilterComponent = ({ data, setDataFilter, columns }: FilterProps) =
         }
 
         const keys = columns
-            // .filter((col: Column) => col.icon === false)
+            .filter((col: Column) => col.isIcon === false)
             .map((col: Column) => col.column)
 
         const filtered = data.filter((item) =>
