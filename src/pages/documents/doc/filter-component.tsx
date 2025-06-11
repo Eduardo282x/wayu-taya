@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 
 import { useEffect, useState } from "react"
@@ -8,7 +6,6 @@ import { CiSearch } from "react-icons/ci"
 import type { DocumentData, FilterColumn } from "../doc/types/document"
 
 
-// Debounce utility function
 const debounce = (func: (...args: any[]) => void, wait: number) => {
   let timeout: NodeJS.Timeout
   return function executedFunction(...args: any[]) {
