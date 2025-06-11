@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { FaRegSave } from "react-icons/fa";
 import { TiUserAddOutline } from "react-icons/ti";
 import FormInput from "@/components/formInput/FormInputCustom";
+import { IUsers, UsersBody } from "@/services/users/user.interface";
 
 export interface User {
   id: number;
@@ -24,8 +25,8 @@ export interface User {
 interface UsersFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (user: Omit<User, "id"> | User) => void;
-  user?: User | null;
+  onSubmit: (user: UsersBody) => void;
+  user?: IUsers | null;
 }
 
 const UsersForm: React.FC<UsersFormProps> = ({
@@ -41,19 +42,19 @@ const UsersForm: React.FC<UsersFormProps> = ({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<Omit<User, "id"> | User>({
+  } = useForm<UsersBody>({
     defaultValues: user || {
-      nombre: "",
-      apellido: "",
-      usuario: "",
+      name: "",
+      lastName: "",
+      username: "",
       correo: "",
     },
   });
 
   useEffect(() => {
-    if (open)
-      reset(user || { nombre: "", apellido: "", usuario: "", correo: "" });
-  }, [open, user, reset]);
+    if (user)
+      reset(user);
+  }, [user]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,7 +75,7 @@ const UsersForm: React.FC<UsersFormProps> = ({
               label="Nombre"
               id="nombre"
               autoFocus
-              {...register("nombre", {
+              {...register("name", {
                 required: "El nombre es obligatorio",
                 pattern: {
                   value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
@@ -82,7 +83,7 @@ const UsersForm: React.FC<UsersFormProps> = ({
                     "El nombre no puede contener números ni caracteres especiales",
                 },
               })}
-              error={errors.nombre?.message}
+              error={errors.name?.message}
             />
           </div>
 
@@ -90,7 +91,7 @@ const UsersForm: React.FC<UsersFormProps> = ({
             <FormInput
               label="Apellido"
               id="apellido"
-              {...register("apellido", {
+              {...register("lastName", {
                 required: "El apellido es obligatorio",
                 pattern: {
                   value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
@@ -98,7 +99,7 @@ const UsersForm: React.FC<UsersFormProps> = ({
                     "El apellido no puede contener números ni caracteres especiales",
                 },
               })}
-              error={errors.apellido?.message}
+              error={errors.lastName?.message}
             />
           </div>
 
@@ -106,10 +107,10 @@ const UsersForm: React.FC<UsersFormProps> = ({
             <FormInput
               label="Usuario"
               id="usuario"
-              {...register("usuario", {
+              {...register("username", {
                 required: "El usuario es obligatorio",
               })}
-              error={errors.usuario?.message}
+              error={errors.username?.message}
             />
           </div>
 

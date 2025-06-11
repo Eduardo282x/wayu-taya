@@ -1,6 +1,8 @@
 import { Column } from "@/components/table/table.interface";
 import { IPeople } from "@/services/people/people.interface";
 import { formatDate } from "@/utils/formatters";
+import { MdEdit } from "react-icons/md";
+import { FiTrash2 } from "react-icons/fi";
 
 export const columnPeople: Column[] = [
   {
@@ -58,7 +60,33 @@ export const columnPeople: Column[] = [
     element: (data: IPeople) => formatDate(data.birthdate),
     isIcon: false,
     visible: true
-  }
+  },
+  {
+    label: 'Editar',
+    column: 'edit',
+    element: (data: IPeople) => formatDate(data.birthdate),
+    icon: {
+      icon: MdEdit,
+      label: 'Editar persona',
+      className: '',
+      variant: 'edit'
+    },
+    isIcon: true,
+    visible: true
+  },
+  {
+    label: 'Eliminar',
+    column: 'delete',
+    element: (data: IPeople) => formatDate(data.birthdate),
+    icon: {
+      icon: FiTrash2,
+      label: 'Eliminar persona',
+      className: '',
+      variant: 'delete'
+    },
+    isIcon: true,
+    visible: true
+  },
 ];
 
 export const peopleForm = [

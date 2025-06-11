@@ -2,18 +2,19 @@
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { Column } from "@/components/table/table.interface";
 import { FC, useEffect, useState } from "react";
 import { PagesInterface } from "./table.data";
 import { Button } from "../ui/button";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-
 interface TableProps {
   column: Column[];
   data: any[];
+  actionTable: (action: string, data: any) => void
 }
 
-export const TableComponents: FC<TableProps> = ({ column, data }) => {
+export const TableComponents: FC<TableProps> = ({ column, data, actionTable }) => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<string>('10');
 
@@ -31,25 +32,80 @@ export const TableComponents: FC<TableProps> = ({ column, data }) => {
           <TableBody>
             {data && data.slice(page * Number(rowsPerPage), page * Number(rowsPerPage) + Number(rowsPerPage)).map((item, index: number) => (
               <TableRow key={index}>
-                {column.map((col: Column, index: number) => (
-                  <TableCell key={index}>{col.element(item)}</TableCell>
-                ))}
+                {column.map((col: Column, index: number) => {
+                  if (col.isIcon) {
+                    return <ColumnIcon col={col} item={item} actionTable={actionTable} key={index} />
+                  }
+                  else {
+                    return <ColumnNormal col={col} item={item} actionTable={actionTable} key={index} />
+                  }
+                }
+                )}
               </TableRow>
             ))}
+
+            {data.length == 0 && (
+              <TableRow>
+                <TableCell colSpan={column.length} style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+                  No se encontraron datos.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
 
-      <PaginationTable
-        page={page}
-        setPage={setPage}
-        rowsPerPage={rowsPerPage}
-        setRowsPerPage={setRowsPerPage}
-        totalElements={data.length}
-      />
+      {data.length > 10 && (
+        <PaginationTable
+          page={page}
+          setPage={setPage}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
+          totalElements={data.length}
+        />
+      )}
     </div>
   );
 };
+
+interface ColumnCellProps {
+  col: Column;
+  item: any;
+  actionTable: (action: string, data: any) => void
+}
+
+const ColumnNormal = ({ col, item }: ColumnCellProps) => {
+  return (
+    <TableCell className={col.className ? col.className(item) : ''}>
+      {col.element(item)}
+    </TableCell>
+  )
+}
+
+const ColumnIcon = ({ col, item, actionTable }: ColumnCellProps) => {
+  return (
+    <TableCell className={col.className ? col.className(item) : ''}>
+      <Tooltip>
+        <TooltipTrigger>
+          <Button
+            size={"icon"}
+            className="py-[0.4rem] pl-[0.2rem] "
+            variant={'icon'}
+            onClick={() => actionTable(col.column, item)}
+          >
+            {col.icon && (
+              <col.icon.icon className={`${col.icon.className} size-4.5`} />
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent className="opacity-70" side="left">
+          <span>{col.icon?.label}</span>
+        </TooltipContent>
+      </Tooltip>
+    </TableCell>
+  )
+}
+
 
 interface PaginationTableProps {
   page: number;

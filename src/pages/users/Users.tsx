@@ -1,142 +1,123 @@
 import { PiUsersThree } from "react-icons/pi";
 import { Button } from '@/components/ui/button';
 import { TiUserAddOutline } from "react-icons/ti";
-import UserTable from "./UserTable";
-import { User } from "./types";
-import { useState, useMemo } from "react";
-import UsersForm from "./UserForms"; 
+import { useEffect, useState } from "react";
+import UsersForm from "./UserForms";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
-import AlertDialog from "./AlertDialog";
 import { HeaderPages } from "../layout/Header"
-
-const initialUsers: User[] = [
-  { id: 1, nombre: "Juan", apellido:"Pérez", usuario: "juanp", correo: "juanp@mail.com" },
-  { id: 2, nombre: "María", apellido:"López", usuario: "marial", correo: "marial@mail.com" },
-];
+import { TableComponents } from "@/components/table/TableComponents";
+import { GroupUsers, IUsers, UsersBody } from "@/services/users/user.interface";
+import { FilterComponent } from "@/components/table/FilterComponent";
+import { usersColumns } from "./user.data";
+import { getUsers, postUsers, putUsers } from "@/services/users/user.service";
+import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 
 export const Users = () => {
-  const [users, setUsers] = useState<User[]>(initialUsers);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  const [users, setUsers] = useState<GroupUsers>({ allUsers: [], users: [] });
+  const [userSelected, setUserSelected] = useState<IUsers | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  const openCreateForm = () => {
-    setEditingUser(null);
-    setIsFormOpen(true);
-  };
+  useEffect(() => {
+    getUsersApi()
+  }, [])
 
-  const openEditForm = (user: User) => {
-    setEditingUser(user);
-    setIsFormOpen(true);
-  };
-
-  // Guardar usuario (crear o editar)
-  const handleUserSubmit = (data: Omit<User, "id"> | User) => {
-    const usuarioExistente = users.some(
-      (u) =>
-        u.usuario.toLowerCase() === data.usuario.toLowerCase() &&
-        ("id" in data ? u.id !== data.id : true)
-    );
-    const correoExistente = users.some(
-      (u) =>
-        u.correo.toLowerCase() === data.correo.toLowerCase() &&
-        ("id" in data ? u.id !== data.id : true)
-    );
-
-    if (usuarioExistente || correoExistente) {
-      setAlertMessage("El usuario o correo ya está registrado.");
-      setAlertOpen(true);
-      return;
+  const getUsersApi = async () => {
+    setLoading(true)
+    try {
+      const response: IUsers[] = await getUsers();
+      setUsers({ allUsers: response, users: response })
+    } catch (err) {
+      console.log(err);
     }
+    setLoading(false)
+  }
 
-    if ("id" in data) {
-      // Editar usuario existente
-      setUsers(users.map(u => (u.id === data.id ? data : u)));
-    } else {
-      // Crear nuevo usuario
-      const newUser: User = {
-        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
-        ...data,
-      };
-      setUsers([...users, newUser]);
-    }
-    setIsFormOpen(false);
-    setEditingUser(null);
-  };
 
-  const filteredUsers = useMemo(() => {
-    if (!searchTerm) return users;
-    const lowerSearch = searchTerm.toLowerCase();
-    return users.filter(
-      (user) =>
-        user.nombre.toLowerCase().includes(lowerSearch) ||
-        user.apellido.toLowerCase().includes(lowerSearch) ||
-        user.usuario.toLowerCase().includes(lowerSearch) ||
-        user.correo.toLowerCase().includes(lowerSearch)
-    );
-  }, [searchTerm, users]);
+  const setUserFilter = (users: IUsers[]) => {
+    setUsers((prev) => ({ ...prev, users: users }))
+  }
 
-  const handleDeleteClick = (user: User) => {
-    setUserToDelete(user);
-    setIsDeleteDialogOpen(true);
-  };
+  const newUser = () => {
+    setUserSelected(null);
+    setOpen(true);
+  }
 
   const handleConfirmDelete = () => {
-    if (userToDelete) {
-      setUsers(users.filter((u) => u.id !== userToDelete.id));
-      setUserToDelete(null);
-      setIsDeleteDialogOpen(false);
+    if (userSelected) {
+      // setUsers(users.filter((u) => u.id !== userToDelete.id));
+      // setUserToDelete(null);
+      // setIsDeleteDialogOpen(false);
     }
   };
+
+  const getActionTable = (action: string, data: IUsers) => {
+    setUserSelected(data);
+    if (action == 'edit') {
+      setOpen(true);
+    }
+    if (action == 'delete') {
+      setIsDeleteDialogOpen(true);
+    }
+  }
+
+  const getActionForm = async (user: UsersBody) => {
+    if (userSelected) {
+      await putUsers(userSelected.id, user);
+    } else {
+      await postUsers(user);
+    }
+    getUsersApi();
+    setOpen(false);
+  }
 
   return (
     <div className=''>
-      <HeaderPages title="Usuarios" Icon={PiUsersThree}/>
-      <div className='w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between'>
-        <input
-          type='search'
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder='Buscar...'
-          className='focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s w-[30%]'
-        />
-        <Button variant='animated' className='h-[90%]' onClick={openCreateForm}>
-          <TiUserAddOutline className='size-6 '/>Crear Usuario
-        </Button>
+      {loading && (
+        <ScreenLoader />
+      )}
+      <HeaderPages title="Usuarios" Icon={PiUsersThree} />
+
+      <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+        <div className="flex items-center ">
+          <FilterComponent
+            data={users.allUsers}
+            columns={usersColumns}
+            setDataFilter={setUserFilter}
+            placeholder="Buscar usuarios..."
+          />
+          <Button
+            variant={"animated"}
+            className="h-full"
+            onClick={newUser}
+          >
+            <TiUserAddOutline className='size-6 ' />
+            Crear Usuario
+          </Button>
+        </div>
       </div>
-      <div>
-        <UserTable
-          users={filteredUsers}
-          onEdit={openEditForm}
-          onDelete={(userId) => {
-            const user = users.find((u) => u.id === userId);
-            if (user) handleDeleteClick(user);
-          }}
+
+      <div className="mt-4">
+        <TableComponents
+          data={users.users}
+          column={usersColumns}
+          actionTable={getActionTable}
         />
 
         <UsersForm
-          open={isFormOpen}
-          onOpenChange={setIsFormOpen}
-          onSubmit={handleUserSubmit}
-          user={editingUser}
+          open={open}
+          onOpenChange={setOpen}
+          user={userSelected}
+          onSubmit={getActionForm}
         />
 
         <ConfirmDeleteDialog
           open={isDeleteDialogOpen}
           onOpenChange={setIsDeleteDialogOpen}
           onConfirm={handleConfirmDelete}
-          userName={userToDelete?.nombre}
-        />
-
-        <AlertDialog
-          open={alertOpen}
-          onOpenChange={setAlertOpen}
-          title="Error"
-          description={alertMessage}
+          userName={userSelected?.name}
         />
       </div>
     </div>

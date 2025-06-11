@@ -14,22 +14,27 @@ import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 import { Column } from "@/components/table/table.interface";
+import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 
 export const Medicine = () => {
   const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: [], medicine: [] });
   const [columns, setColumns] = useState<Column[]>(medicineColumns);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getMedicineApi();
   }, [])
 
   const getMedicineApi = async () => {
-    const response: IMedicine[] = await getMedicine();
-    setMedicines({
-      allMedicine: response,
-      medicine: response
-    })
+    setLoading(true);
+    try {
+      const response: IMedicine[] = await getMedicine();
+      setMedicines({ allMedicine: response, medicine: response })
+    } catch (err) {
+      console.log(err);
+    }
+    setLoading(false);
   }
 
   const openAddForm = () => {
@@ -46,8 +51,23 @@ export const Medicine = () => {
     setMedicines((prev) => ({ ...prev, medicine: medicines }));
   };
 
+  const getActionTable = (action: string, data: IMedicine) => {
+    console.log(action);
+    console.log(data);
+    // setUserSelected(data);
+    // if (action == 'edit') {
+    //   setOpen(true);
+    // }
+    // if (action == 'delete') {
+    //   setIsDeleteDialogOpen(true);
+    // }
+  }
+
   return (
     <>
+      {loading && (
+        <ScreenLoader />
+      )}
       <div>
         <HeaderPages title="Medicamentos" Icon={FaPills} />
       </div>
@@ -74,7 +94,11 @@ export const Medicine = () => {
       </div>
 
       <div className="mt-4">
-        <TableComponents column={columns.filter(item => item.visible == true)} data={medicines.medicine} />
+        <TableComponents
+          column={columns.filter(item => item.visible == true)}
+          data={medicines.medicine}
+          actionTable={getActionTable}
+        />
       </div>
 
       <MedicineForm
