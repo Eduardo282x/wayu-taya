@@ -57,5 +57,5 @@ export const usersColumns: Column[] = [
         },
         isIcon: true,
         visible: true
-    },
+    }
 ]

@@ -8,6 +8,7 @@ import { Column } from "@/components/table/table.interface";
 import { FC, useEffect, useState } from "react";
 import { PagesInterface } from "./table.data";
 import { Button } from "../ui/button";
+import './table.css';
 interface TableProps {
   column: Column[];
   data: any[];

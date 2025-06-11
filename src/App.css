@@ -37,8 +37,6 @@
   font-style: normal;
 }
 
-
-
 .animationOpacity {
   animation: fadeIn 0.2s ease-in-out;
 }
@@ -51,12 +49,14 @@
   100% {
     opacity: 1;
   }
-} 
-  @keyframes fadeUp {
+}
+
+@keyframes fadeUp {
   0% {
     opacity: 0.4;
     transform: translateY(40px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);

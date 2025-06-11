@@ -5,6 +5,7 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdOutlineInventory2 } from "react-icons/md";
 import { AiOutlineProduct } from "react-icons/ai";
+import { BiDonateHeart } from "react-icons/bi";
 
 export interface IMenu {
     label: string;
@@ -45,6 +46,12 @@ export const menu: IMenu[] = [
         active: false,
         url: '/documentos/documentos',
         icon: IoDocumentTextOutline,
+    },
+    {
+        label: 'Donaciones',
+        active: false,
+        url: '/salud/donaciones',
+        icon: BiDonateHeart,
     },
     {
         label: 'Inventario',
@@ -99,6 +106,12 @@ export const menuHealth: IMenu[] = [
         active: false,
         url: '/documentos/eventos',
         icon: FaRegCalendarAlt,
+    },
+    {
+        label: 'Donaciones',
+        active: false,
+        url: '/salud/donaciones',
+        icon: BiDonateHeart,
     },
     {
         label: 'Inventario',

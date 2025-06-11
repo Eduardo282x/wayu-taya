@@ -70,7 +70,7 @@ export const People = () => {
       <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />
 
       <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-        <DropdownColumnFilter columns={columns.filter(item => item.isIcon == false)} setColumns={setColumns} />
+        <DropdownColumnFilter columns={columns} setColumns={setColumns} />
 
         <div className="flex items-center ">
           <FilterComponent

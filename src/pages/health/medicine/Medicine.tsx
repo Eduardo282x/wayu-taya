@@ -1,20 +1,17 @@
-import { useEffect, useState } from "react";
-import { HeaderPages } from "@/pages/layout/Header";
-import { FaPills } from "react-icons/fa";
-import {
-  medicineColumns,
-} from "./medicine.data";
-import { Button } from "@/components/ui/button";
-import { GiMedicines } from "react-icons/gi";
-
-import { MedicineForm, MedicineData } from "./MedicineForm";
-import { getMedicine } from "@/services/medicine/medicine.service";
 import { GroupMedicine, IMedicine } from "@/services/medicine/medicine.interface";
+import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
-import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
-import { Column } from "@/components/table/table.interface";
+import { getMedicine } from "@/services/medicine/medicine.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
+import { Column } from "@/components/table/table.interface";
+import { MedicineForm, MedicineData } from "./MedicineForm";
+import { HeaderPages } from "@/pages/layout/Header";
+import { medicineColumns } from "./medicine.data";
+import { Button } from "@/components/ui/button";
+import { GiMedicines } from "react-icons/gi";
+import { useEffect, useState } from "react";
+import { FaPills } from "react-icons/fa";
 
 export const Medicine = () => {
   const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: [], medicine: [] });
@@ -55,9 +52,9 @@ export const Medicine = () => {
     console.log(action);
     console.log(data);
     // setUserSelected(data);
-    // if (action == 'edit') {
-    //   setOpen(true);
-    // }
+    if (action == 'edit') {
+      setIsAddFormOpen(true);
+    }
     // if (action == 'delete') {
     //   setIsDeleteDialogOpen(true);
     // }

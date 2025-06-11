@@ -37,7 +37,7 @@ export const DropdownColumnFilter = ({ columns, setColumns }: DropdownColumnFilt
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                    {columns.map((column: Column, index: number) => (
+                    {columns.filter(item => item.isIcon == false).map((column: Column, index: number) => (
                         <DropdownMenuCheckboxItem
                             key={index}
                             className='capitalize hover:bg-gray-200'
