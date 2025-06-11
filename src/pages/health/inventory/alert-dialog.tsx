@@ -1,4 +1,4 @@
-import type React from "react"
+import type React from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,17 +7,22 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface AlertDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title?: string
-  description: string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title?: string;
+  description: string;
 }
 
-const AlertDialog: React.FC<AlertDialogProps> = ({ open, onOpenChange, title = "Aviso", description }) => {
+const AlertDialog: React.FC<AlertDialogProps> = ({
+  open,
+  onOpenChange,
+  title = "Aviso",
+  description,
+}) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md text-[red]">
@@ -27,14 +32,14 @@ const AlertDialog: React.FC<AlertDialogProps> = ({ open, onOpenChange, title = "
         </DialogHeader>
         <DialogFooter className="flex justify-end">
           <DialogClose asChild>
-            <Button variant={"usuarioForm"} className="p-3 w-[17%] rounded-2xl justify-evenly" type="submit">
+            <Button variant={"animated"} className="p-3 w-[17%] rounded-2xl justify-evenly" type="submit">
               OK
             </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default AlertDialog
+export default AlertDialog;

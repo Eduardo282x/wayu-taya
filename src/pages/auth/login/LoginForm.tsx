@@ -6,7 +6,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
 import { useNavigate } from "react-router"
 import { Snackbar } from "@/components/snackbar/Snackbar"
 import toast from "react-hot-toast"
-import { authLogin } from "@/services/auth/auth"
+import { authLogin } from "@/services/auth/auth.service"
 import { SnackbarProps } from "@/components/snackbar/Snackbar"
 
 // Definir la interfaz para las props

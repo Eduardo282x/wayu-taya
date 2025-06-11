@@ -8,7 +8,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { EventForm } from './EventForm';
 import { useEffect, useState } from 'react';
 import { DatePickerRange } from '@/components/datePickerRange/DatePickerRange';
-import { getEvents } from '@/services/events/events';
+import { getEvents } from '@/services/events/events.service';
 import { GroupEvents, IEvents } from '@/services/events/events.interface';
 import { days, months } from '@/utils/formatters';
 import { ScreenLoader } from '@/components/loaders/ScreenLoader';

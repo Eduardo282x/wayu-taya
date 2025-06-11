@@ -5,11 +5,11 @@ import { HeaderPages } from "@/pages/layout/Header";
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import { IoPersonAddOutline } from "react-icons/io5";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { PeopleForm } from "./PeopleForm";
-import { GroupPeople, IPeople } from "@/services/people/people.interface";
-import { getPeople } from "@/services/people/people";
+import { GroupPeople, IPeople, PeopleBody } from "@/services/people/people.interface";
+import { getPeople, postPeopleNormal } from "@/services/people/people.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 
 export const People = () => {
@@ -31,6 +31,12 @@ export const People = () => {
     setLoading(false)
   }
 
+  const addPeople = async (people: PeopleBody) => {
+    await postPeopleNormal(people);
+    getPeopleApi();
+    setOpen(false);
+  }
+
   const setPeopleFilter = (users: IPeople[]) => {
     setPeople((prev) => ({ ...prev, people: users }))
   }
@@ -38,7 +44,7 @@ export const People = () => {
   return (
     <div>
       {loading && (
-        <ScreenLoader/>
+        <ScreenLoader />
       )}
       <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />
       <div className="flex justify-end gap-2 mb-2">
@@ -51,16 +57,17 @@ export const People = () => {
       <div>
         <TableComponents column={columnPeople} data={people.people} />
       </div>
-      <DialogPeople open={open} setOpen={setOpen} />
+      <DialogPeople open={open} setOpen={setOpen} addPeople={addPeople}/>
     </div>
   );
 };
 interface DialogPeopleProps {
-  open: boolean
-  setOpen: (active: boolean) => void
+  open: boolean;
+  setOpen: (active: boolean) => void;
+  addPeople: (data: PeopleBody) => void
 }
 
-const DialogPeople = ({ open, setOpen }: DialogPeopleProps) => {
+const DialogPeople = ({ open, setOpen, addPeople }: DialogPeopleProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl">
@@ -70,13 +77,7 @@ const DialogPeople = ({ open, setOpen }: DialogPeopleProps) => {
             Rellena todos los campos para añadir una nueva persona.
           </DialogDescription>
         </DialogHeader>
-        <PeopleForm />
-        <DialogFooter>
-          <Button type="submit">Guardar</Button>
-          <DialogClose asChild>
-            <Button variant="outline">Cancelar</Button>
-          </DialogClose>
-        </DialogFooter>
+        <PeopleForm addPeople={addPeople} />
       </DialogContent>
     </Dialog>
   )
