@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
@@ -11,10 +12,12 @@ import './table.css';
 interface TableProps {
   column: Column[];
   data: any[];
-  actionTable: (action: string, data: any) => void
+  actionTable: (action: string, data: any) => void;
+  renderRow?: (item: any, index: number) => React.ReactNode;
+  colSpanColumns?: boolean;
 }
 
-export const TableComponents: FC<TableProps> = ({ column, data, actionTable }) => {
+export const TableComponents: FC<TableProps> = ({ column, data, actionTable, renderRow, colSpanColumns }) => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<string>('10');
 
@@ -32,15 +35,22 @@ export const TableComponents: FC<TableProps> = ({ column, data, actionTable }) =
           <TableBody>
             {data && data.slice(page * Number(rowsPerPage), page * Number(rowsPerPage) + Number(rowsPerPage)).map((item, index: number) => (
               <TableRow key={index}>
-                {column.map((col: Column, index: number) => {
-                  if (col.isIcon) {
-                    return <ColumnIcon col={col} item={item} actionTable={actionTable} key={index} />
+
+                {renderRow
+                  ?
+                  <TableCell key={index} colSpan={colSpanColumns ? column.length : 1} className="p-0">
+                    {renderRow(item, index)}
+                  </TableCell>
+                  :
+                  column.map((col: Column, index: number) => {
+                    if (col.isIcon) {
+                      return <ColumnIcon col={col} item={item} actionTable={actionTable} key={index} />
+                    }
+                    else {
+                      return <ColumnNormal col={col} item={item} actionTable={actionTable} key={index} />
+                    }
                   }
-                  else {
-                    return <ColumnNormal col={col} item={item} actionTable={actionTable} key={index} />
-                  }
-                }
-                )}
+                  )}
               </TableRow>
             ))}
 
