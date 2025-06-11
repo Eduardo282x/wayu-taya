@@ -10,21 +10,25 @@ import { FilterComponent } from "@/components/table/FilterComponent";
 import { PeopleForm } from "./PeopleForm";
 import { GroupPeople, IPeople } from "@/services/people/people.interface";
 import { getPeople } from "@/services/people/people";
+import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 
 export const People = () => {
   const [people, setPeople] = useState<GroupPeople>({ allPeople: [], people: [] });
   const [open, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getPeopleApi()
   }, [])
 
   const getPeopleApi = async () => {
+    setLoading(true)
     const response: IPeople[] = await getPeople();
     setPeople({
       allPeople: response,
       people: response
     })
+    setLoading(false)
   }
 
   const setPeopleFilter = (users: IPeople[]) => {
@@ -33,6 +37,9 @@ export const People = () => {
 
   return (
     <div>
+      {loading && (
+        <ScreenLoader/>
+      )}
       <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />
       <div className="flex justify-end gap-2 mb-2">
         <FilterComponent data={people.allPeople} columns={columnPeople} setDataFilter={setPeopleFilter} />

@@ -19,6 +19,7 @@ export const TableComponents: FC<TableProps> = ({ column, data }) => {
 
   return (
     <div className="w-full">
+
       <div className="w-full h-[25rem] overflow-auto">
         <Table className="w-full">
           <TableHeader>
@@ -61,7 +62,7 @@ interface PaginationTableProps {
 
 const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElements }: PaginationTableProps) => {
   return (
-    <div className="flex items-center justify-between w-full mt-2">
+    <div className="flex items-center justify-between w-full mt-4">
       <p><span className="font-semibold">Total de elementos:</span> {totalElements}</p>
 
       <div className="flex items-center justify-center gap-2">

@@ -11,22 +11,29 @@ import { DatePickerRange } from '@/components/datePickerRange/DatePickerRange';
 import { getEvents } from '@/services/events/events';
 import { GroupEvents, IEvents } from '@/services/events/events.interface';
 import { days, months } from '@/utils/formatters';
+import { ScreenLoader } from '@/components/loaders/ScreenLoader';
 
 export const Events = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [events, setEvents] = useState<GroupEvents>({ allEvents: [], events: [] });
 
+  const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     getEventsApi()
   }, [])
 
   const getEventsApi = async () => {
+    setLoading(true)
     const response: IEvents[] = await getEvents();
     setEvents({ allEvents: response, events: response })
+    setLoading(false)
   }
 
   return (
     <div>
+      {loading && (
+        <ScreenLoader />
+      )}
       <HeaderPages title='Eventos' Icon={FaRegCalendarAlt} />
       <div className='flex justify-between p-4'>
         <DatePickerRange />
