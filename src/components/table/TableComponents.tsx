@@ -45,7 +45,7 @@ export const TableComponents: FC<TableProps> = ({ column, data, actionTable }) =
               </TableRow>
             ))}
 
-            {data.length == 0 && (
+            {!data || data.length == 0 && (
               <TableRow>
                 <TableCell colSpan={column.length} style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
                   No se encontraron datos.
@@ -56,7 +56,7 @@ export const TableComponents: FC<TableProps> = ({ column, data, actionTable }) =
         </Table>
       </div>
 
-      {data.length > 10 && (
+      {data && data.length > 10 && (
         <PaginationTable
           page={page}
           setPage={setPage}
