@@ -40,6 +40,10 @@ export default function Home() {
               icon={me.icon}
               buttonText={me.buttonText}
               url={me.url}
+              style={{
+                animation: 'fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                animationDelay: `${index * 0.03}s`
+              }}
             />
           ))}
         </div>
@@ -48,9 +52,12 @@ export default function Home() {
   )
 }
 
-function CategoryCard({ title, description, icon: Icon, buttonText, url }: CategoryCardProps) {
+function CategoryCard({ title, description, icon: Icon, buttonText, url, style }: CategoryCardProps & { style?: React.CSSProperties }) {
   return (
-    <div className={`rounded-lg shadow-xl bg-gray-200 border-2 border-blue-500 w-80 h-52 p-6`}>
+    <div
+      className="rounded-lg shadow-xl bg-gray-200 border-2 border-blue-500 w-80 h-52 p-6"
+      style={style}
+    >
       <div className="mb-4 flex items-start justify-between gap-4">
         <Icon className="text-blue-500 size-14" />
 
