@@ -94,7 +94,7 @@ export const Users = () => {
   };
 
   return (
-    <div className='h-[90vh] w-[79.5vw] pr-7'>
+    <div className=''>
       <HeaderPages title="Usuarios" Icon={PiUsersThree}/>
       <div className='w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between'>
         <input

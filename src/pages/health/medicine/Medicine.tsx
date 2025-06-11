@@ -1,33 +1,24 @@
 import { useEffect, useState } from "react";
 import { HeaderPages } from "@/pages/layout/Header";
-import { FaFilter, FaPills } from "react-icons/fa";
+import { FaPills } from "react-icons/fa";
 import {
   medicineColumns,
 } from "./medicine.data";
 import { Button } from "@/components/ui/button";
 import { GiMedicines } from "react-icons/gi";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 import { MedicineForm, MedicineData } from "./MedicineForm";
 import { getMedicine } from "@/services/medicine/medicine.service";
 import { GroupMedicine, IMedicine } from "@/services/medicine/medicine.interface";
 import { TableComponents } from "@/components/table/TableComponents";
+import { FilterComponent } from "@/components/table/FilterComponent";
+import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
+import { Column } from "@/components/table/table.interface";
 
 export const Medicine = () => {
-
-  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
-    medicineColumns.reduce((acc, col) => {
-      acc[col.column] = true;
-      return acc;
-    }, {} as Record<string, boolean>)
-  );
-
-  const [medicines, setMedicines] = useState<GroupMedicine>({allMedicine: [], medicine:[]});
+  const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: [], medicine: [] });
+  const [columns, setColumns] = useState<Column[]>(medicineColumns);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
   useEffect(() => {
     getMedicineApi();
@@ -41,14 +32,6 @@ export const Medicine = () => {
     })
   }
 
-  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const displayedColumns = medicineColumns.filter(
-    (col) => visibleColumns[col.column]
-  );
-
   const openAddForm = () => {
     setIsAddFormOpen(true);
   };
@@ -56,14 +39,12 @@ export const Medicine = () => {
   const handleAddMedicineSubmit = (newMedicine: MedicineData) => {
     // setMedicines((prevMedicines) => [...prevMedicines, newMedicine]);
     console.log(newMedicine);
-    
     setIsAddFormOpen(false);
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+  const setMedicineFilter = (medicines: IMedicine[]) => {
+    setMedicines((prev) => ({ ...prev, medicine: medicines }));
   };
-
 
   return (
     <>
@@ -71,49 +52,19 @@ export const Medicine = () => {
         <HeaderPages title="Medicamentos" Icon={FaPills} />
       </div>
 
-      <div className="flex justify-between items-center mt-4 px-2">
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                variant="outline"
-                className="bg-white text-[#0350af] border border-[#0350af] hover:bg-[#e6fafd] hover:text-[#0350af]"
-              >
-                {/* Ver Columnas */}
-                <FaFilter />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {medicineColumns.map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.column}
-                  className="capitalize"
-                  checked={visibleColumns[column.column]}
-                  onCheckedChange={(checked) =>
-                    setVisibleColumns((prev) => ({
-                      ...prev,
-                      [column.column]: checked,
-                    }))
-                  }
-                >
-                  {column.label}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+        <DropdownColumnFilter columns={columns} setColumns={setColumns} />
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="search"
+        <div className="flex items-center ">
+          <FilterComponent
+            data={medicines.allMedicine}
+            columns={medicineColumns}
             placeholder="Buscar medicamentos..."
-            className="w-[250px] focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-xl h-[5vh] m-2 placeholder:opacity-60 py-5 px-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 200s"
-            value={searchTerm}
-            onChange={handleSearchChange}
+            setDataFilter={setMedicineFilter}
           />
           <Button
             variant={"animated"}
-            className="h-[90%]"
+            className="h-full"
             onClick={openAddForm}
           >
             <GiMedicines className="size-6" />
@@ -121,8 +72,9 @@ export const Medicine = () => {
           </Button>
         </div>
       </div>
-      <div className="">
-        <TableComponents column={displayedColumns} data={medicines.medicine} />
+
+      <div className="mt-4">
+        <TableComponents column={columns.filter(item => item.visible == true)} data={medicines.medicine} />
       </div>
 
       <MedicineForm

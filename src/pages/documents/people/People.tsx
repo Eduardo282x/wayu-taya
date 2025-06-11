@@ -11,9 +11,12 @@ import { PeopleForm } from "./PeopleForm";
 import { GroupPeople, IPeople, PeopleBody } from "@/services/people/people.interface";
 import { getPeople, postPeopleNormal } from "@/services/people/people.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
+import { Column } from "@/components/table/table.interface";
+import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 
 export const People = () => {
   const [people, setPeople] = useState<GroupPeople>({ allPeople: [], people: [] });
+  const [columns, setColumns] = useState<Column[]>(columnPeople);
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -47,17 +50,33 @@ export const People = () => {
         <ScreenLoader />
       )}
       <HeaderPages title="Personas" Icon={BsFillPersonLinesFill} />
-      <div className="flex justify-end gap-2 mb-2">
-        <FilterComponent data={people.allPeople} columns={columnPeople} setDataFilter={setPeopleFilter} />
-        <Button onClick={() => setOpen(true)} className="flex items-center mb-2 gap-2">
-          <IoPersonAddOutline />
-          <span>Agregar persona</span>
-        </Button>
+
+      <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+        <DropdownColumnFilter columns={columns} setColumns={setColumns} />
+
+        <div className="flex items-center ">
+          <FilterComponent
+            data={people.allPeople}
+            columns={columnPeople}
+            setDataFilter={setPeopleFilter}
+            placeholder="Buscar personas..."
+          />
+          <Button
+            variant={"animated"}
+            className="h-full"
+            onClick={() => setOpen(true)}
+          >
+            <IoPersonAddOutline />
+            <span>Agregar persona</span>
+          </Button>
+        </div>
       </div>
-      <div>
-        <TableComponents column={columnPeople} data={people.people} />
+
+      <div className="mt-4">
+        <TableComponents column={columns.filter(item => item.visible == true)} data={people.people} />
       </div>
-      <DialogPeople open={open} setOpen={setOpen} addPeople={addPeople}/>
+
+      <DialogPeople open={open} setOpen={setOpen} addPeople={addPeople} />
     </div>
   );
 };

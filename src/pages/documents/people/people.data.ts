@@ -1,4 +1,4 @@
-import { Column } from "@/interfaces/table.interface";
+import { Column } from "@/components/table/table.interface";
 import { IPeople } from "@/services/people/people.interface";
 import { formatDate } from "@/utils/formatters";
 
@@ -24,18 +24,26 @@ export const columnPeople: Column[] = [
     isIcon: false,
     visible: true
   },
-  // {
-  //   label: 'Sexo',
-  //   element: (data: IPeople) => data.sex,
-  // isIcon: false,
-  // visible: true
-  // },
+  {
+    label: 'Correo Electrónico',
+    column: 'email',
+    element: (data: IPeople) => data.email,
+    isIcon: false,
+    visible: false
+  },
   {
     label: 'Teléfono',
     column: 'phone',
     element: (data: IPeople) => data.phone,
     isIcon: false,
     visible: true
+  },
+  {
+    label: 'Sexo',
+    column: 'sex',
+    element: (data: IPeople) => data.sex,
+    isIcon: false,
+    visible: false
   },
   {
     label: 'Dirección',
@@ -50,13 +58,7 @@ export const columnPeople: Column[] = [
     element: (data: IPeople) => formatDate(data.birthdate),
     isIcon: false,
     visible: true
-  },
-  // {
-  //   label: 'Correo Electrónico',
-  //   element: (data: IPeople) => data.email,
-  // isIcon: false,
-  // visible: true
-  // }
+  }
 ];
 
 export const peopleForm = [

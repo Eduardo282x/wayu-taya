@@ -2,7 +2,7 @@
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Column } from "@/interfaces/table.interface";
+import { Column } from "@/components/table/table.interface";
 import { FC, useEffect, useState } from "react";
 import { PagesInterface } from "./table.data";
 import { Button } from "../ui/button";
@@ -19,9 +19,8 @@ export const TableComponents: FC<TableProps> = ({ column, data }) => {
 
   return (
     <div className="w-full">
-
-      <div className="w-full h-[25rem] overflow-auto">
-        <Table className="w-full">
+      <div>
+        <Table>
           <TableHeader>
             <TableRow>
               {column.map((col: Column, index: number) => (
