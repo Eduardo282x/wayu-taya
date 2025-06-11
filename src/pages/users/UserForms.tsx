@@ -13,7 +13,7 @@ import { FaRegSave } from "react-icons/fa"
 import { TiUserAddOutline } from "react-icons/ti"
 // import { FormInputCustoms } from "@/components/formInput/FormInputCustom"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
-import { UsersBody } from "@/services/users/user.interface"
+import { IUsers, UsersBody } from "@/services/users/user.interface"
 
 export interface User {
   id: number
@@ -27,7 +27,7 @@ interface UsersFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (user: UsersBody) => void
-  user?: User | null
+  user?: IUsers | null
 }
 
 const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, user }) => {
@@ -48,9 +48,15 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
   })
 
   useEffect(() => {
-    // if (open) {
-    //   reset(user)
-    // }
+    if (user) {
+      const userData = {
+        name: user.name,
+        lastName: user.lastName,
+        correo: user.correo,
+        username: user.username,
+      }
+      reset(userData)
+    }
   }, [open, user, reset])
 
   return (
