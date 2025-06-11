@@ -32,6 +32,7 @@ export default function Home() {
               icon={me.icon}
               buttonText={me.buttonText}
               url={me.url}
+              section={me.section}
             />
           ))}
         </div>
@@ -41,9 +42,14 @@ export default function Home() {
 }
 
 
-function CategoryCard({ title, description, icon: Icon, buttonText, url }: CategoryCardProps) {
+function CategoryCard({ title, description, icon: Icon, buttonText, url, section }: CategoryCardProps) {
+
+  const setMenuLocal = (section: string) => {
+    localStorage.setItem('menu', section)
+  }
+
   return (
-    <div className={`rounded-lg shadow-xl bg-linear-to-br to-[#024dae] from-[#5cdee5] w-80 h-48 p-6`}>
+    <div onClick={() => setMenuLocal(section)} className={`rounded-lg shadow-xl bg-linear-to-br to-[#024dae] from-[#5cdee5] w-80 h-48 p-6`}>
       <div className="mb-4 flex items-start justify-between gap-4">
         <Icon className="text-white size-14" />
 
