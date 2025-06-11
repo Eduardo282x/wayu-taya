@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button"
 import { TbMedicineSyrup } from "react-icons/tb";
 import InventoryTable from "./inventory-table"
 import type { Medicine } from "./types"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import InventoryForm from "./inventory-forms"
 import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/pages/layout/Header";
+import { getInventory } from "@/services/inventory/inventory.service";
+import { IInventory } from "@/services/inventory/inventory.interface";
 
 const initialMedicines: Medicine[] = [
   {
@@ -42,6 +44,17 @@ export const Inventory = () => {
   const [alertMessage, setAlertMessage] = useState("")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [medicineToDelete, setMedicineToDelete] = useState<Medicine | null>(null)
+
+  useEffect(() => {
+    getInventoryApi()
+  },[]) 
+
+  const getInventoryApi = async () => {
+    const response: IInventory[] = await getInventory();
+    console.log(response);
+    console.log(`${response[0].medicine.name} ${response[0].medicine.amount}${response[0].medicine.unit}`);
+
+  }
 
   const openCreateForm = () => {
     setEditingMedicine(null)

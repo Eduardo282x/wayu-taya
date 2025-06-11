@@ -8,6 +8,7 @@ import FormInput from "@/components/formInput/FormInputCustom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { IMedicine } from "@/services/medicine/medicine.interface";
 
 export interface BaseItemData {
   nombre: string;
@@ -36,6 +37,7 @@ interface MedicineFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: MedicineData) => void;
+  medicine: IMedicine | null
 }
 
 const categoryOptions = [
@@ -88,19 +90,13 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
   open,
   onOpenChange,
   onSubmit,
+  medicine,
 }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">(
     "medicamento"
   );
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    setValue,
-    formState: { errors },
-  } = useForm<MedicineData>({
+  const {register,handleSubmit,reset,control,setValue,formState: { errors },} = useForm<MedicineData>({
     defaultValues: {
       nombre: "",
       descripcion: "",
@@ -116,7 +112,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
   });
 
   useEffect(() => {
-    if (open) {
+    if (medicine) {
       reset({
         nombre: "",
         descripcion: "",

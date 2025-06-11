@@ -15,6 +15,7 @@ import { FaPills } from "react-icons/fa";
 
 export const Medicine = () => {
   const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: [], medicine: [] });
+  const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(null);
   const [columns, setColumns] = useState<Column[]>(medicineColumns);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,6 +36,7 @@ export const Medicine = () => {
   }
 
   const openAddForm = () => {
+    setMedicineSelected(null)
     setIsAddFormOpen(true);
   };
 
@@ -51,6 +53,7 @@ export const Medicine = () => {
   const getActionTable = (action: string, data: IMedicine) => {
     console.log(action);
     console.log(data);
+    setMedicineSelected(data)
     // setUserSelected(data);
     if (action == 'edit') {
       setIsAddFormOpen(true);
@@ -102,6 +105,7 @@ export const Medicine = () => {
         open={isAddFormOpen}
         onOpenChange={setIsAddFormOpen}
         onSubmit={handleAddMedicineSubmit}
+        medicine={medicineSelected}
       />
     </>
   );

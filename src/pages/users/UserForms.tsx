@@ -1,41 +1,37 @@
-// src/pages/users/UserForms.tsx
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import type React from "react"
+import { useEffect } from "react"
+import { useForm } from "react-hook-form"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { FaRegSave } from "react-icons/fa";
-import { TiUserAddOutline } from "react-icons/ti";
-import FormInput from "@/components/formInput/FormInputCustom";
-import { IUsers, UsersBody } from "@/services/users/user.interface";
+  StyledDialog,
+  StyledDialogContent,
+  StyledDialogHeader,
+  StyledDialogTitle,
+  StyledDialogDescription,
+} from "../../components/StyledDialog/StyledDialog"
+import { Button } from "@/components/ui/button"
+import { FaRegSave } from "react-icons/fa"
+import { TiUserAddOutline } from "react-icons/ti"
+// import { FormInputCustoms } from "@/components/formInput/FormInputCustom"
+import FormInputCustom from "@/components/formInput/FormInputCustom"
+import { IUsers, UsersBody } from "@/services/users/user.interface"
 
 export interface User {
-  id: number;
-  nombre: string;
-  apellido: string;
-  usuario: string;
-  correo: string;
+  id: number
+  nombre: string
+  apellido: string
+  usuario: string
+  correo: string
 }
 
 interface UsersFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (user: UsersBody) => void;
-  user?: IUsers | null;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSubmit: (user: UsersBody) => void
+  user?: IUsers | null
 }
 
-const UsersForm: React.FC<UsersFormProps> = ({
-  open,
-  onOpenChange,
-  onSubmit,
-  user,
-}) => {
-  const isEdit = !!user;
+const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, user }) => {
+  const isEdit = !!user
 
   const {
     register,
@@ -43,35 +39,40 @@ const UsersForm: React.FC<UsersFormProps> = ({
     reset,
     formState: { errors },
   } = useForm<UsersBody>({
-    defaultValues: user || {
-      name: "",
-      lastName: "",
-      username: "",
-      correo: "",
-    },
-  });
+    defaultValues: {
+      name: '',
+      lastName: '',
+      correo: '',
+      username: '',
+    }
+  })
 
   useEffect(() => {
-    if (user)
-      reset(user);
-  }, [user]);
+    if (user) {
+      const userData = {
+        name: user.name,
+        lastName: user.lastName,
+        correo: user.correo,
+        username: user.username,
+      }
+      reset(userData)
+    }
+  }, [open, user, reset])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg manrope bg-gray-300">
-        <DialogHeader>
-          <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
-            {isEdit ? "Editar Usuario" : "Crear Usuario"}
-          </DialogTitle>
-          <DialogDescription className="manrope">
+    <StyledDialog open={open} onOpenChange={onOpenChange}>
+      <StyledDialogContent>
+        <StyledDialogHeader>
+          <StyledDialogTitle>{isEdit ? "Editar Usuario" : "Crear Usuario"}</StyledDialogTitle>
+          <StyledDialogDescription>
             {isEdit
               ? "Modifica los datos del usuario y guarda los cambios."
               : "Completa los datos para crear un nuevo usuario."}
-          </DialogDescription>
-        </DialogHeader>
+          </StyledDialogDescription>
+        </StyledDialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div>
-            <FormInput
+            <FormInputCustom
               label="Nombre"
               id="nombre"
               autoFocus
@@ -88,7 +89,7 @@ const UsersForm: React.FC<UsersFormProps> = ({
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustom
               label="Apellido"
               id="apellido"
               {...register("lastName", {
@@ -104,7 +105,7 @@ const UsersForm: React.FC<UsersFormProps> = ({
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustom
               label="Usuario"
               id="usuario"
               {...register("username", {
@@ -115,7 +116,7 @@ const UsersForm: React.FC<UsersFormProps> = ({
           </div>
 
           <div>
-            <FormInput
+            <FormInputCustom
               label="Correo"
               id="correo"
               type="email"
@@ -148,9 +149,9 @@ const UsersForm: React.FC<UsersFormProps> = ({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      </StyledDialogContent>
+    </StyledDialog>
+  )
+}
 
-export default UsersForm;
+export default UsersForm
