@@ -3,7 +3,7 @@ import logo from '@/assets/img/logo.png';
 import { CategoryCardProps, optionsMenu } from "./menu.data";
 
 export default function Home() {
-  const navigate= useNavigate();
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-900 to-[#91d5ff]">
       {/* Header with logo */}
@@ -41,6 +41,10 @@ export default function Home() {
               buttonText={me.buttonText}
               url={me.url}
               section={me.section}
+              style={{
+                animation: 'fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                animationDelay: `${index * 0.03}s`
+              }}
             />
           ))}
         </div>
@@ -49,9 +53,18 @@ export default function Home() {
   )
 }
 
-function CategoryCard({ title, description, icon: Icon, buttonText, url }: CategoryCardProps) {
+function CategoryCard({ title, description, icon: Icon, buttonText, url, section, style }: CategoryCardProps & { style?: React.CSSProperties }) {
+
+  const setMenuLocal = (section: string) => {
+    localStorage.setItem('menu', section)
+  }
+
   return (
-    <div className={`rounded-lg shadow-xl bg-gray-200 border-2 border-blue-500 w-80 h-52 p-6`}>
+    <div
+      className="rounded-lg shadow-xl bg-gray-200 border-2 border-blue-500 w-80 h-52 p-6"
+      style={style}
+      onClick={() => setMenuLocal(section)}
+    >
       <div className="mb-4 flex items-start justify-between gap-4">
         <Icon className="text-blue-500 size-14" />
 
