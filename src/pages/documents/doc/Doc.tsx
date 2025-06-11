@@ -1,10 +1,12 @@
-import { HeaderPages } from '@/pages/layout/Header'
-import { IoDocumentTextOutline } from 'react-icons/io5'
+import { DocumentosTable } from "./documentos-table"
 
-export const Doc = () => {
-    return (
-        <div>
-            <HeaderPages title='Documentos' Icon={IoDocumentTextOutline}/>
-        </div>
-    )
+export default function Doc() {
+  return (
+    <div className="h-fit">
+      <DocumentosTable />
+    </div>
+          
+        
+      
+  )
 }

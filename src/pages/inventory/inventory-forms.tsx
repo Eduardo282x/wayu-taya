@@ -1,11 +1,17 @@
 import type React from "react"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import {
+  StyledDialog,
+  StyledDialogContent,
+  StyledDialogHeader,
+  StyledDialogTitle,
+  StyledDialogDescription,
+} from "../../components/StyledDialog/StyledDialog"
 import { Button } from "@/components/ui/button"
 import { FaRegSave } from "react-icons/fa"
 import { MdOutlineAddShoppingCart } from "react-icons/md"
-import {FormInputCustoms} from "../../components/formInput/FormInputCustom"
+import { FormInputCustoms } from "@/components/formInput/FormInputCustom"
 
 export interface Medicine {
   id: number
@@ -57,18 +63,16 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg manrope bg-gray-300">
-        <DialogHeader>
-          <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
-            {isEdit ? "Editar Medicina" : "Agregar Medicina"}
-          </DialogTitle>
-          <DialogDescription className="manrope">
+    <StyledDialog open={open} onOpenChange={onOpenChange}>
+      <StyledDialogContent>
+        <StyledDialogHeader>
+          <StyledDialogTitle>{isEdit ? "Editar Medicina" : "Agregar Medicina"}</StyledDialogTitle>
+          <StyledDialogDescription>
             {isEdit
               ? "Modifica los datos de la medicina y guarda los cambios."
               : "Completa los datos para agregar una nueva medicina al inventario."}
-          </DialogDescription>
-        </DialogHeader>
+          </StyledDialogDescription>
+        </StyledDialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div>
             <FormInputCustoms
@@ -148,8 +152,8 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </StyledDialogContent>
+    </StyledDialog>
   )
 }
 
