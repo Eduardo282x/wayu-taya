@@ -47,7 +47,7 @@ export const Inventory = () => {
 
   useEffect(() => {
     getInventoryApi()
-  },[]) 
+  }, [])
 
   const getInventoryApi = async () => {
     const response: IInventory[] = await getInventory();
@@ -127,7 +127,7 @@ export const Inventory = () => {
 
   return (
     <div className="h-[90vh] w-[79.5vw] pr-7">
-      <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits}/>
+      <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits} />
       <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between">
         <input
           type="search"
@@ -150,6 +150,23 @@ export const Inventory = () => {
             if (medicine) handleDeleteClick(medicine)
           }}
         />
+
+        {/* <TableComponents
+          data={users.users} --> Agregar data
+          column={usersColumns} --> Agregar columnas
+          actionTable={getActionTable}
+          colSpanColumns={true}
+
+          IUsers es la interfaz, cambiar la interfaz por la que le corresponda
+          renderRow={(item: IUsers, index) => (
+          
+          Este es el componente que va a renderizar
+            <div key={index}>
+              <p className="text-black text-center">{item.name}</p>
+            </div>
+          )
+          }
+        /> */}
 
         <InventoryForm
           open={isFormOpen}
