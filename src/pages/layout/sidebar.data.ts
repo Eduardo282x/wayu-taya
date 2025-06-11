@@ -3,7 +3,7 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 // import { MdAccessTime } from "react-icons/md";
 // import { FaBuilding } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
-import { MdOutlineInventory2 } from "react-icons/md";
+import { MdOutlineInventory2, MdOutlineWarehouse } from "react-icons/md";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BiDonateHeart } from "react-icons/bi";
 
@@ -66,6 +66,12 @@ export const menu: IMenu[] = [
         icon: AiOutlineProduct,
     },
     {
+        label: 'Almacenes',
+        active: false,
+        url: '/salud/almacenes',
+        icon: MdOutlineWarehouse,
+    },
+    {
         label: 'Usuarios',
         active: false,
         url: '/usuarios',
@@ -124,6 +130,12 @@ export const menuHealth: IMenu[] = [
         active: false,
         url: '/salud/medicamentos',
         icon: AiOutlineProduct,
+    },
+    {
+        label: 'Almacenes',
+        active: false,
+        url: '/salud/almacenes',
+        icon: MdOutlineWarehouse,
     },
     {
         label: 'Usuarios',

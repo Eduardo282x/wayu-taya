@@ -25,6 +25,7 @@ import { Users } from './pages/users/Users';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
 import { DocumentosTable } from './pages/documents/doc/documentos-table';
+import { Store } from './pages/health/store/Store';
 
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
             <Route path='/salud/donaciones' element={<Donations />}></Route>
             <Route path='/salud/inventario' element={<Inventory />}></Route>
             <Route path='/salud/medicamentos' element={<Medicine />}></Route>
+            <Route path='/salud/almacenes' element={<Store />}></Route>
 
             <Route path='/musica' element={<Music />}></Route>
             <Route path='/alimentos' element={<Food />}></Route>
