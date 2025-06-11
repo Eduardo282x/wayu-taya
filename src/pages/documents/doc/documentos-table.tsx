@@ -6,7 +6,10 @@ import { Button } from "../../../components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu"
 import { ChevronDown, FileIcon, Grid, Info, List } from "lucide-react"
 import type { DocumentData, ColumnDefinition } from "../doc/types/document"
-import defaultImage from './public/placeholder-user.jpg';
+import { BsFiletypePdf } from "react-icons/bs";
+import { BsFiletypePng } from "react-icons/bs";
+import { BsFiletypeDocx } from "react-icons/bs";
+// import defaultImage from './public/placeholder-user.jpg';
 
 type ViewMode = "list" | "grid"
 type FilterType = "png" | "docx" | "pdf" | null
@@ -100,8 +103,17 @@ export function DocumentosTable() {
       label: "Nombre",
       element: (item: DocumentData) => (
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-blue-100 flex items-center justify-center rounded">
-            <img src={defaultImage} alt="Thumbnail" width={20} height={20} className="object-cover"/>
+          <div className="w-6 h-6 flex items-center justify-center rounded">
+            {item.tipo=='pdf' && (
+              <BsFiletypePdf size={30} className="text-red-500"/>
+            )}
+            {item.tipo=='png' && (
+              <BsFiletypePng size={30} className="text-green-500"/>
+            )}
+            {item.tipo=='docx' && (
+              <BsFiletypeDocx size={30} className="text-blue-500"/>
+            )}
+            {/* <img src={defaultImage} alt="Thumbnail" width={20} height={20} className="object-cover"/> */}
           </div>
           <span>{item.nombre}</span>
         </div>
@@ -175,19 +187,19 @@ export function DocumentosTable() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center border rounded-lg bg-white">
+            <div className="flex items-center border rounded-full overflow-hidden bg-white">
               <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
+                variant={viewMode === "list" ? "noDefault" : "ghost"}
                 size="sm"
-                className={`h-9 px-2 ${viewMode === "list" ? "bg-blue-600" : "bg-white text-blue-600"}`}
+                className={`h-9 px-2 ${viewMode === "list" ? "bg-blue-500" : "bg-white text-blue-500"}`}
                 onClick={() => setViewMode("list")}
               >
                 <List size={18} />
               </Button>
               <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
+                variant={viewMode === "grid" ? "noDefault" : "ghost"}
                 size="sm"
-                className={`h-9 px-2 ${viewMode === "grid" ? "bg-blue-600" : "bg-white text-blue-600"}`}
+                className={`h-9 px-2 ${viewMode === "grid" ? "bg-blue-500" : "bg-white text-blue-500"}`}
                 onClick={() => setViewMode("grid")}
               >
                 <Grid size={18} />

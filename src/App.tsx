@@ -11,7 +11,7 @@ import Home from './pages/home/Home';
 import { People } from './pages/documents/people/People';
 import { Events } from './pages/documents/events/Events';
 import { Documents } from './pages/documents/Documents';
-import { Doc } from './pages/documents/doc/Doc';
+import  Doc  from './pages/documents/doc/Doc';
 
 import { Communities } from './pages/documents/communities/Communities';
 import { Activities } from './pages/documents/activities/Activities';

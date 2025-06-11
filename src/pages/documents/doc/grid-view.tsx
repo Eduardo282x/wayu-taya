@@ -1,6 +1,9 @@
 import { MoreVertical } from "lucide-react"
 import { Button } from "../../../components/ui/button"
 import type { DocumentData} from "../doc/types/document"
+import { BsFiletypePdf } from "react-icons/bs";
+import { BsFiletypePng } from "react-icons/bs";
+import { BsFiletypeDocx } from "react-icons/bs";
 
 interface GridViewProps {
   data: DocumentData[]
@@ -24,7 +27,16 @@ export function GridView({ data }: GridViewProps) {
             <div className="bg-blue-100 p-2 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 bg-blue-50 flex items-center justify-center rounded">
-                  <img src="/placeholder.svg" alt="Thumbnail" width={16} height={16} className="object-cover" />
+                  {item.tipo=='pdf' && (
+                    <BsFiletypePdf size={30} className="text-red-500"/>
+                  )}
+                  {item.tipo=='png' && (
+                    <BsFiletypePng size={30} className="text-green-500"/>
+                  )}
+                  {item.tipo=='docx' && (
+                    <BsFiletypeDocx size={30} className="text-blue-500"/>
+                  )}
+                  {/* <img src="/placeholder.svg" alt="Thumbnail" width={16} height={16} className="object-cover" /> */}
                 </div>
                 <span className="text-sm text-blue-800">{item.nombre}</span>
               </div>
@@ -33,13 +45,22 @@ export function GridView({ data }: GridViewProps) {
               </Button>
             </div>
             <div className="p-4 h-32 flex items-center justify-center bg-white">
-              <img
+              {item.tipo=='pdf' && (
+                    <BsFiletypePdf size={30} className="text-red-500"/>
+                  )}
+                  {item.tipo=='png' && (
+                    <BsFiletypePng size={30} className="text-green-500"/>
+                  )}
+                  {item.tipo=='docx' && (
+                    <BsFiletypeDocx size={30} className="text-blue-500"/>
+                  )}
+              {/* <img
                 src="/placeholder.svg"
                 alt="Document preview"
                 width={100}
                 height={100}
                 className="object-contain max-h-full"
-              />
+              /> */}
             </div>
           </div>
         ))}
