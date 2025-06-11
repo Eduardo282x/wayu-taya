@@ -11,7 +11,7 @@ import Home from './pages/home/Home';
 import { People } from './pages/documents/people/People';
 import { Events } from './pages/documents/events/Events';
 import { Documents } from './pages/documents/Documents';
-import { Doc } from './pages/documents/doc/Doc';
+// import { Doc } from './pages/documents/doc/Doc';
 
 import { Communities } from './pages/documents/communities/Communities';
 import { Activities } from './pages/documents/activities/Activities';
@@ -24,6 +24,7 @@ import { Health } from './pages/health/Health';
 import { Users } from './pages/users/Users';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
+import { DocumentosTable } from './pages/documents/doc/documentos-table';
 
 
 function App() {
@@ -43,7 +44,7 @@ function App() {
             <Route path='/documentos/personas' element={<People />}></Route>
             <Route path='/documentos/comunidades' element={<Communities />}></Route>
             <Route path='/documentos/actividades' element={<Activities />}></Route>
-            <Route path='/documentos/documentos' element={<Doc />}></Route>
+            <Route path='/documentos/documentos' element={<DocumentosTable />}></Route>
             <Route path='/documentos/eventos' element={<Events />}></Route>
             
 
