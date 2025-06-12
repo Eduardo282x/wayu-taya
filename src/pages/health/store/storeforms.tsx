@@ -10,15 +10,15 @@ import {
 } from "@/components/StyledDialog/StyledDialog";
 import { Button } from "@/components/ui/button";
 import { FaRegSave } from "react-icons/fa";
-import { TiUserAddOutline } from "react-icons/ti"; // Lo mantengo por si quieres un ícono similar para añadir almacén
+import { TiUserAddOutline } from "react-icons/ti";
 import FormInputCustom from "@/components/formInput/FormInputCustom";
-import { IAlmacen, AlmacenBody } from "@/pages/health/store/store.interface"; // Importa la interfaz de almacén
+import { IAlmacen, AlmacenBody } from "@/pages/health/store/store.interface";
 
 interface AlmacenFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (almacen: AlmacenBody) => void;
-  almacen?: IAlmacen | null; // Cambiado de 'user' a 'almacen'
+  almacen?: IAlmacen | null;
 }
 
 const AlmacenForm: React.FC<AlmacenFormProps> = ({
@@ -27,7 +27,7 @@ const AlmacenForm: React.FC<AlmacenFormProps> = ({
   onSubmit,
   almacen,
 }) => {
-  const isEdit = !!almacen; // Cambiado de 'user' a 'almacen'
+  const isEdit = !!almacen;
 
   const {
     register,

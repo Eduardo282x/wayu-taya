@@ -13,7 +13,6 @@ import {
 } from "@/pages/health/store/store.interface";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { almacenColumns } from "@/pages/health/store/store.data";
-// Eliminadas las importaciones de los servicios: getAlmacenes, postAlmacen, putAlmacen, deleteAlmacen
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 
 const EXAMPLE_ALMACENES: IAlmacen[] = [
@@ -49,7 +48,6 @@ export const Store = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Función para obtener los almacenes (simulada)
   const getAlmacenesApi = () => {
     setLoading(true);
     setTimeout(() => {
@@ -65,18 +63,15 @@ export const Store = () => {
     getAlmacenesApi();
   }, []);
 
-  // Función para filtrar los almacenes (soluciona "No se encuentra el nombre setAlmacenFilter")
   const setAlmacenFilter = (filteredAlmacenes: IAlmacen[]) => {
     setAlmacenes((prev) => ({ ...prev, almacenes: filteredAlmacenes }));
   };
 
-  // Función para iniciar la creación de un nuevo almacén (soluciona "No se encuentra el nombre newAlmacen")
   const newAlmacen = () => {
     setAlmacenSelected(null);
     setOpen(true);
   };
 
-  // Función para manejar la confirmación de eliminación (soluciona "No se encuentra el nombre handleConfirmDelete")
   const handleConfirmDelete = async () => {
     if (almacenSelected) {
       setLoading(true);
@@ -98,7 +93,6 @@ export const Store = () => {
     }
   };
 
-  // Función para manejar la acción de la tabla (editar/eliminar)
   const getActionTable = (action: string, data: IAlmacen) => {
     setAlmacenSelected(data);
     if (action === "edit") {
@@ -109,7 +103,6 @@ export const Store = () => {
     }
   };
 
-  // Función para manejar el envío del formulario (crear/editar) (soluciona la doble declaración de getActionForm)
   const getActionForm = async (almacen: AlmacenBody) => {
     setLoading(true);
     console.log(`Simulando guardado de almacén:`, almacen);
@@ -125,12 +118,10 @@ export const Store = () => {
 
       let updatedAllAlmacenes;
       if (almacenSelected) {
-        // Editar un almacén existente
         updatedAllAlmacenes = almacenes.allAlmacenes.map((a) =>
           a.id === savedAlmacen.id ? savedAlmacen : a
         );
       } else {
-        // Añadir un nuevo almacén
         updatedAllAlmacenes = [...almacenes.allAlmacenes, savedAlmacen];
       }
 
@@ -153,12 +144,10 @@ export const Store = () => {
           <FilterComponent
             data={almacenes.allAlmacenes}
             columns={almacenColumns}
-            setDataFilter={setAlmacenFilter} // Uso de la función corregida
+            setDataFilter={setAlmacenFilter}
             placeholder="Buscar almacén..."
           />
           <Button variant={"animated"} className="h-full" onClick={newAlmacen}>
-            {" "}
-            {/* Uso de la función corregida */}
             <TiUserAddOutline className="size-6 " />
             Añadir Almacén
           </Button>
@@ -182,7 +171,7 @@ export const Store = () => {
         <ConfirmDeleteDialog
           open={isDeleteDialogOpen}
           onOpenChange={setIsDeleteDialogOpen}
-          onConfirm={handleConfirmDelete} // Uso de la función corregida
+          onConfirm={handleConfirmDelete}
           itemName={almacenSelected?.nombre}
         />
       </div>

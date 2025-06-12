@@ -1,19 +1,19 @@
 import { Column } from "@/components/table/table.interface";
-import { IAlmacen } from "@/pages/health/store/store.interface"; // Asumo que crearás esta interfaz
+import { IAlmacen } from "@/pages/health/store/store.interface";
 import { FiTrash2 } from "react-icons/fi";
 import { MdEdit } from "react-icons/md";
 
 export const almacenColumns: Column[] = [
     {
         label: 'Nombre del Almacén',
-        column: 'nombre', // Nombre del campo en tu interfaz IAlmacen
+        column: 'nombre',
         element: (data: IAlmacen) => data.nombre,
         isIcon: false,
         visible: true
     },
     {
         label: 'Dirección',
-        column: 'direccion', // Nombre del campo en tu interfaz IAlmacen
+        column: 'direccion',
         element: (data: IAlmacen) => data.direccion,
         isIcon: false,
         visible: true
@@ -44,4 +44,4 @@ export const almacenColumns: Column[] = [
         isIcon: true,
         visible: true
     }
-]
+];

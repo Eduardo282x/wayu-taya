@@ -12,14 +12,14 @@ interface ConfirmDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  itemName?: string; // Cambiado de 'userName' a 'itemName'
+  itemName?: string;
 }
 
 const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   open,
   onOpenChange,
   onConfirm,
-  itemName, // Cambiado de 'userName' a 'itemName'
+  itemName,
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
