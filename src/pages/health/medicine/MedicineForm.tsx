@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { BiCartAdd } from "react-icons/bi";
 import FormInput from "@/components/formInput/FormInputCustom";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { IMedicine } from "@/services/medicine/medicine.interface";
 
 export interface BaseItemData {
@@ -22,11 +36,13 @@ export interface MedicineSpecificData {
   manufactura: string;
   principio_activo: string;
   forma: string;
+  // Agregados aquí los campos de producto
+  unidad: string;
+  cantidad: number;
 }
 
 export interface ProductSpecificData {
-  unidad: string;
-  cantidad: number;
+  // Estos campos ya no son necesarios aquí
 }
 
 export type MedicineData = BaseItemData &
@@ -37,7 +53,7 @@ interface MedicineFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: MedicineData) => void;
-  medicine: IMedicine | null
+  medicine: IMedicine | null;
 }
 
 const categoryOptions = [
@@ -96,14 +112,21 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
     "medicamento"
   );
 
-  const {register,handleSubmit,reset,control,setValue,formState: { errors },} = useForm<MedicineData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm<MedicineData>({
     defaultValues: {
       nombre: "",
       descripcion: "",
       categoria: "",
       medicina: true,
-      unidad: "",
-      cantidad: 0,
+      unidad: "", // Ahora parte de los campos de medicamento
+      cantidad: 0, // Ahora parte de los campos de medicamento
       temperatura: "",
       manufactura: "",
       principio_activo: "",
@@ -123,11 +146,12 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
         manufactura: "",
         principio_activo: "",
         forma: "",
+        unidad: "", // Asegurarse de resetear también
       });
 
       setValue("medicina", currentTab === "medicamento");
     }
-  }, [open, reset, currentTab, setValue]);
+  }, [open, reset, currentTab, setValue, medicine]); // Agregado 'medicine' a las dependencias
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value as "medicamento" | "producto");
@@ -140,7 +164,10 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
         !data.temperatura ||
         !data.manufactura ||
         !data.principio_activo ||
-        !data.forma
+        !data.forma ||
+        !data.unidad || // Validar también unidad y cantidad para medicamento
+        data.cantidad === undefined ||
+        data.cantidad === null
       ) {
         alert(
           "Por favor, complete todos los campos obligatorios para el medicamento."
@@ -148,16 +175,8 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
         return;
       }
     } else {
-      if (
-        !data.unidad ||
-        data.cantidad === undefined ||
-        data.cantidad === null
-      ) {
-        alert(
-          "Por favor, complete todos los campos obligatorios para el producto."
-        );
-        return;
-      }
+      // Para 'producto', ya no hay campos específicos que validar aquí,
+      // solo los campos base (nombre, descripcion, categoria) que son validados por register
     }
     onSubmit(data);
     onOpenChange(false);
@@ -336,19 +355,14 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                     </div>
                   )}
                 />
-              </TabsContent>
-            )}
 
-            {currentTab === "producto" && (
-              <TabsContent value="producto" className="mt-0">
-                <input type="hidden" {...register("medicina")} />
-
+                {/* --- CAMPOS MOVIDOS DE 'PRODUCTO' A 'MEDICAMENTO' --- */}
                 <Controller
                   name="unidad"
                   control={control}
                   rules={{
                     required:
-                      currentTab === "producto"
+                      currentTab === "medicamento"
                         ? "La unidad es obligatoria"
                         : false,
                   }}
@@ -394,7 +408,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                   min="0"
                   {...register("cantidad", {
                     required:
-                      currentTab === "producto"
+                      currentTab === "medicamento"
                         ? "La cantidad es obligatoria"
                         : false,
                     min: {
@@ -405,6 +419,15 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                   })}
                   error={errors.cantidad?.message}
                 />
+                {/* --- FIN CAMPOS MOVIDOS --- */}
+              </TabsContent>
+            )}
+
+            {currentTab === "producto" && (
+              <TabsContent value="producto" className="mt-0">
+                <input type="hidden" {...register("medicina")} />
+                {/* Los campos de unidad y cantidad han sido eliminados de aquí */}
+                {/* Ya no hay campos específicos para productos, solo los base */}
               </TabsContent>
             )}
 
