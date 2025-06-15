@@ -8,27 +8,27 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-interface ConfirmDeleteDialogProps {
+interface ConfirmDeleteStoreDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  itemName?: string;
+  storeName?: string;
 }
 
-const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
+const ConfirmDeleteStoreDialog: React.FC<ConfirmDeleteStoreDialogProps> = ({
   open,
   onOpenChange,
   onConfirm,
-  itemName,
+  storeName,
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Confirmar eliminación</DialogTitle>
+          <DialogTitle>Confirmar eliminación de almacén</DialogTitle>{" "}
           <DialogDescription>
-            ¿Estás seguro de que quieres eliminar{" "}
-            {itemName ? `"${itemName}"` : "este almacén"}? Esta acción no se
+            ¿Estás seguro de que quieres eliminar el almacén{" "}
+            {storeName ? `"${storeName}"` : "seleccionado"}? Esta acción no se
             puede deshacer.
           </DialogDescription>
         </DialogHeader>
@@ -48,4 +48,4 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   );
 };
 
-export default ConfirmDeleteDialog;
+export default ConfirmDeleteStoreDialog;

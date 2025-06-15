@@ -22,7 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IMedicine } from "@/services/medicine/medicine.interface";
+import {
+  IMedicine,
+  MedicineBody,
+  Category,
+  Form,
+} from "@/services/medicine/medicine.interface";
 
 export interface BaseItemData {
   nombre: string;
@@ -36,39 +41,25 @@ export interface MedicineSpecificData {
   manufactura: string;
   principio_activo: string;
   forma: string;
-  // Agregados aquí los campos de producto
   unidad: string;
   cantidad: number;
 }
 
-export interface ProductSpecificData {
-  // Estos campos ya no son necesarios aquí
-}
+export interface ProductSpecificData {}
 
-export type MedicineData = BaseItemData &
+export type FormDataInternal = BaseItemData &
   Partial<MedicineSpecificData> &
   Partial<ProductSpecificData>;
 
 interface MedicineFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: MedicineData) => void;
-  medicine: IMedicine | null;
-}
 
-const categoryOptions = [
-  "Analgésicos",
-  "Antibióticos",
-  "Antiinflamatorios",
-  "Vitaminas",
-  "Higiene Personal",
-  "Cuidado de la Piel",
-  "Cuidado Dental",
-  "Suplementos Nutricionales",
-  "Accesorios Médicos",
-  "Material de Curación",
-  "Otros",
-];
+  onSubmit: (data: MedicineBody) => void;
+  medicine: IMedicine | null;
+  categories: Category[];
+  forms: Form[];
+}
 
 const unitOptions = [
   "Unidad(es)",
@@ -84,29 +75,13 @@ const unitOptions = [
   "Otros",
 ];
 
-const formaOptions = [
-  "Tableta",
-  "Cápsula",
-  "Jarabe",
-  "Inyección",
-  "Crema",
-  "Gotas",
-  "Polvo",
-  "Supositorio",
-  "Spray",
-  "Gel",
-  "Parche",
-  "Solución",
-  "Ampolla",
-  "Inhalador",
-  "Otro",
-];
-
 export const MedicineForm: React.FC<MedicineFormProps> = ({
   open,
   onOpenChange,
   onSubmit,
   medicine,
+  categories,
+  forms,
 }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">(
     "medicamento"
@@ -119,14 +94,14 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
     control,
     setValue,
     formState: { errors },
-  } = useForm<MedicineData>({
+  } = useForm<FormDataInternal>({
     defaultValues: {
       nombre: "",
       descripcion: "",
       categoria: "",
       medicina: true,
-      unidad: "", // Ahora parte de los campos de medicamento
-      cantidad: 0, // Ahora parte de los campos de medicamento
+      unidad: "",
+      cantidad: 0,
       temperatura: "",
       manufactura: "",
       principio_activo: "",
@@ -135,50 +110,95 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
   });
 
   useEffect(() => {
-    if (medicine) {
-      reset({
-        nombre: "",
-        descripcion: "",
-        categoria: "",
-        medicina: currentTab === "medicamento",
-        cantidad: 0,
-        temperatura: "",
-        manufactura: "",
-        principio_activo: "",
-        forma: "",
-        unidad: "", // Asegurarse de resetear también
-      });
+    if (open) {
+      if (medicine) {
+        reset({
+          nombre: medicine.name,
+          descripcion: medicine.description,
+          categoria: medicine.category ? medicine.category.category : "",
+          medicina: medicine.medicine,
+          temperatura: medicine.temperate || "",
+          manufactura: medicine.manufacturer || "",
+          principio_activo: medicine.activeIngredient || "",
+          forma: medicine.form ? medicine.form.forms : "",
+          unidad: medicine.unit || "",
+          cantidad: medicine.amount || 0,
+        });
 
-      setValue("medicina", currentTab === "medicamento");
+        setCurrentTab(medicine.medicine ? "medicamento" : "producto");
+      } else {
+        reset({
+          nombre: "",
+          descripcion: "",
+          categoria: "",
+          medicina: true,
+          unidad: "",
+          cantidad: 0,
+          temperatura: "",
+          manufactura: "",
+          principio_activo: "",
+          forma: "",
+        });
+        setCurrentTab("medicamento");
+      }
     }
-  }, [open, reset, currentTab, setValue, medicine]); // Agregado 'medicine' a las dependencias
+  }, [open, reset, medicine, setCurrentTab, categories, forms]);
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value as "medicamento" | "producto");
     setValue("medicina", value === "medicamento");
+
+    if (value === "producto") {
+      setValue("temperatura", "");
+      setValue("manufactura", "");
+      setValue("principio_activo", "");
+      setValue("forma", "");
+    }
   };
 
-  const handleFormSubmit = (data: MedicineData) => {
-    if (data.medicina) {
+  const handleFormSubmit = (formData: FormDataInternal) => {
+    if (formData.medicina) {
       if (
-        !data.temperatura ||
-        !data.manufactura ||
-        !data.principio_activo ||
-        !data.forma ||
-        !data.unidad || // Validar también unidad y cantidad para medicamento
-        data.cantidad === undefined ||
-        data.cantidad === null
+        !formData.temperatura ||
+        !formData.manufactura ||
+        !formData.principio_activo ||
+        !formData.forma ||
+        !formData.unidad ||
+        formData.cantidad === undefined ||
+        formData.cantidad === null
       ) {
         alert(
           "Por favor, complete todos los campos obligatorios para el medicamento."
         );
         return;
       }
-    } else {
-      // Para 'producto', ya no hay campos específicos que validar aquí,
-      // solo los campos base (nombre, descripcion, categoria) que son validados por register
     }
-    onSubmit(data);
+
+    const selectedCategory = categories.find(
+      (cat) => cat.category === formData.categoria
+    );
+    const categoryIdToSend = selectedCategory ? selectedCategory.id : 0;
+
+    let formIdToSend: number | undefined = undefined;
+    if (formData.medicina && formData.forma) {
+      const selectedForm = forms.find((f) => f.forms === formData.forma);
+      formIdToSend = selectedForm ? selectedForm.id : 0;
+    }
+
+    const apiData: MedicineBody = {
+      name: formData.nombre,
+      description: formData.descripcion,
+      categoryId: categoryIdToSend,
+      medicine: formData.medicina,
+      unit: formData.unidad || "",
+      amount: formData.cantidad ?? 0,
+      temperate: formData.temperatura || "",
+      manufacturer: formData.manufactura || "",
+      activeIngredient: formData.principio_activo || "",
+      formId: formIdToSend || 0,
+    };
+
+    onSubmit(apiData);
     onOpenChange(false);
   };
 
@@ -187,7 +207,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
       <DialogContent className="sm:max-w-lg manrope max-h-[95vh] overflow-y-auto bg-gray-300">
         <DialogHeader>
           <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
-            Agregar Nuevo Elemento
+            {medicine ? "Editar Elemento" : "Agregar Nuevo Elemento"}{" "}
           </DialogTitle>
           <DialogDescription className="manrope">
             Selecciona si deseas agregar un medicamento o un producto.
@@ -223,6 +243,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
               label="Nombre"
               id="nombre"
               autoFocus
+              placeholder="Ibuprofeno"
               {...register("nombre", {
                 required: "El nombre es obligatorio",
                 minLength: { value: 2, message: "Mínimo 2 caracteres" },
@@ -232,6 +253,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
             <FormInput
               label="Descripción"
               id="descripcion"
+              placeholder="Analgésico para el dolor"
               {...register("descripcion", {
                 required: "La descripción es obligatoria",
               })}
@@ -257,9 +279,9 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Categorías</SelectLabel>
-                        {categoryOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
+                        {categories.map((option) => (
+                          <SelectItem key={option.id} value={option.category}>
+                            {option.category}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -281,6 +303,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                 <FormInput
                   label="Temperatura de Almacenamiento"
                   id="temperatura"
+                  placeholder="Ambiente"
                   {...register("temperatura", {
                     required:
                       currentTab === "medicamento"
@@ -292,6 +315,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                 <FormInput
                   label="Manufactura"
                   id="manufactura"
+                  placeholder="Bayer"
                   {...register("manufactura", {
                     required:
                       currentTab === "medicamento"
@@ -303,6 +327,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                 <FormInput
                   label="Principio Activo"
                   id="principio_activo"
+                  placeholder="Paracetamol"
                   {...register("principio_activo", {
                     required:
                       currentTab === "medicamento"
@@ -339,9 +364,9 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>Formas de Medicamentos</SelectLabel>
-                            {formaOptions.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
+                            {forms.map((option) => (
+                              <SelectItem key={option.id} value={option.forms}>
+                                {option.forms}
                               </SelectItem>
                             ))}
                           </SelectGroup>
@@ -356,7 +381,6 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                   )}
                 />
 
-                {/* --- CAMPOS MOVIDOS DE 'PRODUCTO' A 'MEDICAMENTO' --- */}
                 <Controller
                   name="unidad"
                   control={control}
@@ -406,6 +430,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                   id="cantidad"
                   type="number"
                   min="0"
+                  placeholder="500"
                   {...register("cantidad", {
                     required:
                       currentTab === "medicamento"
@@ -419,15 +444,12 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                   })}
                   error={errors.cantidad?.message}
                 />
-                {/* --- FIN CAMPOS MOVIDOS --- */}
               </TabsContent>
             )}
 
             {currentTab === "producto" && (
               <TabsContent value="producto" className="mt-0">
                 <input type="hidden" {...register("medicina")} />
-                {/* Los campos de unidad y cantidad han sido eliminados de aquí */}
-                {/* Ya no hay campos específicos para productos, solo los base */}
               </TabsContent>
             )}
 

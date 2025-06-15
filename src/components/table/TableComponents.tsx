@@ -17,9 +17,9 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  TableHead,
 } from "@/components/ui/table";
 import {
   Tooltip,
@@ -30,8 +30,10 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { Column } from "@/components/table/table.interface";
 import { FC, useEffect, useState } from "react";
 import { PagesInterface } from "./table.data";
+
 import { Button } from "../ui/button";
 import "./table.css";
+
 interface TableProps {
   column: Column[];
   data: any[];
@@ -50,6 +52,15 @@ export const TableComponents: FC<TableProps> = ({
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<string>("10");
 
+  useEffect(() => {
+    setPage(0);
+  }, [data, rowsPerPage]);
+
+  const indexOfLastItem = (page + 1) * Number(rowsPerPage);
+  const indexOfFirstItem = indexOfLastItem - Number(rowsPerPage);
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const totalItems = data.length;
+
   return (
     <div className="w-full">
       <div>
@@ -62,74 +73,67 @@ export const TableComponents: FC<TableProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data &&
-              data
-                .slice(
-                  page * Number(rowsPerPage),
-                  page * Number(rowsPerPage) + Number(rowsPerPage)
-                )
-                .map((item, index: number) => (
-                  <TableRow key={index}>
-                    {renderRow ? (
-                      <TableCell
-                        key={index}
-                        colSpan={colSpanColumns ? column.length : 1}
-                        className="p-0"
-                      >
-                        {renderRow(item, index)}
-                      </TableCell>
-                    ) : (
-                      column.map((col: Column, index: number) => {
-                        if (col.isIcon) {
-                          return (
-                            <ColumnIcon
-                              col={col}
-                              item={item}
-                              actionTable={actionTable}
-                              key={index}
-                            />
-                          );
-                        } else {
-                          return (
-                            <ColumnNormal
-                              col={col}
-                              item={item}
-                              actionTable={actionTable}
-                              key={index}
-                            />
-                          );
-                        }
-                      })
-                    )}
-                  </TableRow>
-                ))}
-
-            {!data ||
-              (data.length == 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={column.length}
-                    style={{
-                      textAlign: "center",
-                      padding: "2rem",
-                      color: "#6b7280",
-                    }}
-                  >
-                    No se encontraron datos.
-                  </TableCell>
+            {currentItems && currentItems.length > 0 ? (
+              currentItems.map((item, index: number) => (
+                <TableRow key={index}>
+                  {renderRow ? (
+                    <TableCell
+                      key={index}
+                      colSpan={colSpanColumns ? column.length : 1}
+                      className="p-0"
+                    >
+                      {renderRow(item, index)}
+                    </TableCell>
+                  ) : (
+                    column.map((col: Column, colIndex: number) => {
+                      if (col.isIcon) {
+                        return (
+                          <ColumnIcon
+                            col={col}
+                            item={item}
+                            actionTable={actionTable}
+                            key={colIndex}
+                          />
+                        );
+                      } else {
+                        return (
+                          <ColumnNormal
+                            col={col}
+                            item={item}
+                            actionTable={actionTable}
+                            key={colIndex}
+                          />
+                        );
+                      }
+                    })
+                  )}
                 </TableRow>
-              ))}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={column.length}
+                  style={{
+                    textAlign: "center",
+                    padding: "2rem",
+                    color: "#6b7280",
+                  }}
+                >
+                  No se encontraron datos.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
 
-      {data && data.length > 10 && (
+      {totalItems > 0 && (
         <PaginationTable
           page={page}
           setPage={setPage}
           rowsPerPage={rowsPerPage}
           setRowsPerPage={setRowsPerPage}
-          totalElements={data.length}
+          totalElements={totalItems}
         />
       )}
     </div>
@@ -191,12 +195,10 @@ const PaginationTable = ({
 }: PaginationTableProps) => {
   const [numberPage, setNumberPerPage] = useState<PagesInterface[]>([]);
 
+  const totalPages = Math.ceil(totalElements / Number(rowsPerPage));
+
   useEffect(() => {
-    const totalPaginate = Math.ceil(totalElements / Number(rowsPerPage));
-    const arrayPage = Array.from(
-      { length: totalPaginate },
-      (_, i) => 1 + i * 1
-    );
+    const arrayPage = Array.from({ length: totalPages }, (_, i) => 1 + i * 1);
 
     const parseArray = arrayPage.map((item) => {
       return {
@@ -205,7 +207,7 @@ const PaginationTable = ({
       };
     });
     setNumberPerPage(parseArray);
-  }, [totalElements, rowsPerPage]);
+  }, [totalElements, rowsPerPage, totalPages]);
 
   return (
     <div className="flex items-center justify-between w-full mt-4">
@@ -239,7 +241,7 @@ const PaginationTable = ({
           <PaginationContent>
             <PaginationItem>
               <Button
-                disabled={page == 0}
+                disabled={page === 0}
                 variant="noDefault"
                 onClick={() => setPage(page - 1)}
                 className="hover:bg-[#193db9] hover:text-white cursor-pointer text-black disabled:bg-gray-300 "
@@ -252,7 +254,7 @@ const PaginationTable = ({
               <PaginationItem key={item.value}>
                 <PaginationLink
                   className={`${
-                    page == item.value ? "border bg-[#193db9] text-white" : ""
+                    page === item.value ? "border bg-[#193db9] text-white" : ""
                   } hover:bg-[#193db9] hover:text-white cursor-pointer`}
                   onClick={() => setPage(item.value)}
                 >
@@ -263,7 +265,7 @@ const PaginationTable = ({
 
             <PaginationItem>
               <Button
-                disabled={page == 4}
+                disabled={page === totalPages - 1 || totalPages === 0}
                 variant="noDefault"
                 onClick={() => setPage(page + 1)}
                 className="hover:bg-[#193db9] hover:text-white cursor-pointer text-black disabled:bg-gray-300 "
