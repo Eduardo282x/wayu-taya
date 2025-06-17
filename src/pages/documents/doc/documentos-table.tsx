@@ -32,8 +32,9 @@ import {
   Trash2,
   Download,
   ArrowUpDown,
+  Eye,
 } from "lucide-react"
-import type { DocumentData, ColumnDefinition } from "../doc/types/document"
+import type { DocumentData, ColumnDefinition } from "./types/document"
 import { BsFiletypePdf } from "react-icons/bs"
 import { BsFiletypePng } from "react-icons/bs"
 import { BsFiletypeDocx } from "react-icons/bs"
@@ -54,6 +55,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "8 mar 2022",
     tamano: "17 KB",
+    descripcion: "Fotografía de identificación personal para documentos oficiales",
   },
   {
     id: 2,
@@ -63,6 +65,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "10 mar 2022",
     tamano: "45 KB",
+    descripcion: "Informe médico detallado con diagnóstico y tratamiento recomendado",
   },
   {
     id: 3,
@@ -72,6 +75,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "12 mar 2022",
     tamano: "120 KB",
+    descripcion: "Manual de recetas tradicionales con ingredientes y preparación paso a paso",
   },
   {
     id: 4,
@@ -81,6 +85,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "15 mar 2022",
     tamano: "32 KB",
+    descripcion: "Foto grupal del equipo de trabajo en evento corporativo",
   },
   {
     id: 5,
@@ -90,6 +95,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "18 mar 2022",
     tamano: "28 KB",
+    descripcion: "Receta familiar secreta de paella valenciana con trucos de cocina",
   },
   {
     id: 6,
@@ -99,6 +105,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "20 mar 2022",
     tamano: "250 KB",
+    descripcion: "Guía completa de primeros auxilios y procedimientos de emergencia",
   },
   {
     id: 7,
@@ -108,6 +115,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "22 mar 2022",
     tamano: "64 KB",
+    descripcion: "Retrato profesional para perfil de LinkedIn y redes sociales",
   },
   {
     id: 8,
@@ -117,6 +125,7 @@ const documentosData: DocumentData[] = [
     propietario: "Texto",
     fecha: "25 mar 2022",
     tamano: "35 KB",
+    descripcion: "Prescripción médica con medicamentos y dosis específicas para tratamiento",
   },
 ]
 
@@ -133,11 +142,15 @@ export function DocumentosTable() {
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [selectedContent, setSelectedContent] = useState<ContentType>("personas")
+  const [selectedDescription, setSelectedDescription] = useState("")
 
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editName, setEditName] = useState("")
   const [editContent, setEditContent] = useState<ContentType>("personas")
+
+  const [isViewOpen, setIsViewOpen] = useState(false)
+  const [viewingDocument, setViewingDocument] = useState<DocumentData | null>(null)
 
   const parseFileSize = (sizeStr: string): number => {
     const size = Number.parseFloat(sizeStr)
@@ -225,6 +238,126 @@ export function DocumentosTable() {
     }
   }
 
+  const handleViewDocument = (documentItem: DocumentData) => {
+    setViewingDocument(documentItem)
+    setIsViewOpen(true)
+  }
+
+  const closeViewModal = () => {
+    setIsViewOpen(false)
+    setViewingDocument(null)
+  }
+
+  const renderDocumentContent = (document: DocumentData) => {
+    const descripcion = document.descripcion || "Sin descripción disponible"
+
+    switch (document.tipo) {
+      case "pdf":
+        return (
+          <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="text-center max-w-2xl">
+              <BsFiletypePdf size={64} className="text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Documento PDF</h3>
+              <p className="text-gray-600 mb-4">{document.nombre}.pdf</p>
+              <div className="bg-white p-6 rounded border text-left">
+                <h4 className="font-bold mb-3">Descripción del documento:</h4>
+                <p className="text-gray-700 leading-relaxed">{descripcion}</p>
+                <div className="mt-4 pt-4 border-t text-sm text-gray-500">
+                  <p>
+                    <strong>Tipo de contenido:</strong> {document.contenido}
+                  </p>
+                  <p>
+                    <strong>Tamaño:</strong> {document.tamano}
+                  </p>
+                  <p>
+                    <strong>Fecha:</strong> {document.fecha}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+      case "png":
+        return (
+          <div className="w-full max-h-96 bg-gray-100 rounded-lg flex items-center justify-center p-4">
+            <div className="text-center max-w-2xl">
+              <div className="bg-white p-6 rounded-lg shadow-sm border-2 border-dashed border-gray-300">
+                <BsFiletypePng size={64} className="text-green-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Imagen PNG</h3>
+                <p className="text-gray-600 mb-4">{document.nombre}.png</p>
+                <div className="bg-gradient-to-br from-blue-100 to-green-100 w-48 h-32 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">🖼️</div>
+                    <p className="text-sm text-gray-600">Vista previa de imagen</p>
+                  </div>
+                </div>
+                <div className="text-left bg-gray-50 p-4 rounded">
+                  <h4 className="font-bold mb-2">Descripción:</h4>
+                  <p className="text-gray-700 leading-relaxed">{descripcion}</p>
+                  <div className="mt-3 pt-3 border-t text-sm text-gray-500">
+                    <p>
+                      <strong>Tamaño:</strong> {document.tamano}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+      case "docx":
+        return (
+          <div className="w-full h-96 bg-gray-100 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-6 h-full overflow-y-auto">
+              <div className="flex items-center mb-4">
+                <BsFiletypeDocx size={32} className="text-blue-500 mr-3" />
+                <div>
+                  <h3 className="text-lg font-semibold">{document.nombre}.docx</h3>
+                  <p className="text-sm text-gray-500">Documento de Word</p>
+                </div>
+              </div>
+
+              <div className="prose max-w-none">
+                <h4 className="text-base font-semibold mb-3">Descripción del documento:</h4>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-gray-700 leading-relaxed">{descripcion}</p>
+                </div>
+
+                <div className="mt-4 pt-4 border-t">
+                  <h5 className="font-medium mb-2">Información del archivo:</h5>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p>
+                      <strong>Tipo de contenido:</strong> {document.contenido}
+                    </p>
+                    <p>
+                      <strong>Fecha de modificación:</strong> {document.fecha}
+                    </p>
+                    <p>
+                      <strong>Tamaño:</strong> {document.tamano}
+                    </p>
+                    <p>
+                      <strong>Propietario:</strong> {document.propietario}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+      default:
+        return (
+          <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="text-center">
+              <FileIcon size={64} className="text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">Tipo de archivo no soportado</p>
+            </div>
+          </div>
+        )
+    }
+  }
+
   const columns: ColumnDefinition[] = [
     {
       column: "nombre",
@@ -261,6 +394,10 @@ export function DocumentosTable() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleViewDocument(item)}>
+              <Eye size={16} className="mr-2" />
+              Ver
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => openEditModal(item)}>
               <Edit size={16} className="mr-2" />
               Editar
@@ -374,7 +511,7 @@ export function DocumentosTable() {
 
   const handleDownloadDocument = (documentItem: DocumentData) => {
     try {
-      const fileContent = `Documento: ${documentItem.nombre}\nTipo: ${documentItem.tipo}\nContenido: ${documentItem.contenido}\nFecha: ${documentItem.fecha}\nTamaño: ${documentItem.tamano}`
+      const fileContent = `Documento: ${documentItem.nombre}\nTipo: ${documentItem.tipo}\nContenido: ${documentItem.contenido}\nFecha: ${documentItem.fecha}\nTamaño: ${documentItem.tamano}\nDescripción: ${documentItem.descripcion || "Sin descripción"}`
       const blob = new Blob([fileContent], { type: "text/plain" })
       const url = URL.createObjectURL(blob)
       const link = window.document.createElement("a")
@@ -408,11 +545,13 @@ export function DocumentosTable() {
         year: "numeric",
       }),
       tamano: formatFileSize(uploadedFile.size),
+      descripcion: selectedDescription.trim() || "Sin descripción disponible",
     }
 
     setData((prevData) => [...prevData, newDocument])
     setUploadedFile(null)
     setSelectedContent("personas")
+    setSelectedDescription("")
     setIsUploadOpen(false)
   }
 
@@ -623,6 +762,17 @@ export function DocumentosTable() {
                   </Select>
                 </div>
 
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-700">Descripción del documento</Label>
+                  <textarea
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    rows={3}
+                    value={selectedDescription}
+                    onChange={(e) => setSelectedDescription(e.target.value)}
+                    placeholder="Escribe una breve descripción del documento..."
+                  />
+                </div>
+
                 {uploadedFile && (
                   <div className="border rounded-lg p-4 bg-gray-50">
                     <div className="flex items-center justify-between">
@@ -728,6 +878,35 @@ export function DocumentosTable() {
             </DialogContent>
           </Dialog>
 
+          <Dialog open={isViewOpen} onOpenChange={(open) => !open && closeViewModal()}>
+            <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Eye size={20} />
+                  Ver documento: {viewingDocument?.nombre}
+                </DialogTitle>
+                <DialogDescription>
+                  Visualización del contenido del archivo {viewingDocument?.tipo?.toUpperCase()}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-4">{viewingDocument && renderDocumentContent(viewingDocument)}</div>
+
+              <div className="flex justify-end gap-2 mt-6">
+                <Button variant="outline" onClick={closeViewModal}>
+                  Cerrar
+                </Button>
+                <Button
+                  onClick={() => viewingDocument && handleDownloadDocument(viewingDocument)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Download size={16} className="mr-2" />
+                  Descargar
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           {(tipoFilter || contenidoFilter || searchTerm || sortField) && (
             <Button
               variant="outline"
@@ -744,7 +923,13 @@ export function DocumentosTable() {
         {viewMode === "list" ? (
           <TableComponents column={columns} data={processedData} />
         ) : (
-          <GridView data={processedData} />
+          <GridView
+            data={processedData}
+            onViewDocument={handleViewDocument}
+            onEditDocument={openEditModal}
+            onDownloadDocument={handleDownloadDocument}
+            onDeleteDocument={handleDeleteDocument}
+          />
         )}
       </div>
     </div>

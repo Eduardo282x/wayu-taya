@@ -7,15 +7,11 @@ export interface DocumentData {
   propietario: string
   fecha: string
   tamano: string
+  descripcion?: string
 }
 
 export interface ColumnDefinition {
   column: string
   label: string
   element: (item: DocumentData) => React.ReactNode
-}
-
-export interface FilterColumn {
-  column: string
-  label: string
 }
