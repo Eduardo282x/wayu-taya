@@ -1,19 +1,8 @@
-import {
-  GroupMedicine,
-  IMedicine,
-  MedicineBody,
-  Category,
-  Form,
-} from "@/services/medicine/medicine.interface";
+import { GroupMedicine, IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
-import {
-  getMedicine,
-  postMedicine,
-  putMedicine,
-  deleteMedicine,
-} from "@/services/medicine/medicine.service";
+import { getMedicine, postMedicine, putMedicine, deleteMedicine, getMedicineTemplate } from "@/services/medicine/medicine.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { Column } from "@/components/table/table.interface";
 import { MedicineForm } from "./MedicineForm";
@@ -24,26 +13,20 @@ import { GiMedicines } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import { FaPills } from "react-icons/fa";
 import ConfirmDeleteMedicineDialog from "./ConfirmDeleteMedicineDialog";
+import { FaDownload, FaUpload } from "react-icons/fa6";
 
 export const Medicine = () => {
-  const [medicines, setMedicines] = useState<GroupMedicine>({
-    allMedicine: [],
-    medicine: [],
-  });
-  const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(
-    null
-  );
+  const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: [], medicine: [] });
+  const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(null);
   const [columns, setColumns] = useState<Column[]>(medicineColumns);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [forms, setForms] = useState<Form[]>([]);
 
   useEffect(() => {
     getMedicineApi();
-
     getCategoriesAndForms();
   }, []);
 
@@ -147,6 +130,17 @@ export const Medicine = () => {
       setIsDeleteDialogOpen(true);
     }
   };
+  const downloadTemplate = async () => {
+    const response = await getMedicineTemplate();
+    const url = URL.createObjectURL(response)
+    const link = window.document.createElement("a")
+    link.href = url
+    link.download = `Plantilla excel`
+    window.document.body.appendChild(link)
+    link.click()
+    window.document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <>
@@ -156,7 +150,12 @@ export const Medicine = () => {
       </div>
 
       <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-        <DropdownColumnFilter columns={columns} setColumns={setColumns} />
+        <div className="flex items-center gap-2">
+          <DropdownColumnFilter columns={columns} setColumns={setColumns} />
+
+          <Button onClick={downloadTemplate} variant={'animatedNormal'} className="bg-green-700"><FaDownload /> Descargar plantilla</Button>
+          <Button variant={'animatedNormal'} className="bg-green-700"><FaUpload />Cargar datos</Button>
+        </div>
 
         <div className="flex items-center ">
           <FilterComponent
