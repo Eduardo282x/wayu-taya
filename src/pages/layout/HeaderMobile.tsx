@@ -27,8 +27,8 @@ const MenuMobile = () => {
     return (
         <div>
             <Sheet open={open} onOpenChange={setOpen}>
-                <SheetTrigger>
-                    <Button variant={'normal'} size={'icon'}>
+                <SheetTrigger asChild>
+                    <Button asChild variant={'normal'} size={'icon'}>
                         <IoMdMenu />
                     </Button>
                 </SheetTrigger>
