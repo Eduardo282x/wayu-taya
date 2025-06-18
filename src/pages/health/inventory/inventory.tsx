@@ -1,95 +1,80 @@
 import { MdOutlineProductionQuantityLimits } from "react-icons/md"
 import { InventoryDetailsMedicine } from "./InventoryDetailsMedicine"
 import { FilterComponent } from "@/components/table/FilterComponent"
-import { GroupMedicine, medicineColumns, type Medicine } from "./inventory.data"
+import { inventoryColumns } from "./inventory.data"
 import { useState, useEffect } from "react"
 import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/pages/layout/Header"
 import { getInventory } from "@/services/inventory/inventory.service"
-import { IInventory } from "@/services/inventory/inventory.interface"
+import { GroupInventory, IInventory } from "@/services/inventory/inventory.interface"
 import { TableComponents } from "@/components/table/TableComponents"
-
-const initialMedicines: Medicine[] = [
-  {
-    id: 1,
-    medicina: "Paracetamol 500mg",
-    cantidad: 100,
-    fechaLlegada: "2024-01-15",
-    fechaExpiracion: "2026-01-15",
-  },
-  {
-    id: 2,
-    medicina: "Ibuprofeno 400mg",
-    cantidad: 75,
-    fechaLlegada: "2024-02-10",
-    fechaExpiracion: "2024-12-10",
-  },
-  {
-    id: 3,
-    medicina: "Amoxicilina 250mg",
-    cantidad: 50,
-    fechaLlegada: "2024-03-05",
-    fechaExpiracion: "2025-07-01",
-  },
-];
+import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 
 export const Inventory = () => {
-  const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: initialMedicines, medicine: initialMedicines })
+  const [inventory, setInventory] = useState<GroupInventory>({ allInventory: [], inventory: [] })
   const [alertOpen, setAlertOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [medicineToDelete, setMedicineToDelete] = useState<Medicine | null>(null)
+  const [inventorySelected, setInventorySelected] = useState<IInventory | null>(null)
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getInventoryApi();
   }, []);
 
   const getInventoryApi = async () => {
-    const response: IInventory[] = await getInventory()
-    console.log(response)
-    console.log(`${response[0].medicine.name} ${response[0].medicine.amount}${response[0].medicine.unit}`)
+    setLoading(true)
+    try {
+      const response: IInventory[] = await getInventory();
+      setInventory({ allInventory: response, inventory: response })
+    } catch (err) {
+      console.log(err);
+    }
+    setLoading(false)
   }
 
-  const getActionTable = (action: string, data: Medicine) => {
-    console.log(action);
-    console.log(data);
-
+  const getActionTable = (action: string, data: IInventory) => {
+    setInventorySelected(data);
+    if (action == 'delete') {
+      setIsDeleteDialogOpen(true)
+    }
   }
 
   const handleConfirmDelete = () => {
     // if (medicineToDelete) {
     //   const updatedMedicines = medicines.allMedicine.filter((m) => m.id !== medicineToDelete.id)
     //   setMedicines(updatedMedicines)
-    setMedicineToDelete(null)
-    //   setIsDeleteDialogOpen(false)
+    setInventorySelected(null)
+    setIsDeleteDialogOpen(false)
     // }
   };
 
   return (
     <div className="min-h-[90vh] w-[79.5vw] pr-7 overflow-auto">
+      {loading && <ScreenLoader />}
       <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits} />
 
       {/* Barra de herramientas con filtros */}
-      <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-end mb-4">
+      <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-2 px-2 justify-end">
         <div className="flex items-center gap-4">
           <FilterComponent
-            data={medicines.allMedicine}
-            setDataFilter={(data) => setMedicines((prev) => { return { ...prev, medicine: data } })}
-            columns={medicineColumns}
+            data={inventory.allInventory}
+            setDataFilter={(data) => setInventory((prev) => { return { ...prev, inventory: data } })}
+            columns={inventoryColumns}
             placeholder="Buscar medicina..."
           />
         </div>
       </div>
 
-      <div>
+      <div className="mt-3">
         <TableComponents
-          data={medicines.medicine}
-          column={medicineColumns}
+          data={inventory.inventory}
+          column={inventoryColumns}
           actionTable={getActionTable}
           colSpanColumns={true}
           isExpansible={true}
-          renderRow={(medicine: Medicine, index: number) => (
-            <InventoryDetailsMedicine medicine={medicine} key={index} />
+          renderRow={(inventory: IInventory, index: number) => (
+            <InventoryDetailsMedicine inventory={inventory} key={index} />
           )}
         />
 
@@ -97,7 +82,7 @@ export const Inventory = () => {
           open={isDeleteDialogOpen}
           onOpenChange={setIsDeleteDialogOpen}
           onConfirm={handleConfirmDelete}
-          medicineName={medicineToDelete?.medicina}
+          medicineName={`${inventorySelected?.medicine.name} ${inventorySelected?.medicine.amount}${inventorySelected?.medicine.unit}`}
         />
 
         <AlertDialog

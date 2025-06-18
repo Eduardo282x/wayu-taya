@@ -14,7 +14,7 @@ interface ConfirmDeleteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: () => void
-  medicineName?: string
+  medicineName: string
 }
 
 const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({ open, onOpenChange, onConfirm, medicineName }) => {

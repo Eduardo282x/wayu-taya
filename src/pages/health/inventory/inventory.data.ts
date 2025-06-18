@@ -1,52 +1,40 @@
 import { Column } from "@/components/table/table.interface"
+import { IInventory } from "@/services/inventory/inventory.interface";
 import { formatDate } from "@/utils/formatters"
 import { FaRegTrashAlt } from "react-icons/fa"
 
-export interface GroupMedicine {
-  allMedicine: Medicine[];
-  medicine: Medicine[];
-}
-
-export interface Medicine {
-  id: number
-  medicina: string
-  cantidad: number
-  fechaLlegada: string
-  fechaExpiracion: string
-}
-
-export const medicineColumns: Column[] = [
+export const inventoryColumns: Column[] = [
   {
     label: "Medicina",
-    column: "medicina",
+    column: "medicine.name",
     visible: true,
     isIcon: false,
-    element: (data: Medicine) => data.medicina,
+    element: (data: IInventory) => `${data.medicine.name} ${data.medicine.amount}${data.medicine.unit}`,
   },
   {
     label: "Cantidad",
-    column: "cantidad",
+    column: "totalStock",
     visible: true,
     isIcon: false,
-    element: (data: Medicine) => `${data.cantidad} unidades`,
+    element: (data: IInventory) => `${data.totalStock} unidades`,
   },
   {
     label: "Fecha de Llegada",
-    column: "fechaLlegada",
+    column: "admissionDate",
     visible: true,
     isIcon: false,
-    element: (data: Medicine) => formatDate(data.fechaLlegada),
+    element: (data: IInventory) => formatDate(data.datesMedicine[0].admissionDate),
   },
   {
     label: "Fecha de Expiración",
-    column: "fechaExpiracion",
+    column: "expirationDate",
     visible: true,
     isIcon: false,
-    element: (data: Medicine) => formatDate(data.fechaExpiracion),
-    className: (data: Medicine) => {
-      if (isExpired(data.fechaExpiracion)) {
+    element: (data: IInventory) => formatDate(data.datesMedicine[0].expirationDate),
+    className: (data: IInventory) => {
+      if (isExpired(data.datesMedicine[0].expirationDate, false)) {
         return "expired-date"
-      } else if (isExpiringSoon(data.fechaExpiracion)) {
+      } else if (isExpired(data.datesMedicine[0].expirationDate, true)) {
         return "expiring-soon-date"
       }
       return ""
@@ -67,17 +55,12 @@ export const medicineColumns: Column[] = [
   },
 ];
 
+const isExpired = (expirationDate: string | Date, soon: boolean) => {
+  const today = new Date();
+  const expDate = new Date(expirationDate);
+  if (soon) return expDate < today;
 
-const isExpiringSoon = (expirationDate: string) => {
-  const today = new Date()
-  const expDate = new Date(expirationDate)
   const diffTime = expDate.getTime() - today.getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   return diffDays <= 30 && diffDays > 0
-}
-
-const isExpired = (expirationDate: string) => {
-  const today = new Date()
-  const expDate = new Date(expirationDate)
-  return expDate < today
 }

@@ -1,11 +1,11 @@
-import { Medicine } from "./inventory.data";
+import { IInventory } from "@/services/inventory/inventory.interface";
 
-interface MedicineDetailsProps {
-  medicine: Medicine;
+interface InventoryDetailsMedicine {
+  inventory: IInventory;
 }
 
-export const InventoryDetailsMedicine = ({ medicine }: MedicineDetailsProps) => {
-  console.log(medicine);
+export const InventoryDetailsMedicine = ({ inventory }: InventoryDetailsMedicine) => {
+  console.log(inventory);
 
   return (
     <div>
