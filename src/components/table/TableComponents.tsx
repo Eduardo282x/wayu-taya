@@ -50,7 +50,7 @@ export const TableComponents: FC<TableProps> = ({
                 <TableHead key={index}>{col.label}</TableHead>
               ))}
               {isExpansible && (
-                <TableHead className="cursor-pointer bg-white z-50">
+                <TableHead className="cursor-pointer z-50">
                   Abrir
                 </TableHead>
               )}
@@ -111,7 +111,7 @@ const TableRowNormal = <T,>({ index, columns, data, colSpanColumns, columnData, 
   return (
     <TableRow key={index}>
       {renderRow ?
-        <TableCell key={index} colSpan={colSpanColumns ? columnData.length : 1} className="p-0">
+        <TableCell key={index} colSpan={colSpanColumns ? columnData.length : 1} className="!p-0">
           {renderRow(data, index)}
         </TableCell>
         :
@@ -169,7 +169,7 @@ const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: Tab
 
       {/* Fila expandida */}
       <TableRow key={`expand-${index}`} className="bg-muted">
-        <TableCell colSpan={columns.length + 1} className="p-0">
+        <TableCell colSpan={columns.length + 1} className="!p-0">
           <div
             className={`transition-all duration-300 ease-in-out w-full ${open ? 'h-auto px-4 py-2' : '!h-0'} interpolate overflow-hidden`}
           >

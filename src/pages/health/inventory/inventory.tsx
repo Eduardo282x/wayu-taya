@@ -1,18 +1,14 @@
 import { MdOutlineProductionQuantityLimits } from "react-icons/md"
-import { Button } from "@/components/ui/button"
-import { TbMedicineSyrup } from "react-icons/tb"
-import { InventoryTableVariant } from "./inventory-table-variant"
+import { MedicineDetails } from "./inventory-table-variant"
 import { FilterComponent } from "@/components/table/FilterComponent"
-import type { Medicine } from "./inventory.data"
-import type { Column } from "@/components/table/table.interface"
+import { GroupMedicine, medicineColumns, type Medicine } from "./inventory.data"
 import { useState, useEffect } from "react"
-import InventoryForm from "./inventory-forms"
 import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/pages/layout/Header"
 import { getInventory } from "@/services/inventory/inventory.service"
 import type { IInventory } from "@/services/inventory/inventory.interface"
-import { FaRegEdit, FaRegTrashAlt, FaChevronDown } from "react-icons/fa"
+import { TableComponents } from "@/components/table/TableComponents"
 
 const initialMedicines: Medicine[] = [
   {
@@ -39,85 +35,10 @@ const initialMedicines: Medicine[] = [
 ];
 
 export const Inventory = () => {
-  const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines)
-  const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>(initialMedicines)
-  const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null)
-  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: initialMedicines, medicine: initialMedicines })
   const [alertOpen, setAlertOpen] = useState(false)
-  const [alertMessage, setAlertMessage] = useState("")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [medicineToDelete, setMedicineToDelete] = useState<Medicine | null>(null)
-
-  // Configuración de columnas para el filtro
-  const [columns] = useState<Column[]>([
-    {
-      label: "",
-      column: "expand",
-      visible: true,
-      isIcon: true,
-      element: () => "",
-      icon: {
-        label: "Expandir detalles",
-        icon: FaChevronDown,
-        className: "text-gray-600",
-        variant: "ghost",
-      },
-    },
-    {
-      label: "Medicina",
-      column: "medicina",
-      visible: true,
-      isIcon: false,
-      element: (data: Medicine) => data.medicina,
-    },
-    {
-      label: "Cantidad",
-      column: "cantidad",
-      visible: true,
-      isIcon: false,
-      element: (data: Medicine) => `${data.cantidad} unidades`,
-    },
-    {
-      label: "Fecha de Llegada",
-      column: "fechaLlegada",
-      visible: true,
-      isIcon: false,
-      element: (data: Medicine) => data.fechaLlegada,
-    },
-    {
-      label: "Fecha de Expiración",
-      column: "fechaExpiracion",
-      visible: true,
-      isIcon: false,
-      element: (data: Medicine) => data.fechaExpiracion,
-    },
-    {
-      label: "Editar",
-      column: "edit",
-      visible: true,
-      isIcon: true,
-      element: () => "",
-      icon: {
-        label: "Editar medicina",
-        icon: FaRegEdit,
-        className: "text-blue-600",
-        variant: "ghost",
-      },
-    },
-    {
-      label: "Eliminar",
-      column: "delete",
-      visible: true,
-      isIcon: true,
-      element: () => "",
-      icon: {
-        label: "Eliminar medicina",
-        icon: FaRegTrashAlt,
-        className: "text-red-600",
-        variant: "ghost",
-      },
-    },
-  ])
 
   useEffect(() => {
     getInventoryApi();
@@ -129,74 +50,19 @@ export const Inventory = () => {
     console.log(`${response[0].medicine.name} ${response[0].medicine.amount}${response[0].medicine.unit}`)
   }
 
-  const openCreateForm = () => {
-    setEditingMedicine(null);
-    setIsFormOpen(true);
-  };
+  const getActionTable = (action: string, data: Medicine) => {
+    console.log(action);
+    console.log(data);
 
-  const openEditForm = (medicine: Medicine) => {
-    setEditingMedicine(medicine);
-    setIsFormOpen(true);
-  };
-
-  // Guardar medicina (crear o editar)
-  const handleMedicineSubmit = (data: Omit<Medicine, "id"> | Medicine) => {
-    const medicinaExistente = medicines.some(
-      (m) =>
-        m.medicina.toLowerCase() === data.medicina.toLowerCase() &&
-        ("id" in data ? m.id !== data.id : true)
-    );
-
-    if (medicinaExistente) {
-      setAlertMessage("Esta medicina ya está registrada en el inventario.");
-      setAlertOpen(true);
-      return;
-    }
-
-    // Validar fechas
-    const fechaLlegada = new Date(data.fechaLlegada);
-    const fechaExpiracion = new Date(data.fechaExpiracion);
-
-    if (fechaExpiracion <= fechaLlegada) {
-      setAlertMessage(
-        "La fecha de expiración debe ser posterior a la fecha de llegada."
-      );
-      setAlertOpen(true);
-      return;
-    }
-
-    if ("id" in data) {
-      // Editar medicina existente
-      const updatedMedicines = medicines.map((m) => (m.id === data.id ? data : m))
-      setMedicines(updatedMedicines)
-    } else {
-      // Crear nueva medicina
-      const newMedicine: Medicine = {
-        id:
-          medicines.length > 0
-            ? Math.max(...medicines.map((m) => m.id)) + 1
-            : 1,
-        ...data,
-      }
-      const updatedMedicines = [...medicines, newMedicine]
-      setMedicines(updatedMedicines)
-    }
-    setIsFormOpen(false)
-    setEditingMedicine(null)
   }
 
-  const handleDeleteClick = (medicine: Medicine) => {
-    setMedicineToDelete(medicine);
-    setIsDeleteDialogOpen(true);
-  };
-
   const handleConfirmDelete = () => {
-    if (medicineToDelete) {
-      const updatedMedicines = medicines.filter((m) => m.id !== medicineToDelete.id)
-      setMedicines(updatedMedicines)
+    // if (medicineToDelete) {
+    //   const updatedMedicines = medicines.allMedicine.filter((m) => m.id !== medicineToDelete.id)
+    //   setMedicines(updatedMedicines)
       setMedicineToDelete(null)
-      setIsDeleteDialogOpen(false)
-    }
+    //   setIsDeleteDialogOpen(false)
+    // }
   };
 
   return (
@@ -204,36 +70,28 @@ export const Inventory = () => {
       <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits} />
 
       {/* Barra de herramientas con filtros */}
-      <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-between mb-4">
+      <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-1 justify-end mb-4">
         <div className="flex items-center gap-4">
           <FilterComponent
-            data={medicines}
-            setDataFilter={setFilteredMedicines}
-            columns={columns}
+            data={medicines.allMedicine}
+            setDataFilter={(data) => setMedicines((prev) => { return { ...prev, medicine: data } })}
+            columns={medicineColumns}
             placeholder="Buscar medicina..."
           />
         </div>
-        <Button variant={"animated"} className="h-[90%]" onClick={openCreateForm}>
-          <TbMedicineSyrup className="size-6" />
-          Agregar Medicina
-        </Button>
       </div>
 
       <div>
-        <InventoryTableVariant
-          medicines={filteredMedicines}
-          onEdit={openEditForm}
-          onDelete={(medicineId) => {
-            const medicine = medicines.find((m) => m.id === medicineId);
-            if (medicine) handleDeleteClick(medicine);
-          }}
-        />
-
-        <InventoryForm
-          open={isFormOpen}
-          onOpenChange={setIsFormOpen}
-          onSubmit={handleMedicineSubmit}
-          medicine={editingMedicine}
+        <TableComponents
+          data={medicines.medicine}
+          column={medicineColumns}
+          actionTable={getActionTable}
+          colSpanColumns={true}
+          isExpansible={true}
+          renderRow={(medicine: Medicine, index: number) => (
+            <MedicineDetails medicine={medicine} key={index}>
+            </MedicineDetails>
+          )}
         />
 
         <ConfirmDeleteDialog
@@ -247,7 +105,7 @@ export const Inventory = () => {
           open={alertOpen}
           onOpenChange={setAlertOpen}
           title="Error"
-          description={alertMessage}
+          description={'Mensaje'}
         />
       </div>
     </div>
