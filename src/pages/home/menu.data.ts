@@ -28,7 +28,7 @@ export const optionsMenu: CategoryCardProps[] = [
         description: "Actividades y recursos destinados al campo de salud",
         icon: GiHealthNormal,
         buttonText: "Salud",
-        url: '/salud',
+        url: '/salud/inventario',
         section:'salud'
     },
     {

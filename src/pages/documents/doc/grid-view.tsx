@@ -1,76 +1,138 @@
-import { MoreVertical } from "lucide-react"
 import { Button } from "../../../components/ui/button"
-import type { DocumentData} from "../doc/types/document"
-import { BsFiletypePdf } from "react-icons/bs";
-import { BsFiletypePng } from "react-icons/bs";
-import { BsFiletypeDocx } from "react-icons/bs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../components/ui/dropdown-menu"
+import { MoreVertical, Edit, Trash2, Download, Eye } from "lucide-react"
+import type { DocumentData } from "./types/document"
+import { BsFiletypePdf } from "react-icons/bs"
+import { BsFiletypePng } from "react-icons/bs"
+import { BsFiletypeDocx } from "react-icons/bs"
 
 interface GridViewProps {
   data: DocumentData[]
+  onViewDocument: (document: DocumentData) => void
+  onEditDocument: (document: DocumentData) => void
+  onDownloadDocument: (document: DocumentData) => void
+  onDeleteDocument: (id: number) => void
 }
 
-export function GridView({ data }: GridViewProps) {
-  return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-4 px-2">
-        <Button variant="ghost" size="sm" className="text-blue-600">
-          <span className="sr-only">Ordenar</span>↑ Nombre
-        </Button>
-        <Button variant="ghost" size="sm">
-          <MoreVertical size={16} />
-        </Button>
-      </div>
+export function GridView({
+  data,
+  onViewDocument,
+  onEditDocument,
+  onDownloadDocument,
+  onDeleteDocument,
+}: GridViewProps) {
+  const getFileIcon = (tipo: string) => {
+    switch (tipo) {
+      case "pdf":
+        return <BsFiletypePdf size={48} className="text-red-500" />
+      case "png":
+        return <BsFiletypePng size={48} className="text-green-500" />
+      case "docx":
+        return <BsFiletypeDocx size={48} className="text-blue-500" />
+      default:
+        return <BsFiletypePdf size={48} className="text-gray-500" />
+    }
+  }
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {data.map((item, index) => (
-          <div key={index} className="border rounded-lg overflow-hidden bg-white">
-            <div className="bg-blue-100 p-2 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 bg-blue-50 flex items-center justify-center rounded">
-                  {item.tipo=='pdf' && (
-                    <BsFiletypePdf size={30} className="text-red-500"/>
-                  )}
-                  {item.tipo=='png' && (
-                    <BsFiletypePng size={30} className="text-green-500"/>
-                  )}
-                  {item.tipo=='docx' && (
-                    <BsFiletypeDocx size={30} className="text-blue-500"/>
-                  )}
-                  {/* <img src="/placeholder.svg" alt="Thumbnail" width={16} height={16} className="object-cover" /> */}
-                </div>
-                <span className="text-sm text-blue-800">{item.nombre}</span>
-              </div>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                <MoreVertical size={14} />
-              </Button>
+  const getContentBadgeColor = (contenido: string) => {
+    switch (contenido) {
+      case "personas":
+        return "bg-blue-100 text-blue-800"
+      case "comida":
+        return "bg-green-100 text-green-800"
+      case "medicina":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-500 text-lg">No se encontraron documentos</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="h-[28rem] overflow-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      {data.map((document) => (
+        <div
+          key={document.id}
+          className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 relative group"
+        >
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 bg-white shadow-sm border">
+                  <MoreVertical size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onViewDocument(document)}>
+                  <Eye size={16} className="mr-2" />
+                  Ver
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEditDocument(document)}>
+                  <Edit size={16} className="mr-2" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDownloadDocument(document)}>
+                  <Download size={16} className="mr-2" />
+                  Descargar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onDeleteDocument(document.id)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 size={16} className="mr-2" />
+                  Eliminar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="flex flex-col items-center text-center space-y-3">
+            <div className="flex-shrink-0">{getFileIcon(document.tipo)}</div>
+
+            <div className="w-full">
+              <h3 className="font-medium text-gray-900 truncate" title={document.nombre}>
+                {document.nombre}
+              </h3>
+              <p className="text-sm text-gray-500 uppercase">{document.tipo}</p>
             </div>
-            <div className="p-4 h-32 flex items-center justify-center bg-white">
-              {item.tipo=='pdf' && (
-                    <BsFiletypePdf size={30} className="text-red-500"/>
-                  )}
-                  {item.tipo=='png' && (
-                    <BsFiletypePng size={30} className="text-green-500"/>
-                  )}
-                  {item.tipo=='docx' && (
-                    <BsFiletypeDocx size={30} className="text-blue-500"/>
-                  )}
-              {/* <img
-                src="/placeholder.svg"
-                alt="Document preview"
-                width={100}
-                height={100}
-                className="object-contain max-h-full"
-              /> */}
+
+            <div className="w-full">
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getContentBadgeColor(document.contenido)}`}
+              >
+                {document.contenido.charAt(0).toUpperCase() + document.contenido.slice(1)}
+              </span>
+            </div>
+
+            {document.descripcion && (
+              <div className="w-full">
+                <p className="text-xs text-gray-600 line-clamp-2" title={document.descripcion}>
+                  {document.descripcion}
+                </p>
+              </div>
+            )}
+
+            <div className="w-full pt-2 border-t border-gray-100">
+              <div className="flex justify-between items-center text-xs text-gray-500">
+                <span>{document.tamano}</span>
+                <span>{document.fecha}</span>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className="mt-4 flex justify-between items-center">
-        <p>
-          <span className="font-semibold">Total de elementos:</span> {data.length}
-        </p>
-      </div>
+        </div>
+      ))}
     </div>
   )
 }

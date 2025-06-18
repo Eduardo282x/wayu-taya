@@ -1,25 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, } from "@/components/ui/pagination";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, } from "../ui/select";
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip";
+import { IoIosArrowBack, IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import { Column } from "@/components/table/table.interface";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { PagesInterface } from "./table.data";
+
 import { Button } from "../ui/button";
-import './table.css';
+import "./table.css";
+
 interface TableProps {
   column: Column[];
   data: any[];
   actionTable: (action: string, data: any) => void;
   renderRow?: (item: any, index: number) => React.ReactNode;
   colSpanColumns?: boolean;
+  isExpansible?: boolean;
 }
 
-export const TableComponents: FC<TableProps> = ({ column, data, actionTable, renderRow, colSpanColumns }) => {
+export const TableComponents: FC<TableProps> = ({
+  column,
+  data,
+  actionTable,
+  renderRow,
+  colSpanColumns,
+  isExpansible
+}) => {
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<string>('10');
+  const [rowsPerPage, setRowsPerPage] = useState<string>("10");
+
+  useEffect(() => {
+    setPage(0);
+  }, [data, rowsPerPage]);
+
+  const indexOfLastItem = (page + 1) * Number(rowsPerPage);
+  const indexOfFirstItem = indexOfLastItem - Number(rowsPerPage);
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const totalItems = data.length;
 
   return (
     <div className="w-full">
@@ -30,33 +49,33 @@ export const TableComponents: FC<TableProps> = ({ column, data, actionTable, ren
               {column.map((col: Column, index: number) => (
                 <TableHead key={index}>{col.label}</TableHead>
               ))}
+              {isExpansible && (
+                <TableHead className="cursor-pointer bg-white z-50">
+                  Abrir
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data && data.slice(page * Number(rowsPerPage), page * Number(rowsPerPage) + Number(rowsPerPage)).map((item, index: number) => (
-              <TableRow key={index}>
-
-                {renderRow
-                  ?
-                  <TableCell key={index} colSpan={colSpanColumns ? column.length : 1} className="p-0">
-                    {renderRow(item, index)}
-                  </TableCell>
+            {currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => (
+              <>
+                {isExpansible ?
+                  <TableRowExpansible index={index} data={item} columns={column} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={column} />
                   :
-                  column.map((col: Column, index: number) => {
-                    if (col.isIcon) {
-                      return <ColumnIcon col={col} item={item} actionTable={actionTable} key={index} />
-                    }
-                    else {
-                      return <ColumnNormal col={col} item={item} actionTable={actionTable} key={index} />
-                    }
-                  }
-                  )}
-              </TableRow>
-            ))}
-
-            {!data || data.length == 0 && (
+                  <TableRowNormal index={index} data={item} columns={column} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={column} />
+                }
+              </>
+            ))
+            ) : (
               <TableRow>
-                <TableCell colSpan={column.length} style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+                <TableCell
+                  colSpan={column.length}
+                  style={{
+                    textAlign: "center",
+                    padding: "2rem",
+                    color: "#6b7280",
+                  }}
+                >
                   No se encontraron datos.
                 </TableCell>
               </TableRow>
@@ -65,43 +84,127 @@ export const TableComponents: FC<TableProps> = ({ column, data, actionTable, ren
         </Table>
       </div>
 
-      {data && data.length > 10 && (
+      {totalItems > 0 && (
         <PaginationTable
           page={page}
           setPage={setPage}
           rowsPerPage={rowsPerPage}
           setRowsPerPage={setRowsPerPage}
-          totalElements={data.length}
+          totalElements={totalItems}
         />
       )}
     </div>
   );
 };
 
+interface TableRowNormalProps<T> {
+  index: number;
+  columns: Column[];
+  columnData: Column[];
+  data: T;
+  colSpanColumns?: boolean;
+  action?: (action: string, data: any) => void;
+  renderRow?: (item: any, index: number) => React.ReactNode;
+}
+
+const TableRowNormal = <T,>({ index, columns, data, colSpanColumns, columnData, action, renderRow }: TableRowNormalProps<T>) => {
+  return (
+    <TableRow key={index}>
+      {renderRow ?
+        <TableCell key={index} colSpan={colSpanColumns ? columnData.length : 1} className="p-0">
+          {renderRow(data, index)}
+        </TableCell>
+        :
+        (columns && columns.map((column: Column, index: number) => (
+          <TableCell key={index}>
+            {(!column.icon
+              ? <ColumnNormal col={column} item={data} actionTable={action} />
+              : <ColumnIcon col={column} item={data} actionTable={action} />
+            )}
+          </TableCell>
+        )))
+      }
+    </TableRow>
+  )
+}
+
+const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: TableRowNormalProps<T>) => {
+  const [open, setOpen] = useState<boolean>(false);
+  const rowRef = useRef<HTMLTableRowElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (rowRef.current && !rowRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <>
+      <TableRow
+        key={`main-${index}`}
+        ref={rowRef}
+        onClick={() => setOpen(!open)}
+        className="cursor-pointer transition-all"
+      >
+        {columns.map((column: Column, idx: number) => (
+          <TableCell key={idx}>
+            {!column.icon
+              ? <ColumnNormal col={column} item={data} actionTable={action} />
+              : <ColumnIcon col={column} item={data} actionTable={action} />}
+          </TableCell>
+        ))}
+        <TableCell>
+          <IoIosArrowDown
+            className={`transition-transform text-xl ${open ? 'rotate-180' : 'rotate-0'}`}
+          />
+        </TableCell>
+      </TableRow>
+
+      {/* Fila expandida */}
+      <TableRow key={`expand-${index}`} className="bg-muted">
+        <TableCell colSpan={columns.length + 1} className="p-0">
+          <div
+            className={`transition-all duration-300 ease-in-out w-full ${open ? 'h-auto px-4 py-2' : '!h-0'} interpolate overflow-hidden`}
+          >
+            <p>{renderRow && renderRow(data, index)}</p>
+          </div>
+        </TableCell>
+      </TableRow>
+    </>
+  )
+}
+
 interface ColumnCellProps {
   col: Column;
   item: any;
-  actionTable: (action: string, data: any) => void
+  actionTable?: (action: string, data: any) => void;
 }
 
 const ColumnNormal = ({ col, item }: ColumnCellProps) => {
   return (
-    <TableCell className={col.className ? col.className(item) : ''}>
+    <TableCell className={col.className ? col.className(item) : ""}>
       {col.element(item)}
     </TableCell>
-  )
-}
+  );
+};
 
 const ColumnIcon = ({ col, item, actionTable }: ColumnCellProps) => {
   return (
-    <TableCell className={col.className ? col.className(item) : ''}>
+    <TableCell className={col.className ? col.className(item) : ""}>
       <Tooltip>
         <TooltipTrigger>
           <Button
             size={"icon"}
             className="py-[0.4rem] pl-[0.2rem] "
-            variant={'icon'}
-            onClick={() => actionTable(col.column, item)}
+            variant={"icon"}
+            onClick={() => actionTable && actionTable(col.column, item)}
           >
             {col.icon && (
               <col.icon.icon className={`${col.icon.className} size-4.5`} />
@@ -113,40 +216,46 @@ const ColumnIcon = ({ col, item, actionTable }: ColumnCellProps) => {
         </TooltipContent>
       </Tooltip>
     </TableCell>
-  )
-}
-
+  );
+};
 
 interface PaginationTableProps {
   page: number;
   setPage: (page: number) => void;
   rowsPerPage: string;
   setRowsPerPage: (rowsPerPage: string) => void;
-  totalElements: number
+  totalElements: number;
 }
 
-const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElements }: PaginationTableProps) => {
-  const [numberPage, setNumberPerPage] = useState<PagesInterface[]>([])
+const PaginationTable = ({
+  page,
+  setPage,
+  rowsPerPage,
+  setRowsPerPage,
+  totalElements,
+}: PaginationTableProps) => {
+  const [numberPage, setNumberPerPage] = useState<PagesInterface[]>([]);
+
+  const totalPages = Math.ceil(totalElements / Number(rowsPerPage));
 
   useEffect(() => {
-    const totalPaginate = Math.ceil(totalElements / Number(rowsPerPage))
-    const arrayPage = Array.from(
-      { length: totalPaginate },
-      (_, i) => 1 + i * 1,
-    )
+    const arrayPage = Array.from({ length: totalPages }, (_, i) => 1 + i * 1);
 
-    const parseArray = arrayPage.map(item => {
+    const parseArray = arrayPage.map((item) => {
       return {
         value: item - 1,
-        page: item
-      }
-    })
-    setNumberPerPage(parseArray)
-  }, [totalElements, rowsPerPage])
+        page: item,
+      };
+    });
+    setNumberPerPage(parseArray);
+  }, [totalElements, rowsPerPage, totalPages]);
 
   return (
     <div className="flex items-center justify-between w-full mt-4">
-      <p><span className="font-semibold">Total de elementos:</span> {totalElements}</p>
+      <p>
+        <span className="font-semibold">Total de elementos:</span>{" "}
+        {totalElements}
+      </p>
 
       <div className="flex items-center justify-center gap-2">
         <div className="flex justify-start items-center gap-2">
@@ -173,8 +282,8 @@ const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElem
           <PaginationContent>
             <PaginationItem>
               <Button
-                disabled={page == 0}
-                variant='noDefault'
+                disabled={page === 0}
+                variant="noDefault"
                 onClick={() => setPage(page - 1)}
                 className="hover:bg-[#193db9] hover:text-white cursor-pointer text-black disabled:bg-gray-300 "
               >
@@ -184,13 +293,20 @@ const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElem
 
             {numberPage.map((item) => (
               <PaginationItem key={item.value}>
-                <PaginationLink className={`${page == item.value ? 'border bg-[#193db9] text-white' : ''} hover:bg-[#193db9] hover:text-white cursor-pointer`} onClick={() => setPage(item.value)}>{item.page}</PaginationLink>
+                <PaginationLink
+                  className={`${page === item.value ? "border bg-[#193db9] text-white" : ""
+                    } hover:bg-[#193db9] hover:text-white cursor-pointer`}
+                  onClick={() => setPage(item.value)}
+                >
+                  {item.page}
+                </PaginationLink>
               </PaginationItem>
             ))}
 
             <PaginationItem>
-              <Button disabled={page == 4}
-                variant='noDefault'
+              <Button
+                disabled={page === totalPages - 1 || totalPages === 0}
+                variant="noDefault"
                 onClick={() => setPage(page + 1)}
                 className="hover:bg-[#193db9] hover:text-white cursor-pointer text-black disabled:bg-gray-300 "
               >
@@ -201,5 +317,5 @@ const PaginationTable = ({ page, setPage, rowsPerPage, setRowsPerPage, totalElem
         </Pagination>
       </div>
     </div>
-  )
-}
+  );
+};
