@@ -107,23 +107,14 @@ interface TableRowNormalProps<T> {
   renderRow?: (item: any, index: number) => React.ReactNode;
 }
 
-const TableRowNormal = <T,>({ index, columns, data, colSpanColumns, columnData, action, renderRow }: TableRowNormalProps<T>) => {
+const TableRowNormal = <T,>({ index, columns, data, action }: TableRowNormalProps<T>) => {
   return (
     <TableRow key={index}>
-      {renderRow ?
-        <TableCell key={index} colSpan={colSpanColumns ? columnData.length : 1} className="!p-0">
-          {renderRow(data, index)}
-        </TableCell>
-        :
-        (columns && columns.map((column: Column, index: number) => (
-          <TableCell key={index}>
-            {(!column.icon
-              ? <ColumnNormal col={column} item={data} actionTable={action} />
-              : <ColumnIcon col={column} item={data} actionTable={action} />
-            )}
-          </TableCell>
-        )))
-      }
+      {columns && columns.map((col: Column, index: number) => (
+        col.isIcon
+          ? <ColumnIcon col={col} item={data} actionTable={action} key={index} />
+          : <ColumnNormal col={col} item={data} actionTable={action} key={index} />
+      ))}
     </TableRow>
   )
 }
@@ -154,11 +145,9 @@ const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: Tab
         className="cursor-pointer transition-all"
       >
         {columns.map((column: Column, idx: number) => (
-          <TableCell key={idx}>
-            {!column.icon
-              ? <ColumnNormal col={column} item={data} actionTable={action} />
-              : <ColumnIcon col={column} item={data} actionTable={action} />}
-          </TableCell>
+          !column.icon
+            ? <ColumnNormal key={idx} col={column} item={data} actionTable={action} />
+            : <ColumnIcon key={idx} col={column} item={data} actionTable={action} />
         ))}
         <TableCell>
           <IoIosArrowDown
