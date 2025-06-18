@@ -38,7 +38,7 @@ export const EventForm = ({ selectedEvent, isEditing, onClose, onEventSaved }: E
     if (selectedEvent && isEditing) {
       const eventDate = new Date(selectedEvent.date)
       setFormData({
-        id: selectedEvent.id,
+        id: '1',
         name: selectedEvent.name || "",
         date: eventDate.toISOString().split("T")[0],
         startTime: selectedEvent.startTime || "08:00",

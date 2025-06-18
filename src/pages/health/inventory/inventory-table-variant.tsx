@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react"
+// import React from "react"
 import { TableComponents } from "@/components/table/TableComponents"
-import { TableRow, TableCell } from "@/components/ui/table"
+// import { TableRow, TableCell } from "@/components/ui/table"
 import type { Column } from "@/components/table/table.interface"
 import type { Medicine } from "./inventory.data"
-import { FaRegEdit, FaRegTrashAlt, FaChevronDown, FaChevronUp, FaRegSave } from "react-icons/fa"
+import { FaRegEdit, FaRegTrashAlt, FaChevronDown, FaChevronUp } from "react-icons/fa"
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+// import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
 import "./inventory-table-variant.css"
 
 interface InventoryTableVariantProps {
@@ -40,7 +40,7 @@ export const InventoryTableVariant = ({ medicines, onEdit, onDelete }: Inventory
   const [expandedRow, setExpandedRow] = useState<number | null>(null)
   const [isEditingDetails, setIsEditingDetails] = useState(false)
   const [additionalData, setAdditionalData] = useState<{ [key: number]: AdditionalData }>({})
-  const [editableData, setEditableData] = useState<AdditionalData | null>(null)
+  // const [editableData, setEditableData] = useState<AdditionalData | null>(null)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -75,22 +75,22 @@ export const InventoryTableVariant = ({ medicines, onEdit, onDelete }: Inventory
           ...prev,
           [medicine.id]: data,
         }))
-        setEditableData(data)
+        // setEditableData(data)
       } else {
-        setEditableData(additionalData[medicine.id])
+        // setEditableData(additionalData[medicine.id])
       }
     }
   }
 
-  const handleSaveAdditionalData = () => {
-    if (editableData && expandedRow) {
-      setAdditionalData((prev) => ({
-        ...prev,
-        [expandedRow]: editableData,
-      }))
-      setIsEditingDetails(false)
-    }
-  }
+  // const handleSaveAdditionalData = () => {
+  //   if (editableData && expandedRow) {
+  //     setAdditionalData((prev) => ({
+  //       ...prev,
+  //       [expandedRow]: editableData,
+  //     }))
+  //     setIsEditingDetails(false)
+  //   }
+  // }
 
   const handleActionTable = (action: string, data: Medicine) => {
     switch (action) {
@@ -108,18 +108,18 @@ export const InventoryTableVariant = ({ medicines, onEdit, onDelete }: Inventory
     }
   }
 
-  const getRowClassName = (medicine: Medicine) => {
-    let className = ""
-    if (isExpired(medicine.fechaExpiracion)) {
-      className += " expired-row"
-    } else if (isExpiringSoon(medicine.fechaExpiracion)) {
-      className += " expiring-soon-row"
-    }
-    if (expandedRow === medicine.id) {
-      className += " expanded-row"
-    }
-    return className
-  }
+  // const getRowClassName = (medicine: Medicine) => {
+  //   let className = ""
+  //   if (isExpired(medicine.fechaExpiracion)) {
+  //     className += " expired-row"
+  //   } else if (isExpiringSoon(medicine.fechaExpiracion)) {
+  //     className += " expiring-soon-row"
+  //   }
+  //   if (expandedRow === medicine.id) {
+  //     className += " expanded-row"
+  //   }
+  //   return className
+  // }
 
 
   const medicineColumns: Column[] = [
@@ -223,7 +223,7 @@ interface MedicineDetailsProps {
   isEditingDetails: boolean;
 }
 
-const MedicineDetails = ({ medicine, setIsEditingDetails, isEditingDetails }: MedicineDetailsProps) => {
+const MedicineDetails = ({ medicine }: MedicineDetailsProps) => {
   console.log(medicine);
 
   return (
