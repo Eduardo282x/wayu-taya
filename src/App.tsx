@@ -47,7 +47,7 @@ function App() {
             <Route path='/documentos/actividades' element={<Activities />}></Route>
             <Route path='/documentos/documentos' element={<DocumentosTable />}></Route>
             <Route path='/documentos/eventos' element={<Events />}></Route>
-            
+
 
             <Route path='/salud' element={<Health />}></Route>
             <Route path='/salud/donaciones' element={<Donations />}></Route>

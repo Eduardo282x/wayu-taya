@@ -84,7 +84,7 @@ export const TableComponents: FC<TableProps> = ({
         </Table>
       </div>
 
-      {totalItems > 0 && (
+      {totalItems >= 10 && (
         <PaginationTable
           page={page}
           setPage={setPage}

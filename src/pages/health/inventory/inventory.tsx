@@ -1,5 +1,5 @@
 import { MdOutlineProductionQuantityLimits } from "react-icons/md"
-import { MedicineDetails } from "./inventory-table-variant"
+import { InventoryDetailsMedicine } from "./InventoryDetailsMedicine"
 import { FilterComponent } from "@/components/table/FilterComponent"
 import { GroupMedicine, medicineColumns, type Medicine } from "./inventory.data"
 import { useState, useEffect } from "react"
@@ -7,7 +7,7 @@ import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/pages/layout/Header"
 import { getInventory } from "@/services/inventory/inventory.service"
-import type { IInventory } from "@/services/inventory/inventory.interface"
+import { IInventory } from "@/services/inventory/inventory.interface"
 import { TableComponents } from "@/components/table/TableComponents"
 
 const initialMedicines: Medicine[] = [
@@ -60,7 +60,7 @@ export const Inventory = () => {
     // if (medicineToDelete) {
     //   const updatedMedicines = medicines.allMedicine.filter((m) => m.id !== medicineToDelete.id)
     //   setMedicines(updatedMedicines)
-      setMedicineToDelete(null)
+    setMedicineToDelete(null)
     //   setIsDeleteDialogOpen(false)
     // }
   };
@@ -89,8 +89,7 @@ export const Inventory = () => {
           colSpanColumns={true}
           isExpansible={true}
           renderRow={(medicine: Medicine, index: number) => (
-            <MedicineDetails medicine={medicine} key={index}>
-            </MedicineDetails>
+            <InventoryDetailsMedicine medicine={medicine} key={index} />
           )}
         />
 

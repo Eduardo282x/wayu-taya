@@ -4,7 +4,7 @@ interface MedicineDetailsProps {
   medicine: Medicine;
 }
 
-export const MedicineDetails = ({ medicine }: MedicineDetailsProps) => {
+export const InventoryDetailsMedicine = ({ medicine }: MedicineDetailsProps) => {
   console.log(medicine);
 
   return (
