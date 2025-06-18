@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type React from "react"
 
 import { useState, useMemo } from "react"
@@ -126,7 +127,7 @@ const documentosData: DocumentData[] = [
     fecha: "25 mar 2022",
     tamano: "35 KB",
     descripcion: "Prescripción médica con medicamentos y dosis específicas para tratamiento",
-  },
+  }
 ]
 
 export function DocumentosTable() {
@@ -707,205 +708,210 @@ export function DocumentosTable() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="bg-transparent border-white text-white hover:bg-blue-600">
-                <Upload size={16} className="mr-1" />
-                Subir archivo
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Subir nuevo documento</DialogTitle>
-                <DialogDescription>Arrastra y suelta un archivo o haz clic para seleccionar</DialogDescription>
-              </DialogHeader>
+          {isUploadOpen && (
+            <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="bg-transparent border-white text-white hover:bg-blue-600">
+                  <Upload size={16} className="mr-1" />
+                  Subir archivo
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Subir nuevo documento</DialogTitle>
+                  <DialogDescription>Arrastra y suelta un archivo o haz clic para seleccionar</DialogDescription>
+                </DialogHeader>
 
-              <div className="space-y-4">
-                <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                    dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
-                  }`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-lg font-medium text-gray-900 mb-2">Arrastra archivos aquí</p>
-                  <p className="text-sm text-gray-500 mb-4">o haz clic para seleccionar archivos</p>
-                  <input
-                    type="file"
-                    className="hidden"
-                    id="file-upload"
-                    accept=".pdf,.png,.jpg,.jpeg,.docx,.doc"
-                    onChange={handleFileInput}
-                  />
-                  <Label
-                    htmlFor="file-upload"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                <div className="space-y-4">
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
                   >
-                    Seleccionar archivo
-                  </Label>
-                </div>
+                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <p className="text-lg font-medium text-gray-900 mb-2">Arrastra archivos aquí</p>
+                    <p className="text-sm text-gray-500 mb-4">o haz clic para seleccionar archivos</p>
+                    <input
+                      type="file"
+                      className="hidden"
+                      id="file-upload"
+                      accept=".pdf,.png,.jpg,.jpeg,.docx,.doc"
+                      onChange={handleFileInput}
+                    />
+                    <Label
+                      htmlFor="file-upload"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    >
+                      Seleccionar archivo
+                    </Label>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Tipo de contenido</Label>
-                  <Select value={selectedContent} onValueChange={(value) => setSelectedContent(value as ContentType)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el tipo de contenido" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="personas">Personas</SelectItem>
-                      <SelectItem value="comida">Comida</SelectItem>
-                      <SelectItem value="medicina">Medicina</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">Tipo de contenido</Label>
+                    <Select value={selectedContent} onValueChange={(value) => setSelectedContent(value as ContentType)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona el tipo de contenido" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="personas">Personas</SelectItem>
+                        <SelectItem value="comida">Comida</SelectItem>
+                        <SelectItem value="medicina">Medicina</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Descripción del documento</Label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    rows={3}
-                    value={selectedDescription}
-                    onChange={(e) => setSelectedDescription(e.target.value)}
-                    placeholder="Escribe una breve descripción del documento..."
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">Descripción del documento</Label>
+                    <textarea
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      rows={3}
+                      value={selectedDescription}
+                      onChange={(e) => setSelectedDescription(e.target.value)}
+                      placeholder="Escribe una breve descripción del documento..."
+                    />
+                  </div>
 
-                {uploadedFile && (
-                  <div className="border rounded-lg p-4 bg-gray-50">
-                    <div className="flex items-center justify-between">
+                  {uploadedFile && (
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 flex items-center justify-center">
+                            {getFileType(uploadedFile.name) === "pdf" && (
+                              <BsFiletypePdf size={24} className="text-red-500" />
+                            )}
+                            {getFileType(uploadedFile.name) === "png" && (
+                              <BsFiletypePng size={24} className="text-green-500" />
+                            )}
+                            {getFileType(uploadedFile.name) === "docx" && (
+                              <BsFiletypeDocx size={24} className="text-blue-500" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{uploadedFile.name}</p>
+                            <p className="text-xs text-gray-500">{formatFileSize(uploadedFile.size)}</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={removeUploadedFile} className="h-8 w-8 p-0">
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setIsUploadOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleSaveFile} disabled={!uploadedFile} className="bg-blue-600 hover:bg-blue-700">
+                      Guardar archivo
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {isEditOpen && (
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen} modal>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Editar documento</DialogTitle>
+                  <DialogDescription>Modifica el nombre y tipo de contenido del documento</DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                  {currentEditingDocument && (
+                    <div className="border rounded-lg p-4 bg-gray-50">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 flex items-center justify-center">
-                          {getFileType(uploadedFile.name) === "pdf" && (
-                            <BsFiletypePdf size={24} className="text-red-500" />
-                          )}
-                          {getFileType(uploadedFile.name) === "png" && (
+                          {currentEditingDocument.tipo === "pdf" && <BsFiletypePdf size={24} className="text-red-500" />}
+                          {currentEditingDocument.tipo === "png" && (
                             <BsFiletypePng size={24} className="text-green-500" />
                           )}
-                          {getFileType(uploadedFile.name) === "docx" && (
+                          {currentEditingDocument.tipo === "docx" && (
                             <BsFiletypeDocx size={24} className="text-blue-500" />
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{uploadedFile.name}</p>
-                          <p className="text-xs text-gray-500">{formatFileSize(uploadedFile.size)}</p>
+                          <p className="font-medium text-sm">
+                            {currentEditingDocument.nombre}.{currentEditingDocument.tipo}
+                          </p>
+                          <p className="text-xs text-gray-500">{currentEditingDocument.tamano}</p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={removeUploadedFile} className="h-8 w-8 p-0">
-                        <X size={16} />
-                      </Button>
                     </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">Nombre del archivo</Label>
+                    <Input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="Ingresa el nombre del archivo"
+                    />
                   </div>
-                )}
 
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setIsUploadOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleSaveFile} disabled={!uploadedFile} className="bg-blue-600 hover:bg-blue-700">
-                    Guardar archivo
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={isEditOpen} onOpenChange={(open) => !open && closeEditModal()}>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Editar documento</DialogTitle>
-                <DialogDescription>Modifica el nombre y tipo de contenido del documento</DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4">
-                {currentEditingDocument && (
-                  <div className="border rounded-lg p-4 bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 flex items-center justify-center">
-                        {currentEditingDocument.tipo === "pdf" && <BsFiletypePdf size={24} className="text-red-500" />}
-                        {currentEditingDocument.tipo === "png" && (
-                          <BsFiletypePng size={24} className="text-green-500" />
-                        )}
-                        {currentEditingDocument.tipo === "docx" && (
-                          <BsFiletypeDocx size={24} className="text-blue-500" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">
-                          {currentEditingDocument.nombre}.{currentEditingDocument.tipo}
-                        </p>
-                        <p className="text-xs text-gray-500">{currentEditingDocument.tamano}</p>
-                      </div>
-                    </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">Tipo de contenido</Label>
+                    <Select value={editContent} onValueChange={(value) => setEditContent(value as ContentType)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="personas">Personas</SelectItem>
+                        <SelectItem value="comida">Comida</SelectItem>
+                        <SelectItem value="medicina">Medicina</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                )}
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Nombre del archivo</Label>
-                  <Input
-                    type="text"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    placeholder="Ingresa el nombre del archivo"
-                  />
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={closeEditModal}>
+                      Cancelar
+                    </Button>
+                    <Button onClick={saveEdit} disabled={!editName.trim()} className="bg-blue-600 hover:bg-blue-700">
+                      Guardar cambios
+                    </Button>
+                  </div>
                 </div>
+              </DialogContent>
+            </Dialog>
+          )}
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Tipo de contenido</Label>
-                  <Select value={editContent} onValueChange={(value) => setEditContent(value as ContentType)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="personas">Personas</SelectItem>
-                      <SelectItem value="comida">Comida</SelectItem>
-                      <SelectItem value="medicina">Medicina</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+          {isViewOpen && (
+            <Dialog open={isViewOpen} onOpenChange={setIsViewOpen} modal>
+              <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Eye size={20} />
+                    Ver documento: {viewingDocument?.nombre}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Visualización del contenido del archivo {viewingDocument?.tipo?.toUpperCase()}
+                  </DialogDescription>
+                </DialogHeader>
 
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={closeEditModal}>
-                    Cancelar
+                <div className="mt-4">{viewingDocument && renderDocumentContent(viewingDocument)}</div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                  <Button variant="outline" onClick={closeViewModal}>
+                    Cerrar
                   </Button>
-                  <Button onClick={saveEdit} disabled={!editName.trim()} className="bg-blue-600 hover:bg-blue-700">
-                    Guardar cambios
+                  <Button
+                    onClick={() => viewingDocument && handleDownloadDocument(viewingDocument)}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Download size={16} className="mr-2" />
+                    Descargar
                   </Button>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={isViewOpen} onOpenChange={(open) => !open && closeViewModal()}>
-            <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Eye size={20} />
-                  Ver documento: {viewingDocument?.nombre}
-                </DialogTitle>
-                <DialogDescription>
-                  Visualización del contenido del archivo {viewingDocument?.tipo?.toUpperCase()}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="mt-4">{viewingDocument && renderDocumentContent(viewingDocument)}</div>
-
-              <div className="flex justify-end gap-2 mt-6">
-                <Button variant="outline" onClick={closeViewModal}>
-                  Cerrar
-                </Button>
-                <Button
-                  onClick={() => viewingDocument && handleDownloadDocument(viewingDocument)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Download size={16} className="mr-2" />
-                  Descargar
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          )}
 
           {(tipoFilter || contenidoFilter || searchTerm || sortField) && (
             <Button

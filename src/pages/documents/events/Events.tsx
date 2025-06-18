@@ -95,7 +95,7 @@ export const Events = () => {
   const apiEventsAsLocal: LocalEvent[] = events.events.map((event: IEvents, index: number) => ({
     id: event.id?.toString() || `api-event-${index}`,
     name: event.name || "",
-    date: event.date || new Date().toISOString(),
+    date: event.date.toISOString() || new Date().toISOString(),
     location: "",
     contact: "",
     startTime: "08:00",
@@ -246,7 +246,8 @@ const CardEventsBase = ({ event }: CardEventsBaseProps) => {
   const [open, setOpen] = useState<boolean>(false)
 
   return (
-    <div className="w-full rounded-2xl bg-blue-500">
+    // <div className={`w-full rounded-2xl bg-blue-500 h-80 overflow-hidden interpolate ease-in-out delay-100 duration-150 transition-all`}>
+    <div className={`w-full rounded-2xl bg-blue-500`}>
       <div onClick={() => setOpen(!open)} className="flex items-center justify-between w-full p-4 cursor-pointer">
         <div className="flex gap-2">
           <div className="bg-white rounded-2xl p-1 text-center w-20 h-20">
@@ -267,7 +268,7 @@ const CardEventsBase = ({ event }: CardEventsBaseProps) => {
       </div>
 
       {open && (
-        <div className="px-4 pb-4 border-t border-blue-400 mt-2 pt-4">
+        <div className={` px-4 pb-4 border-t border-blue-400 mt-2 pt-4`}>
           <div className="bg-blue-400 rounded-xl p-4 text-white">
             <h3 className="font-bold text-lg mb-3">Detalles del Evento</h3>
             <div className="space-y-2 text-sm">

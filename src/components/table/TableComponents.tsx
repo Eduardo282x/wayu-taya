@@ -1,34 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-} from "@/components/ui/pagination";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-  TableHead,
-} from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, } from "@/components/ui/pagination";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, } from "../ui/select";
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip";
+import { IoIosArrowBack, IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import { Column } from "@/components/table/table.interface";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { PagesInterface } from "./table.data";
 
 import { Button } from "../ui/button";
@@ -40,6 +17,7 @@ interface TableProps {
   actionTable: (action: string, data: any) => void;
   renderRow?: (item: any, index: number) => React.ReactNode;
   colSpanColumns?: boolean;
+  isExpansible?: boolean;
 }
 
 export const TableComponents: FC<TableProps> = ({
@@ -48,6 +26,7 @@ export const TableComponents: FC<TableProps> = ({
   actionTable,
   renderRow,
   colSpanColumns,
+  isExpansible
 }) => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<string>("10");
@@ -70,45 +49,23 @@ export const TableComponents: FC<TableProps> = ({
               {column.map((col: Column, index: number) => (
                 <TableHead key={index}>{col.label}</TableHead>
               ))}
+              {isExpansible && (
+                <TableHead className="cursor-pointer bg-white z-50">
+                  Abrir
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentItems && currentItems.length > 0 ? (
-              currentItems.map((item, index: number) => (
-                <TableRow key={index}>
-                  {renderRow ? (
-                    <TableCell
-                      key={index}
-                      colSpan={colSpanColumns ? column.length : 1}
-                      className="p-0"
-                    >
-                      {renderRow(item, index)}
-                    </TableCell>
-                  ) : (
-                    column.map((col: Column, colIndex: number) => {
-                      if (col.isIcon) {
-                        return (
-                          <ColumnIcon
-                            col={col}
-                            item={item}
-                            actionTable={actionTable}
-                            key={colIndex}
-                          />
-                        );
-                      } else {
-                        return (
-                          <ColumnNormal
-                            col={col}
-                            item={item}
-                            actionTable={actionTable}
-                            key={colIndex}
-                          />
-                        );
-                      }
-                    })
-                  )}
-                </TableRow>
-              ))
+            {currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => (
+              <>
+                {isExpansible ?
+                  <TableRowExpansible index={index} data={item} columns={column} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={column} />
+                  :
+                  <TableRowNormal index={index} data={item} columns={column} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={column} />
+                }
+              </>
+            ))
             ) : (
               <TableRow>
                 <TableCell
@@ -140,10 +97,94 @@ export const TableComponents: FC<TableProps> = ({
   );
 };
 
+interface TableRowNormalProps<T> {
+  index: number;
+  columns: Column[];
+  columnData: Column[];
+  data: T;
+  colSpanColumns?: boolean;
+  action?: (action: string, data: any) => void;
+  renderRow?: (item: any, index: number) => React.ReactNode;
+}
+
+const TableRowNormal = <T,>({ index, columns, data, colSpanColumns, columnData, action, renderRow }: TableRowNormalProps<T>) => {
+  return (
+    <TableRow key={index}>
+      {renderRow ?
+        <TableCell key={index} colSpan={colSpanColumns ? columnData.length : 1} className="p-0">
+          {renderRow(data, index)}
+        </TableCell>
+        :
+        (columns && columns.map((column: Column, index: number) => (
+          <TableCell key={index}>
+            {(!column.icon
+              ? <ColumnNormal col={column} item={data} actionTable={action} />
+              : <ColumnIcon col={column} item={data} actionTable={action} />
+            )}
+          </TableCell>
+        )))
+      }
+    </TableRow>
+  )
+}
+
+const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: TableRowNormalProps<T>) => {
+  const [open, setOpen] = useState<boolean>(false);
+  const rowRef = useRef<HTMLTableRowElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (rowRef.current && !rowRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <>
+      <TableRow
+        key={`main-${index}`}
+        ref={rowRef}
+        onClick={() => setOpen(!open)}
+        className="cursor-pointer transition-all"
+      >
+        {columns.map((column: Column, idx: number) => (
+          <TableCell key={idx}>
+            {!column.icon
+              ? <ColumnNormal col={column} item={data} actionTable={action} />
+              : <ColumnIcon col={column} item={data} actionTable={action} />}
+          </TableCell>
+        ))}
+        <TableCell>
+          <IoIosArrowDown
+            className={`transition-transform text-xl ${open ? 'rotate-180' : 'rotate-0'}`}
+          />
+        </TableCell>
+      </TableRow>
+
+      {/* Fila expandida */}
+      <TableRow key={`expand-${index}`} className="bg-muted">
+        <TableCell colSpan={columns.length + 1} className="p-0">
+          <div
+            className={`transition-all duration-300 ease-in-out w-full ${open ? 'h-auto px-4 py-2' : '!h-0'} interpolate overflow-hidden`}
+          >
+            <p>{renderRow && renderRow(data, index)}</p>
+          </div>
+        </TableCell>
+      </TableRow>
+    </>
+  )
+}
+
 interface ColumnCellProps {
   col: Column;
   item: any;
-  actionTable: (action: string, data: any) => void;
+  actionTable?: (action: string, data: any) => void;
 }
 
 const ColumnNormal = ({ col, item }: ColumnCellProps) => {
@@ -163,7 +204,7 @@ const ColumnIcon = ({ col, item, actionTable }: ColumnCellProps) => {
             size={"icon"}
             className="py-[0.4rem] pl-[0.2rem] "
             variant={"icon"}
-            onClick={() => actionTable(col.column, item)}
+            onClick={() => actionTable && actionTable(col.column, item)}
           >
             {col.icon && (
               <col.icon.icon className={`${col.icon.className} size-4.5`} />
@@ -253,9 +294,8 @@ const PaginationTable = ({
             {numberPage.map((item) => (
               <PaginationItem key={item.value}>
                 <PaginationLink
-                  className={`${
-                    page === item.value ? "border bg-[#193db9] text-white" : ""
-                  } hover:bg-[#193db9] hover:text-white cursor-pointer`}
+                  className={`${page === item.value ? "border bg-[#193db9] text-white" : ""
+                    } hover:bg-[#193db9] hover:text-white cursor-pointer`}
                   onClick={() => setPage(item.value)}
                 >
                   {item.page}

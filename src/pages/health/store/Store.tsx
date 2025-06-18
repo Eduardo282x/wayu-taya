@@ -1,31 +1,20 @@
 import { GroupStore, IStore } from "@/services/store/store.interface";
-import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
-import {
-  getStore,
-  postStore,
-  putStore,
-  deleteStore,
-} from "@/services/store/store.service";
+import { getStore, postStore, putStore, deleteStore } from "@/services/store/store.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
-import { Column } from "@/components/table/table.interface";
-import { StoreForm, StoreData } from "./storeforms";
 import { HeaderPages } from "@/pages/layout/Header";
-import { storeColumns } from "./store.data";
+import { storeColumns, StoreData } from "./store.data";
 import { Button } from "@/components/ui/button";
 import { FaWarehouse } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { MdOutlineStore } from "react-icons/md";
 import ConfirmDeleteStoreDialog from "./ConfirmDeleteStoreDialog";
+import { StoreForm } from "./StoreForm";
 
 export const Store = () => {
-  const [stores, setStores] = useState<GroupStore>({
-    allStores: [],
-    stores: [],
-  });
+  const [stores, setStores] = useState<GroupStore>({ allStores: [], stores: [], });
   const [storeSelected, setStoreSelected] = useState<IStore | null>(null);
-  const [columns, setColumns] = useState<Column[]>(storeColumns);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -104,9 +93,7 @@ export const Store = () => {
         <HeaderPages title="Almacenes" Icon={FaWarehouse} />
       </div>
 
-      <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-        <DropdownColumnFilter columns={columns} setColumns={setColumns} />
-
+      <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
         <div className="flex items-center ">
           <FilterComponent
             data={stores.allStores}
@@ -123,7 +110,7 @@ export const Store = () => {
 
       <div className="mt-4">
         <TableComponents
-          column={columns.filter((item) => item.visible === true)}
+          column={storeColumns}
           data={stores.stores}
           actionTable={getActionTable}
         />

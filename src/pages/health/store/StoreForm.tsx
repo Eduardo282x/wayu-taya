@@ -1,24 +1,12 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
 import { MdDomainAdd } from "react-icons/md";
-
 import FormInput from "@/components/formInput/FormInputCustom";
-
 import { IStore } from "@/services/store/store.interface";
+import { StoreData } from "./store.data";
 
-export interface StoreData {
-  name: string;
-  address: string;
-}
 
 interface StoreFormProps {
   open: boolean;
@@ -27,18 +15,8 @@ interface StoreFormProps {
   store: IStore | null;
 }
 
-export const StoreForm: React.FC<StoreFormProps> = ({
-  open,
-  onOpenChange,
-  onSubmit,
-  store,
-}) => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<StoreData>({
+export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubmit, store, }) => {
+  const { register, handleSubmit, reset, formState: { errors }, } = useForm<StoreData>({
     defaultValues: {
       name: "",
       address: "",
@@ -46,18 +24,11 @@ export const StoreForm: React.FC<StoreFormProps> = ({
   });
 
   useEffect(() => {
-    if (open) {
-      if (store) {
-        reset({
-          name: store.name,
-          address: store.address,
-        });
-      } else {
-        reset({
-          name: "",
-          address: "",
-        });
-      }
+    if (store) {
+      reset({
+        name: store.name,
+        address: store.address,
+      });
     }
   }, [open, reset, store]);
 
