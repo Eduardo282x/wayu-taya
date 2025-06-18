@@ -9,10 +9,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { EventForm } from "./EventForm"
 import { useEffect, useState } from "react"
 import { DatePickerRange } from "@/components/datePickerRange/DatePickerRange"
-import { getEvents } from "@/services/events/events.service"
-import type { GroupEvents, IEvents } from "@/services/events/events.interface"
+import { getEvents, postEvents, putEvents } from "@/services/events/events.service"
+import type { EventsBody, GroupEvents, IEvents } from "@/services/events/events.interface"
 import { days, months } from "@/utils/formatters"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import { getProviders } from "@/services/provider/provider.service"
 
 interface LocalEvent {
   id: string
@@ -40,11 +41,12 @@ export const Events = () => {
   const [events, setEvents] = useState<GroupEvents>({ allEvents: [], events: [] })
   const [localEvents, setLocalEvents] = useState<LocalEvent[]>([]) // Eventos creados localmente
   const [loading, setLoading] = useState<boolean>(false)
-  const [selectedEvent, setSelectedEvent] = useState<LocalEvent | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<EventsBody | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
   useEffect(() => {
-    getEventsApi()
+    getEventsApi();
+    getProvidersApi();
   }, [])
 
   const getEventsApi = async () => {
@@ -58,7 +60,19 @@ export const Events = () => {
     setLoading(false)
   }
 
-  const openDialog = (event?: LocalEvent) => {
+  const getProvidersApi = async () => {
+    setLoading(true)
+    try {
+      const response: IEvents[] = await getProviders()
+      console.log(response);
+
+    } catch (err) {
+      console.log(err)
+    }
+    setLoading(false)
+  }
+
+  const openDialog = (event?: EventsBody) => {
     if (event) {
       setSelectedEvent(event)
       setIsEditing(true)
@@ -69,20 +83,28 @@ export const Events = () => {
     setOpen(true)
   }
 
-  const handleEventSaved = (newEvent: LocalEvent) => {
-    if (isEditing && selectedEvent) {
-      setLocalEvents((prev: LocalEvent[]) =>
-        prev.map((event: LocalEvent) =>
-          event.id === selectedEvent.id ? { ...newEvent, id: selectedEvent.id } : event,
-        ),
-      )
+  const handleEventSaved = async (newEvent: EventsBody) => {
+    // if (isEditing && selectedEvent) {
+    //   setLocalEvents((prev: LocalEvent[]) =>
+    //     prev.map((event: LocalEvent) =>
+    //       event.id === selectedEvent.id ? { ...newEvent, id: selectedEvent.id } : event,
+    //     ),
+    //   )
+    // } else {
+    //   const eventWithId: LocalEvent = {
+    //     ...newEvent,
+    //     id: Date.now().toString(),
+    //   }
+    //   setLocalEvents((prev: LocalEvent[]) => [...prev, eventWithId])
+    // }
+
+    if (selectedEvent) {
+      await putEvents(Number(1), newEvent)
     } else {
-      const eventWithId: LocalEvent = {
-        ...newEvent,
-        id: Date.now().toString(),
-      }
-      setLocalEvents((prev: LocalEvent[]) => [...prev, eventWithId])
+
+      await postEvents(newEvent)
     }
+    getEventsApi()
     setOpen(false)
   }
 
@@ -136,7 +158,7 @@ export const Events = () => {
 
 interface CardEventsProps {
   event: LocalEvent
-  onEdit: (event: LocalEvent) => void
+  onEdit: (event: any) => void
   onDelete: (eventId: string) => void
 }
 
@@ -292,9 +314,9 @@ const CardEventsBase = ({ event }: CardEventsBaseProps) => {
 interface DialogEventsProps {
   open: boolean
   setOpen: (active: boolean) => void
-  selectedEvent: LocalEvent | null
+  selectedEvent: EventsBody | null
   isEditing: boolean
-  onEventSaved: (event: LocalEvent) => void
+  onEventSaved: (event: EventsBody) => void
 }
 
 const DialogEvents = ({ open, setOpen, selectedEvent, isEditing, onEventSaved }: DialogEventsProps) => {
