@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type React from "react"
 
 import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import { CiSearch } from "react-icons/ci"
-import type { DocumentData, FilterColumn } from "../doc/types/document"
+import type { DocumentData } from "../doc/types/document"
 
 
 const debounce = (func: (...args: any[]) => void, wait: number) => {
@@ -21,7 +22,7 @@ const debounce = (func: (...args: any[]) => void, wait: number) => {
 interface FilterComponentProps {
   data: DocumentData[]
   setDataFilter: (data: DocumentData[]) => void
-  columns: FilterColumn[]
+  columns: any[]
 }
 
 export const FilterComponent = ({ data, setDataFilter, columns }: FilterComponentProps) => {
