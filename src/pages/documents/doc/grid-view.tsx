@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu"
 import { MoreVertical, Edit, Trash2, Download, Eye } from "lucide-react"
-import type { DocumentData } from "./types/document"
+import { DocumentData } from "./documents.data"
 import { BsFiletypePdf } from "react-icons/bs"
 import { BsFiletypePng } from "react-icons/bs"
 import { BsFiletypeDocx } from "react-icons/bs"
