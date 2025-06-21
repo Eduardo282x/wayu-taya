@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table"
 import { Button } from "../../../components/ui/button"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
-import type { DocumentData, ColumnDefinition} from "../doc/types/document"
+import { DocumentData, ColumnDefinition } from "./documents.data"
 
 interface PageData {
   page: string
@@ -35,7 +35,7 @@ export const TableComponents = ({ column, data }: TableComponentsProps) => {
           <TableHeader className="bg-blue-50">
             <TableRow>
               {column.map((col, index) => (
-                <TableHead key={index} className="text-blue-700">
+                <TableHead key={index} className="text-white">
                   {col.label}
                 </TableHead>
               ))}

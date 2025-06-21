@@ -4,27 +4,22 @@ import { CategoryCardProps, optionsMenu } from "./menu.data";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    navigate('/login')
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-[#91d5ff]">
+    <div className="h-screen w-screen overflow-x-hidden bg-gradient-to-b from-blue-900 to-[#91d5ff] relative">
       {/* Header with logo */}
       <header className="w-full p-2">
-        <div className="mx-auto max-w-8xl flex items-center justify-between">
-          <div className="w-32"></div>
-          {/* Logo y título centrados */}
-          <div className="p-8 text-center flex flex-col items-center justify-center">
-            <img src={logo} alt="Fundación Wayuu Taya Logo" width={80} height={80} className="mb-2" />
-            <h1 className="text-2xl font-bold text-[#fff] md:text-3xl">
-              FUNDACIÓN
-              <div className="mt-1 border-b-2 border-t-2 border-[#fff] text-3xl md:text-5xl">WAYUU TAYA</div>
-            </h1>
-          </div>
-          <button
-            className="bg-red-600 text-white font-semibold py-2 px-4 rounded shadow cursor-pointer transition-colors  hover:bg-[#570206] duration-300"
-            onClick={() => navigate('/login')}
-
-          >
-            Cerrar sesión
-          </button>
+        <div className="p-8 text-center flex items-center justify-center gap-8">
+          <img src={logo} alt="Fundación Wayuu Taya Logo" width={80} height={80} className="mt-2" />
+          <h1 className="text-2xl font-bold text-[#fff] md:text-3xl">
+            FUNDACIÓN
+            <div className="mt-1 border-b-2 border-t-2 border-[#fff] text-3xl md:text-5xl">WAYUU TAYA</div>
+          </h1>
         </div>
       </header>
 
@@ -49,6 +44,15 @@ export default function Home() {
           ))}
         </div>
       </main>
+
+      <div className="absolute bottom-5 left-5">
+        <button
+          className="bg-red-600 text-white font-semibold py-2 px-4 rounded shadow cursor-pointer transition-colors  hover:bg-[#570206] duration-300"
+          onClick={logout}
+        >
+          Cerrar sesión
+        </button>
+      </div>
     </div>
   )
 }

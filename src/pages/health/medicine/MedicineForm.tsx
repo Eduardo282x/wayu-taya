@@ -1,33 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { BiCartAdd } from "react-icons/bi";
 import FormInput from "@/components/formInput/FormInputCustom";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  IMedicine,
-  MedicineBody,
-  Category,
-  Form,
-} from "@/services/medicine/medicine.interface";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface";
 
 export interface BaseItemData {
   nombre: string;
@@ -45,16 +26,15 @@ export interface MedicineSpecificData {
   cantidad: number;
 }
 
-export interface ProductSpecificData {}
+// export interface ProductSpecificData { }
 
 export type FormDataInternal = BaseItemData &
   Partial<MedicineSpecificData> &
-  Partial<ProductSpecificData>;
+  Partial<BaseItemData>;
 
 interface MedicineFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-
   onSubmit: (data: MedicineBody) => void;
   medicine: IMedicine | null;
   categories: Category[];
@@ -75,26 +55,12 @@ const unitOptions = [
   "Otros",
 ];
 
-export const MedicineForm: React.FC<MedicineFormProps> = ({
-  open,
-  onOpenChange,
-  onSubmit,
-  medicine,
-  categories,
-  forms,
-}) => {
+export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, onSubmit, medicine, categories, forms }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">(
     "medicamento"
   );
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    setValue,
-    formState: { errors },
-  } = useForm<FormDataInternal>({
+  const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<FormDataInternal>({
     defaultValues: {
       nombre: "",
       descripcion: "",
@@ -268,7 +234,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                 <div className="space-y-1">
                   <label
                     htmlFor="categoria-select"
-                    className="text-sm font-medium leading-none"
+                    className="text-sm font-medium leading-none text-blue-800"
                   >
                     Categoría
                   </label>
@@ -350,7 +316,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                     <div className="space-y-1">
                       <label
                         htmlFor="forma-select"
-                        className="text-sm font-medium leading-none"
+                        className="text-sm font-medium leading-none text-blue-800"
                       >
                         Forma
                       </label>
@@ -394,7 +360,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
                     <div className="space-y-1">
                       <label
                         htmlFor="unidad-select"
-                        className="text-sm font-medium leading-none"
+                        className="text-sm font-medium leading-none text-blue-800"
                       >
                         Unidad
                       </label>

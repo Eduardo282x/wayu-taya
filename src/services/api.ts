@@ -15,6 +15,20 @@ export const getDataApi = async (url: string) => {
     }
 }
 
+export const getDataFileApi = (url: string) => {
+    try {
+        return api.get(url, {
+            responseType: 'blob',
+        },).then((response) => {
+            return response.data;
+        }).catch(err => {
+            return err.response.data;
+        })
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 export const postDataApi = async (url: string, body: any) => {
     try {
         return await api.post(url, body).then(res => {

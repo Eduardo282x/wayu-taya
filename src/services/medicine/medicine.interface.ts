@@ -27,6 +27,7 @@ export interface IMedicine {
     temperate:        string;
     manufacturer:     string;
     activeIngredient: string;
+    countryOfOrigin: string;
     formId:           number;
     category:         Category;
     form:             Form;
