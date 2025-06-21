@@ -47,10 +47,10 @@ export const TableComponents: FC<TableProps> = ({
           <TableHeader>
             <TableRow>
               {column.map((col: Column, index: number) => (
-                <TableHead key={index}>{col.label}</TableHead>
+                <TableHead className={`${col.className && col.className(col)}`} key={index}>{col.label}</TableHead>
               ))}
               {isExpansible && (
-                <TableHead className="cursor-pointer z-50">
+                <TableHead className="cursor-pointer !z-50">
                   Abrir
                 </TableHead>
               )}
@@ -178,7 +178,7 @@ interface ColumnCellProps {
 
 const ColumnNormal = ({ col, item }: ColumnCellProps) => {
   return (
-    <TableCell className={col.className ? col.className(item) : ""}>
+    <TableCell>
       {col.element(item)}
     </TableCell>
   );

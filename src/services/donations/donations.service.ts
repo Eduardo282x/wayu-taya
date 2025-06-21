@@ -1,0 +1,16 @@
+import { getDataApi, getDataFileApi, postDataApi } from "../api";
+import { DonationBody } from "./donations.interface";
+
+const donationsUrl = "/donations";
+
+export const getDonations = async () => {
+    return await getDataApi(donationsUrl);
+}
+
+export const getDonationsReport = async (id: number) => {
+    return await getDataFileApi(`${donationsUrl}/download/${id}`);
+}
+
+export const postInventory = async (data: DonationBody) => {
+    return await postDataApi(donationsUrl, data)
+}
