@@ -13,6 +13,7 @@ export interface ColumnDefinition {
     column: string
     label: string
     element: (item: DocumentData) => React.ReactNode
+    className: (item: DocumentData) => string;
 }
 
 

@@ -255,6 +255,7 @@ export function DocumentosTable() {
     {
       column: "nombre",
       label: "Nombre",
+      className: () => 'text-white',
       element: (item: DocumentData) => (
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 flex items-center justify-center rounded">
@@ -269,16 +270,19 @@ export function DocumentosTable() {
     {
       column: "fecha",
       label: "Última modificación",
+      className: () => 'text-white',
       element: (item: DocumentData) => <span>{item.fecha}</span>,
     },
     {
       column: "tamano",
       label: "Tamaño del archivo",
+      className: () => 'text-white',
       element: (item: DocumentData) => <span>{item.tamano}</span>,
     },
     {
       column: "actions",
       label: "",
+      className: () => 'text-white',
       element: (item: DocumentData) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

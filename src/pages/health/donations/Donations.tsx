@@ -101,7 +101,6 @@ export const Donations = () => {
                 actionTable={getActionTable}
               />
             </div>
-            // <InventoryDetailsMedicine inventory={donations} key={index} />
           )}
         />
       </div>
