@@ -1,54 +1,55 @@
-import { ScreenLoader } from "@/components/loaders/ScreenLoader";
-import { TableComponents } from "@/components/table/TableComponents";
-import { HeaderPages } from "@/pages/layout/Header";
-import { GroupDonations, IDonations } from "@/services/donations/donations.interface";
-import { getDonations, getDonationsReport } from "@/services/donations/donations.service";
-import { useEffect, useState } from "react";
-import { BiDonateHeart } from "react-icons/bi";
-import { detDonationsColumns, donationsColumns } from "./donations.data";
-import { FilterComponent } from "@/components/table/FilterComponent";
-import { Button } from "@/components/ui/button";
-import { DonationsForm } from "./DonationsForm";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-// import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
+import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import { TableComponents } from "@/components/table/TableComponents"
+import { HeaderPages } from "@/pages/layout/Header"
+import type { GroupDonations, IDonations } from "@/services/donations/donations.interface"
+import { getDonations, getDonationsReport } from "@/services/donations/donations.service"
+import { useEffect, useState } from "react"
+import { BiDonateHeart } from "react-icons/bi"
+import { detDonationsColumns, donationsColumns } from "./donations.data"
+import { FilterComponent } from "@/components/table/FilterComponent"
+import { Button } from "@/components/ui/button"
+import { DonationsForm } from "./DonationsForm"
+import { StyledDialog, StyledDialogContent, StyledDialogHeader, StyledDialogTitle } from "@/components/StyledDialog/StyledDialog"
+import { Plus} from "lucide-react"
+
 
 export const Donations = () => {
   const [donations, setDonations] = useState<GroupDonations>({ allDonations: [], donations: [] })
-  const [donationSelected, setDonationSelected] = useState<IDonations | null>(null);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    getDonationsApi();
-  }, []);
+    getDonationsApi()
+  }, [])
 
   const getDonationsApi = async () => {
     setLoading(true)
     try {
-      const response: IDonations[] = await getDonations();
+      const response: IDonations[] = await getDonations()
       setDonations({ allDonations: response, donations: response })
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
     setLoading(false)
   }
 
   const newDonations = () => {
-    setDonationSelected(null);
-    setOpenDialog(true);
+    setDonationSelected(null)
+    setOpenDialog(true)
   }
 
   const getActionTable = async (action: string, data: IDonations) => {
-    setDonationSelected(data);
+    setDonationSelected(data)
 
-    if (action == 'edit') {
-      setOpenDialog(true);
+    if (action == "edit") {
+      setOpenDialog(true)
     }
 
-    if (action == 'download') {
-      setLoading(true);
-      const response = await getDonationsReport(data.id);
+    if (action == "download") {
+      setLoading(true)
+      const response = await getDonationsReport(data.id)
       const url = URL.createObjectURL(response)
       const link = window.document.createElement("a")
       link.href = url
@@ -57,14 +58,24 @@ export const Donations = () => {
       link.click()
       window.document.body.removeChild(link)
       URL.revokeObjectURL(url)
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   const setDonationFilter = (filteredDonation: IDonations[]) => {
-    setDonations((prev) => ({ ...prev, donations: filteredDonation }));
-  };
+    setDonations((prev) => ({ ...prev, donations: filteredDonation }))
+  }
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false)
+    setDonationSelected(null)
+  }
+
+  const handleSaveDonation = () => {
+    // Aquí puedes agregar la lógica para guardar la donación
+    handleCloseDialog()
+    getDonationsApi() // Refrescar la lista
+  }
 
   return (
     <div className="min-h-[90vh] w-[79.5vw] pr-7 overflow-auto">
@@ -80,8 +91,8 @@ export const Donations = () => {
             setDataFilter={setDonationFilter}
           />
           <Button variant={"animated"} className="h-full" onClick={newDonations}>
-            {/* <GiMedicines className="size-6" /> */}
-            Registrar Donación
+            <Plus className="w-4 h-4 mr-1"/>
+            Agregar Donacion
           </Button>
         </div>
       </div>
@@ -95,21 +106,20 @@ export const Donations = () => {
           isExpansible={true}
           renderRow={(donations: IDonations, index: number) => (
             <div key={index} className="max-h-32">
-              <TableComponents
-                data={donations.detDonation}
-                column={detDonationsColumns}
-                actionTable={getActionTable}
-              />
+              <TableComponents data={donations.detDonation} column={detDonationsColumns} actionTable={getActionTable} />
             </div>
           )}
         />
       </div>
 
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="">
-          <DonationsForm donation={donationSelected} />
-        </DialogContent>
-      </Dialog>
+      <StyledDialog open={openDialog} onOpenChange={setOpenDialog}>
+        <StyledDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <StyledDialogHeader>
+            <StyledDialogTitle>{donationSelected ? "Editar Donación" : "Registrar Nueva Donación"}</StyledDialogTitle>
+          </StyledDialogHeader>
+          <DonationsForm donation={donationSelected} onSave={handleSaveDonation} onCancel={handleCloseDialog} />
+        </StyledDialogContent>
+      </StyledDialog>
     </div>
   )
 }

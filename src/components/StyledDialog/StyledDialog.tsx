@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
 import type * as React from "react"
 import {
   Dialog,
@@ -27,7 +26,7 @@ function StyledDialog({ ...props }: StyledDialogProps) {
 }
 
 function StyledDialogContent({ className, ...props }: StyledDialogContentProps) {
-  return <DialogContent className={cn("sm:max-w-lg manrope bg-gray-300", className)} {...props} />
+  return <DialogContent className={cn("sm:max-w-lg manrope bg-gray-300 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-500 scrollbar-width-thin scrollbar-color-gray-400", className)} {...props} />
 }
 
 function StyledDialogHeader({ ...props }: React.ComponentProps<typeof DialogHeader>) {
