@@ -83,15 +83,19 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
           className="w-full justify-between overflow-hidden"
           onClick={() => setOpen(!open)}
         >
-          {value
-            ? data.find((option) => option.value.toString() === value)?.label
-            : placeholder}
-          <ChevronsUpDown className="absolute top-[2.15rem] right-2 ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <span className="-ml-2">
+            {value
+              ? data.find((option) => option.value.toString() === value)?.label
+              : placeholder}
+          </span>
+          <div className="absolute top-[2.15rem] right-1 bg-white">
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </div>
         </Button>
       </div>
 
       {open && (
-        <div className="border rounded-lg overflow-hidden absolute animationOpacity z-20 mt-1 bg-white">
+        <div className="border rounded-lg overflow-hidden absolute animationOpacity z-50 mt-1 bg-white">
           <div className="flex items-center justify-start px-2 border-b-2">
             <SearchIcon className="size-4 shrink-0 opacity-50" />
             <input
