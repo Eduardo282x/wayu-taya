@@ -10,19 +10,69 @@ import { FilterComponent } from "@/components/table/FilterComponent"
 import { Button } from "@/components/ui/button"
 import { DonationsForm } from "./DonationsForm"
 import { StyledDialog, StyledDialogContent, StyledDialogHeader, StyledDialogTitle } from "@/components/StyledDialog/StyledDialog"
-import { Plus} from "lucide-react"
-
+import { Plus } from "lucide-react"
+import { IProviders } from "@/services/provider/provider.interface"
+import { getProviders } from "@/services/provider/provider.service"
+import { getStore } from "@/services/store/store.service"
+import { IStore } from "@/services/store/store.interface"
+import { getMedicine } from "@/services/medicine/medicine.service"
+import { IMedicine } from "@/services/medicine/medicine.interface"
+import { IInstitution } from "@/services/institution/institution.interface"
+import { getInstitutions } from "@/services/institution/institution.service"
 
 export const Donations = () => {
   const [donations, setDonations] = useState<GroupDonations>({ allDonations: [], donations: [] })
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
+  const [providers, setProviders] = useState<IProviders[]>([])
+  const [institutions, setInstitutions] = useState<IInstitution[]>([])
+  const [stores, setStores] = useState<IStore[]>([])
+  const [medicines, setMedicines] = useState<IMedicine[]>([])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
   const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     getDonationsApi()
+    getProvidersApi()
+    getStoresApi()
+    getMedicinesApi()
+    getInstitutionsApi()
   }, [])
+
+  const getProvidersApi = async () => {
+    try {
+      const response: IProviders[] = await getProviders()
+      setProviders(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  const getInstitutionsApi = async () => {
+    try {
+      const response: IInstitution[] = await getInstitutions()
+      setInstitutions(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const getStoresApi = async () => {
+    try {
+      const response: IStore[] = await getStore()
+      setStores(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const getMedicinesApi = async () => {
+    try {
+      const response: IMedicine[] = await getMedicine()
+      setMedicines(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const getDonationsApi = async () => {
     setLoading(true)
@@ -91,9 +141,10 @@ export const Donations = () => {
             setDataFilter={setDonationFilter}
           />
           <Button variant={"animated"} className="h-full" onClick={newDonations}>
-            <Plus className="w-4 h-4 mr-1"/>
-            Agregar Donacion
+            <Plus className="w-4 h-4 mr-1" />
+            Agregar Donación
           </Button>
+
         </div>
       </div>
 
@@ -112,12 +163,20 @@ export const Donations = () => {
         />
       </div>
 
+
       <StyledDialog open={openDialog} onOpenChange={setOpenDialog}>
-        <StyledDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <StyledDialogContent className="w-[60rem] max-h-[90vh] overflow-y-auto overflow-x-hidden">
           <StyledDialogHeader>
             <StyledDialogTitle>{donationSelected ? "Editar Donación" : "Registrar Nueva Donación"}</StyledDialogTitle>
           </StyledDialogHeader>
-          <DonationsForm donation={donationSelected} onSave={handleSaveDonation} onCancel={handleCloseDialog} />
+          <DonationsForm
+            donation={donationSelected}
+            providers={providers}
+            stores={stores}
+            medicines={medicines}
+            institutions={institutions}
+            onSave={handleSaveDonation}
+            onCancel={handleCloseDialog} />
         </StyledDialogContent>
       </StyledDialog>
     </div>

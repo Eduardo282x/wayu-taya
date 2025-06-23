@@ -40,7 +40,7 @@ export const InventoryDetailsMedicine = ({ inventory }: InventoryDetailsMedicine
         <ul className="list-disc list-inside ml-2 text-gray-800">
           {stores.map((store) => (
             <li key={store.id}>
-              {store.name} - <span className="text-gray-500">{store.address}</span>
+              {store.name} - <span className="text-gray-500">{store.address} - Cantidad: {store.amount}</span>
             </li>
           ))}
         </ul>

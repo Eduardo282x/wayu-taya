@@ -7,6 +7,11 @@
 /* *{
   border: 2px solid red;
 } */
+
+* {
+  font-family: "Manrope", sans-serif;
+}
+
 .julius-sans-one-regular {
   font-family: "Julius Sans One", sans-serif;
   font-weight: 400;
@@ -50,9 +55,19 @@
   interpolate-size: allow-keywords;
 }
 
-.expandEvents { 
+.expandEvents {
   animation: animateHeight 0.2s ease-in-out;
   interpolate-size: allow-keywords;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 @keyframes animateHeight {

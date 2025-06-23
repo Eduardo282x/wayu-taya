@@ -31,14 +31,14 @@ export const inventoryColumns: Column[] = [
     visible: true,
     isIcon: false,
     element: (data: IInventory) => formatDate(data.datesMedicine[0].expirationDate),
-    className: (data: IInventory) => {
-      if (isExpired(data.datesMedicine[0].expirationDate, false)) {
-        return "expired-date"
-      } else if (isExpired(data.datesMedicine[0].expirationDate, true)) {
-        return "expiring-soon-date"
-      }
-      return ""
-    },
+    // className: (data: IInventory) => {
+    //   if (isExpired(data.datesMedicine[0].expirationDate, false)) {
+    //     return "expired-date"
+    //   } else if (isExpired(data.datesMedicine[0].expirationDate, true)) {
+    //     return "expiring-soon-date"
+    //   }
+    //   return ""
+    // },
   },
   {
     label: "Eliminar",

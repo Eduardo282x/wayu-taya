@@ -1,37 +1,55 @@
-import type React from "react"
-import type { IDonations } from "@/services/donations/donations.interface"
+import { DonationForm, DonationType, IDonations } from "@/services/donations/donations.interface"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { Button } from "@/components/ui/button"
 import { StyledDialogFooter } from "@/components/StyledDialog/StyledDialog"
 import { useState, useEffect } from "react"
 import { Plus, Trash2 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { IProviders } from "@/services/provider/provider.interface"
+// import FormAutoCompleteCustom from "@/components/formInput/FormAutoCompleteCustom"
+import FormSelectCustom from "@/components/formInput/FormSelectCustom"
+import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
+import { IStore } from "@/services/store/store.interface"
+import { IMedicine } from "@/services/medicine/medicine.interface"
+import { IInstitution } from "@/services/institution/institution.interface"
 
 interface DonationsFormProps {
-  donation: IDonations | null
+  donation: IDonations | null;
+  providers: IProviders[];
+  stores: IStore[];
+  medicines: IMedicine[];
+  institutions: IInstitution[];
   onSave: () => void
   onCancel: () => void
 }
 
 interface MedicineDetail {
-  medicineId: string
-  medicineName: string
+  medicineId: number
   amount: number
   admissionDate: string
   expirationDate: string
 }
 
-export const DonationsForm = ({ donation, onSave, onCancel }: DonationsFormProps) => {
-  const [formData, setFormData] = useState({
-    providerName: "",
-    type: "",
-    lote: "",
-    date: "",
+export const DonationsForm = ({ donation, providers, stores, medicines, institutions, onSave, onCancel }: DonationsFormProps) => {
+  // const [medicineFilter, setMedicineFilter] = useState<IMedicine[]>([]);
+  const { register, handleSubmit, reset, watch } = useForm<DonationForm>({
+    defaultValues: {
+      providerName: "",
+      type: "Entrada",
+      lote: "",
+      date: new Date(),
+    },
   })
+
+  const typeDonation = watch("type");
+
+  useEffect(() => {
+    console.log(typeDonation);
+  }, [typeDonation])
 
   const [medicineDetails, setMedicineDetails] = useState<MedicineDetail[]>([
     {
-      medicineId: "",
-      medicineName: "",
+      medicineId: 0,
       amount: 0,
       admissionDate: "",
       expirationDate: "",
@@ -40,18 +58,17 @@ export const DonationsForm = ({ donation, onSave, onCancel }: DonationsFormProps
 
   useEffect(() => {
     if (donation) {
-      setFormData({
-        providerName: donation.provider?.name || "",
-        type: donation.type || "",
+      reset({
+        providerName: donation.provider.name || "",
+        type: donation.type as DonationType || "Entrada",
         lote: donation.lote || "",
-        date: donation.date ? new Date(donation.date).toISOString().split("T")[0] : "",
+        date: donation.date,
       })
 
       if (donation.detDonation && donation.detDonation.length > 0) {
         setMedicineDetails(
           donation.detDonation.map((det) => ({
-            medicineId: det.medicine?.id?.toString() || "",
-            medicineName: det.medicine?.name || "",
+            medicineId: det.medicine?.id || 0,
             amount: det.amount || 0,
             admissionDate: det.admissionDate ? new Date(det.admissionDate).toISOString().split("T")[0] : "",
             expirationDate: det.expirationDate ? new Date(det.expirationDate).toISOString().split("T")[0] : "",
@@ -61,13 +78,6 @@ export const DonationsForm = ({ donation, onSave, onCancel }: DonationsFormProps
     }
   }, [donation])
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
   const handleMedicineDetailChange = (index: number, field: string, value: string | number) => {
     setMedicineDetails((prev) => prev.map((detail, i) => (i === index ? { ...detail, [field]: value } : detail)))
   }
@@ -76,8 +86,7 @@ export const DonationsForm = ({ donation, onSave, onCancel }: DonationsFormProps
     setMedicineDetails((prev) => [
       ...prev,
       {
-        medicineId: "",
-        medicineName: "",
+        medicineId: 0,
         amount: 0,
         admissionDate: "",
         expirationDate: "",
@@ -91,61 +100,98 @@ export const DonationsForm = ({ donation, onSave, onCancel }: DonationsFormProps
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = (data: DonationForm) => {
     // Aquí puedes agregar la lógica para enviar los datos al servidor
-    console.log("Datos del formulario:", { formData, medicineDetails })
+    console.log("Datos del formulario:", { data, medicineDetails })
     onSave()
   }
 
+  const filteredOptions = (detail: MedicineDetail, index: number): { value: string; label: string }[] => {
+    return medicines
+      .filter(med => {
+        // Obtén los ids seleccionados en otros campos (excepto el actual)
+        const selectedIds = medicineDetails
+          .filter((_, i) => i !== index)
+          .map(item => item.medicineId?.toString());
+        // Muestra la opción si:
+        // - No está seleccionada en otro campo
+        // - O es la seleccionada actualmente en este campo
+        return (
+          !selectedIds.includes(med.id.toString()) ||
+          med.id.toString() === detail.medicineId?.toString()
+        );
+      })
+      .map(med => ({
+        value: med.id.toString(),
+        label: `${med.name} ${med.amount}${med.unit}`,
+      }))
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-2">
         <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">
           Información General
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInputCustom
-            label="Proveedor"
-            id="providerName"
-            value={formData.providerName}
-            onChange={(e) => handleInputChange("providerName", e.target.value)}
-            placeholder="Nombre del proveedor"
-            required
-          />
+        <div className="flex items-center justify-around gap-4 bg-white rounded-2xl p-4">
+          <div className="w-60">
+            <FormSelectCustom
+              label="Tipo"
+              id="type"
+              {...register("type")}
+              options={[
+                { value: "Entrada", label: "Entrada" },
+                { value: "Salida", label: "Salida" }
+              ]}
+            />
+          </div>
 
-          <FormInputCustom
-            label="Tipo"
-            id="type"
-            value={formData.type}
-            onChange={(e) => handleInputChange("type", e.target.value)}
-            placeholder="Tipo de donación"
-            required
-          />
+          <div className="w-full">
+            {typeDonation == 'Entrada' ?
+              <FormAutocompleteV2
+                label="Proveedor"
+                placeholder="Selecciona un proveedor"
+                data={providers.map(provider => ({
+                  value: provider.id.toString(),
+                  label: provider.name,
+                }))}
+                onChange={(value) => {
+                  console.log(value);
+                }}
+              />
+              :
+              <FormAutocompleteV2
+                label="Institución"
+                placeholder="Selecciona una institución"
+                data={institutions.map(institution => ({
+                  value: institution.id.toString(),
+                  label: institution.name,
+                }))}
+                onChange={(value) => {
+                  console.log(value);
+                }}
+              />
+            }
+          </div>
 
           <FormInputCustom
             label="Lote"
             id="lote"
-            value={formData.lote}
-            onChange={(e) => handleInputChange("lote", e.target.value)}
-            placeholder="Número de lote"
-            required
+            {...register("lote")}
+            placeholder="Lote"
           />
 
           <FormInputCustom
             label="Fecha"
             id="date"
             type="date"
-            value={formData.date}
-            onChange={(e) => handleInputChange("date", e.target.value)}
-            required
+            {...register("date")}
           />
         </div>
       </div>
 
-      
-      <div className="space-y-4">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">
             Detalles de Medicinas
@@ -177,41 +223,42 @@ export const DonationsForm = ({ donation, onSave, onCancel }: DonationsFormProps
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInputCustom
-                label="ID de Medicina"
-                id={`medicineId-${index}`}
-                value={detail.medicineId}
-                onChange={(e) => handleMedicineDetailChange(index, "medicineId", e.target.value)}
-                placeholder="ID de la medicina"
-                required
-              />
-              <FormInputCustom
-                label="Nombre de Medicina"
-                id={`medicineName-${index}`}
-                value={detail.medicineName}
-                onChange={(e) => handleMedicineDetailChange(index, "medicineName", e.target.value)}
-                placeholder="Nombre de la medicina"
-                required
-              />
-              <FormInputCustom
-                label="Cantidad"
-                id={`amount-${index}`}
-                type="number"
-                value={detail.amount.toString()}
-                onChange={(e) => handleMedicineDetailChange(index, "amount", Number.parseInt(e.target.value) || 0)}
-                placeholder="Cantidad"
-                min="1"
-                required
-              />
-              <div></div> 
+            <div className="flex items-center justify-around gap-4">
+              <div className="w-60">
+                <FormAutocompleteV2
+                  label="Medicina"
+                  placeholder="Nombre de la medicina"
+                  data={filteredOptions(detail, index)}
+                  onChange={(value) => {
+                    handleMedicineDetailChange(index, "medicineId", value);
+                  }}
+                />
+              </div>
+              <div className="w-20">
+                <FormInputCustom
+                  label="Cantidad"
+                  id={`amount-${index}`}
+                  type="number"
+                  value={detail.amount.toString()}
+                  onChange={(e) => handleMedicineDetailChange(index, "amount", Number.parseInt(e.target.value) || 0)}
+                  placeholder="Cantidad"
+                />
+              </div>
+              <div className="w-40">
+                <FormSelectCustom
+                  label="Almacén"
+                  id={`store-${index}`}
+                  options={stores.map(store => {
+                    return { value: store.id.toString(), label: `${store.name} ${store.address}` }
+                  })}
+                />
+              </div>
               <FormInputCustom
                 label="Fecha de Ingreso"
                 id={`admissionDate-${index}`}
                 type="date"
                 value={detail.admissionDate}
                 onChange={(e) => handleMedicineDetailChange(index, "admissionDate", e.target.value)}
-                required
               />
               <FormInputCustom
                 label="Fecha de Expiración"
@@ -219,7 +266,6 @@ export const DonationsForm = ({ donation, onSave, onCancel }: DonationsFormProps
                 type="date"
                 value={detail.expirationDate}
                 onChange={(e) => handleMedicineDetailChange(index, "expirationDate", e.target.value)}
-                required
               />
             </div>
           </div>

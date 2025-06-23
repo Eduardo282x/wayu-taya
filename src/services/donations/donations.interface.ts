@@ -51,3 +51,12 @@ export interface DetDonation {
     admissionDate?: Date;
     expirationDate?: Date;
 }
+
+export type DonationType = "Entrada" | "Salida";
+
+export interface DonationForm {
+    providerName: string;
+    type: DonationType;
+    lote: string;
+    date: Date;
+}
