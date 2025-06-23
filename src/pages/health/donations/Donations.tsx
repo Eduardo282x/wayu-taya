@@ -5,7 +5,7 @@ import type { GroupDonations, IDonations } from "@/services/donations/donations.
 import { getDonations, getDonationsReport } from "@/services/donations/donations.service"
 import { useEffect, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
-import { detDonationsColumns, donationsColumns } from "./donations.data"
+import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data"
 import { FilterComponent } from "@/components/table/FilterComponent"
 import { Button } from "@/components/ui/button"
 import { DonationsForm } from "./DonationsForm"
@@ -19,6 +19,7 @@ import { getMedicine } from "@/services/medicine/medicine.service"
 import { IMedicine } from "@/services/medicine/medicine.interface"
 import { IInstitution } from "@/services/institution/institution.interface"
 import { getInstitutions } from "@/services/institution/institution.service"
+import { DonationFilterDropDown } from "./DonationFilters"
 
 export const Donations = () => {
   const [donations, setDonations] = useState<GroupDonations>({ allDonations: [], donations: [] })
@@ -30,6 +31,12 @@ export const Donations = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
   const [loading, setLoading] = useState<boolean>(false)
+  const [donationsFilter, setDonationsFilter] = useState<IDonationsFilters>({
+    type: 'all',
+    lote: '',
+    providerId: null,
+    institutionId: null,
+  })
 
   useEffect(() => {
     getDonationsApi()
@@ -127,12 +134,54 @@ export const Donations = () => {
     getDonationsApi() // Refrescar la lista
   }
 
+  useEffect(() => {
+    if (donationsFilter) {
+      const filteredDonations = donations.allDonations.filter((donation) => {
+        const matchesType = donationsFilter.type === 'all' || donation.type === donationsFilter.type;
+        const matchesLote = donationsFilter.lote === 'all' || donation.lote.toLowerCase().includes(donationsFilter.lote.toLowerCase());
+        const matchesProvider = donationsFilter.providerId ? donation.providerId === donationsFilter.providerId : true;
+        const matchesInstitution = donationsFilter.institutionId ? donation.institutionId === donationsFilter.institutionId : true;
+
+        return matchesType && matchesLote && matchesProvider && matchesInstitution;
+      });
+
+      setDonations((prev) => ({ ...prev, donations: filteredDonations }));
+    }
+  }, [donationsFilter])
+
+  const handleDonationFilterChange = (filter: string, value: string | number) => {
+    if (filter === 'type') {
+      setDonationsFilter((prev) => ({ ...prev, type: value as 'Entrada' | 'Salida' }));
+    } else if (filter === 'lote') {
+      setDonationsFilter((prev) => ({ ...prev, lote: value.toString() }));
+    } else if (filter === 'providerId') {
+      setDonationsFilter((prev) => ({ ...prev, providerId: value ? Number(value) : null }));
+    } else if (filter === 'institutionId') {
+      setDonationsFilter((prev) => ({ ...prev, institutionId: value ? Number(value) : null }));
+    }
+  }
+
+  const cleanFilters = () => {
+    setDonationsFilter({
+      type: 'all',
+      lote: '',
+      providerId: null,
+      institutionId: null,
+    })
+  }
+
   return (
     <div className="min-h-[90vh] w-[79.5vw] pr-7 overflow-auto">
       {loading && <ScreenLoader />}
       <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
 
-      <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+      <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+        <DonationFilterDropDown
+          providers={providers}
+          institutions={institutions}
+          handleDonationFilterChange={handleDonationFilterChange}
+          cleanFilters={cleanFilters}
+        />
         <div className="flex items-center ">
           <FilterComponent
             data={donations.allDonations}

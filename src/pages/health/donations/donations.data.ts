@@ -4,13 +4,20 @@ import { formatDate } from "@/utils/formatters";
 import { Download } from "lucide-react";
 import { MdEdit } from "react-icons/md";
 
+export interface IDonationsFilters {
+    type: 'all' | 'Entrada' | 'Salida';
+    lote: string;
+    providerId: number | null;
+    institutionId: number | null;
+}
+
 export const donationsColumns: Column[] = [
     {
         label: "Proveedor",
         column: "provider.name",
         visible: true,
         isIcon: false,
-        element: (data: IDonations) => `${data.provider.name}`,
+        element: (data: IDonations) => data.provider ? `${data.provider.name}` : `${data.institution.name}`,
     },
     {
         label: "Tipo",
