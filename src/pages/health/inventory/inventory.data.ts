@@ -55,12 +55,12 @@ export const inventoryColumns: Column[] = [
   },
 ];
 
-const isExpired = (expirationDate: string | Date, soon: boolean) => {
-  const today = new Date();
-  const expDate = new Date(expirationDate);
-  if (soon) return expDate < today;
+// const isExpired = (expirationDate: string | Date, soon: boolean) => {
+//   const today = new Date();
+//   const expDate = new Date(expirationDate);
+//   if (soon) return expDate < today;
 
-  const diffTime = expDate.getTime() - today.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays <= 30 && diffDays > 0
-}
+//   const diffTime = expDate.getTime() - today.getTime()
+//   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+//   return diffDays <= 30 && diffDays > 0
+// }
