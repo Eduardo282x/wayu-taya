@@ -31,14 +31,14 @@ export const inventoryColumns: Column[] = [
     visible: true,
     isIcon: false,
     element: (data: IInventory) => formatDate(data.datesMedicine[0].expirationDate),
-    className: (data: IInventory) => {
-      if (isExpired(data.datesMedicine[0].expirationDate, false)) {
-        return "expired-date"
-      } else if (isExpired(data.datesMedicine[0].expirationDate, true)) {
-        return "expiring-soon-date"
-      }
-      return ""
-    },
+    // className: (data: IInventory) => {
+    //   if (isExpired(data.datesMedicine[0].expirationDate, false)) {
+    //     return "expired-date"
+    //   } else if (isExpired(data.datesMedicine[0].expirationDate, true)) {
+    //     return "expiring-soon-date"
+    //   }
+    //   return ""
+    // },
   },
   {
     label: "Eliminar",
@@ -55,12 +55,12 @@ export const inventoryColumns: Column[] = [
   },
 ];
 
-const isExpired = (expirationDate: string | Date, soon: boolean) => {
-  const today = new Date();
-  const expDate = new Date(expirationDate);
-  if (soon) return expDate < today;
+// const isExpired = (expirationDate: string | Date, soon: boolean) => {
+//   const today = new Date();
+//   const expDate = new Date(expirationDate);
+//   if (soon) return expDate < today;
 
-  const diffTime = expDate.getTime() - today.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays <= 30 && diffDays > 0
-}
+//   const diffTime = expDate.getTime() - today.getTime()
+//   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+//   return diffDays <= 30 && diffDays > 0
+// }
