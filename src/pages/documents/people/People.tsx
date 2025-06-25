@@ -109,7 +109,7 @@ const DialogPeople = ({ open, setOpen, addPeople, people }: DialogPeopleProps) =
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl">
-        <DialogHeader>
+        <DialogHeader className="-mb-4">
           <DialogTitle>Agregar Nueva Persona</DialogTitle>
           <DialogDescription>
             Rellena todos los campos para añadir una nueva persona.

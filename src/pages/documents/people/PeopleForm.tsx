@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form"
 
-import { Input } from "@/components/ui/input"
+// import { Input } from "@/components/ui/input"    
 import { IPeople, PeopleBody } from "@/services/people/people.interface"
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
+import FormInputCustom from "@/components/formInput/FormInputCustom";
 
 interface PeopleFormProps {
     people: IPeople | null;
@@ -48,90 +49,60 @@ export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
 
     return (
         <>
-            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="name" className="text-left">
-                        Nombre
-                    </label>
-                    <Input id="name" placeholder="Juan" {...register('name')} className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="lastname" className="text-left">
-                        Apellido
-                    </label>
-                    <Input
-                        id="lastname"
-                        {...register('lastName')}
-                        placeholder="Pérez"
-                        className="col-span-3"
-                    />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="identification" className="text-left">
-                        Cédula
-                    </label>
-                    <Input
-                        {...register('identification')}
-                        id="identification"
-                        placeholder="V-12345678"
-                        className="col-span-3"
-                    />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="sex" className="text-left">
-                        Sexo
-                    </label>
-                    <Input
-                        id="sex"
-                        {...register('sex')}
-                        placeholder="Masculino/Femenino"
-                        className="col-span-3"
-                    />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="address" className="text-left">
-                        Dirección
-                    </label>
-                    <Input
-                        id="address"
-                        {...register('address')}
-                        placeholder="Calle Principal, Casa #1"
-                        className="col-span-3"
-                    />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="birthdate" className="text-left">
-                        F. Nacimiento
-                    </label>
-                    <Input id="birthdate" {...register('birthdate')} type="date" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="phone" className="text-left">
-                        Teléfono
-                    </label>
-                    <Input
-                        id="phone"
-                        {...register('phone')}
-                        placeholder="0414-1234567"
-                        className="col-span-3"
-                    />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="email" className="text-left">
-                        Correo Electrónico
-                    </label>
-                    <Input
-                        id="email"
-                        type="email"
-                        {...register('email')}
-                        placeholder="ejemplo@dominio.com"
-                        className="col-span-3"
-                    />
-                </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-2 py-2">
+                <FormInputCustom
+                    id="name"
+                    label="Nombre"
+                    placeholder="Juan"
+                    {...register("name")}
+                />
+                <FormInputCustom
+                    id="lastName"
+                    label="Apellido"
+                    placeholder="Perez"
+                    {...register("lastName")}
+                />
+                <FormInputCustom
+                    id="identification"
+                    placeholder="V-12345678"
+                    label="Cédula"
+                    {...register("identification")}
+                />
+                <FormInputCustom
+                    id="sex"
+                    label="Sexo"
+                    placeholder="Masculino/Femenino"
+                    {...register("sex")}
+                />
+                <FormInputCustom
+                    id="address"
+                    label="Dirección"
+                    placeholder="Calle Principal, Casa #1"
+                    {...register("address")}
+                />
+                <FormInputCustom
+                    id="birthdate"
+                    label="F. Nacimiento"
+                    type="date"
+                    {...register("birthdate")}
+                />
+                <FormInputCustom
+                    id="phone"
+                    label="Teléfono"
+                    placeholder="0414-1234567"
+                    {...register("phone")}
+                />
+                <FormInputCustom
+                    id="email"
+                    label="Correo Electrónico"
+                    {...register("email")}
+                    type="email"
+                    placeholder="ejemplo@dominio.com"
+                />
 
-                <div className="flex items-center justify-end gap-2 w-full">
+                <div className="flex items-center justify-end gap-2 mt-2 w-full">
                     <Button type="submit">Guardar</Button>
-                    <Button variant="outline">Cancelar</Button>
+                    <Button type="button" variant="outline">Cancelar</Button>
                 </div>
             </form>
         </>

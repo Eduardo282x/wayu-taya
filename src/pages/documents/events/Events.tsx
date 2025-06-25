@@ -104,7 +104,7 @@ export const Events = () => {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-3 h-[27rem] overflow-y-auto">
+      <div className="flex flex-col gap-3 h-[30rem] overflow-y-auto">
         {events.events.map((eve: IEvents, index: number) => (
           <CardEvents event={eve} key={`event-${eve.id}-${index}`} onEdit={openDialog} onDelete={handleDeleteEvent} />
         ))}
@@ -114,7 +114,7 @@ export const Events = () => {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-full max-w-md overflow-y-auto max-h-[90vh] rounded-xl p-6 bg-blue-100 border border-blue-300 text-blue-800">
+        <DialogContent className="w-full max-w-md overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-blue-700 text-xl">
               {isEditing ? "Editar evento" : "Crear nuevo evento"}

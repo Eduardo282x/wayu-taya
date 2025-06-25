@@ -45,7 +45,7 @@ export default function Home() {
         </div>
       </main>
 
-      <div className="absolute bottom-5 left-5">
+      <div className="fixed bottom-5 left-5">
         <button
           className="bg-red-600 text-white font-semibold py-2 px-4 rounded shadow cursor-pointer transition-colors  hover:bg-[#570206] duration-300"
           onClick={logout}
