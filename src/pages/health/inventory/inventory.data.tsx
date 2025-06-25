@@ -74,9 +74,9 @@ export const historyColumns: Column[] = [
     visible: true,
     isIcon: false,
     element: (data: IInventoryHistory) => (
-      <span className={`px - 2 py - 1 rounded - full text - xs font - medium ${data.donation && data.donation.type == 'Entrada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+      <p className={`px-2 py-1 rounded-full text-xs text-center font-medium ${data.donation && data.donation.type == 'Entrada' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
         {data.donation.type}
-      </span>
+      </p>
     ),
   },
   {

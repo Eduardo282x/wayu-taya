@@ -11,9 +11,11 @@ export interface IDonationsFilters {
     institutionId: number | null;
 }
 
+export type DonationTypeForm = 'medicineId' | 'amount' | 'storageId' | 'admissionDate' | 'expirationDate';
+
 export const donationsColumns: Column[] = [
     {
-        label: "Proveedor",
+        label: "Proveedor / Institución",
         column: "provider.name",
         visible: true,
         isIcon: false,
@@ -24,7 +26,14 @@ export const donationsColumns: Column[] = [
         column: "type",
         visible: true,
         isIcon: false,
-        element: (data: IDonations) => data.type,
+        element: (data: IDonations) => (
+            <p className={`
+                px-2 py-1 rounded-full font-medium text-center
+                ${data.type == 'Entrada' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}
+            `}>
+                {data.type}
+            </p>
+        ),
     },
     {
         label: "Lote",
@@ -75,7 +84,8 @@ export const detDonationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: DetDonation) => `${data.medicine.name} ${data.medicine.amount}${data.medicine.unit}`,
-        className: () => 'bg-[#193db9] text-white'
+        className: () => 'bg-[#193db9] text-white',
+        disabledClassName: true,
     },
     {
         label: "Cantidad",
@@ -83,7 +93,8 @@ export const detDonationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: DetDonation) => data.amount.toString(),
-        className: () => 'bg-[#193db9] text-white'
+        className: () => 'bg-[#193db9] text-white',
+        disabledClassName: true,
     },
     {
         label: "Fecha de ingreso",
@@ -91,7 +102,8 @@ export const detDonationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: DetDonation) => formatDate(data.admissionDate || new Date()),
-        className: () => 'bg-[#193db9] text-white'
+        className: () => 'bg-[#193db9] text-white',
+        disabledClassName: true,
     },
     {
         label: "Fecha de expiración",
@@ -99,6 +111,7 @@ export const detDonationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: DetDonation) => formatDate(data.expirationDate || new Date()),
-        className: () => 'bg-[#193db9] text-white'
+        className: () => 'bg-[#193db9] text-white',
+        disabledClassName: true,
     },
 ]

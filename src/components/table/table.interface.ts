@@ -10,6 +10,7 @@ export interface Column {
     icon?: Icon;
     element: (data: any) => string | React.ReactNode;
     className?: (data: any) => string;
+    disabledClassName?: boolean;
 }
 
 type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];

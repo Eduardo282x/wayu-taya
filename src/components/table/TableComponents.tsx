@@ -178,7 +178,7 @@ interface ColumnCellProps {
 
 const ColumnNormal = ({ col, item }: ColumnCellProps) => {
   return (
-    <TableCell className={col.className ? col.className(item) : ""}>
+    <TableCell className={col.className && (!col.disabledClassName) ? col.className(item) : ""}>
       {col.element(item)}
     </TableCell>
   );

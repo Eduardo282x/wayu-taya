@@ -18,15 +18,20 @@ interface EventFormProps {
 }
 
 export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEventSaved }: EventFormProps) => {
+  const today = new Date();
+  const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
+
+
   const [formData, setFormData] = useState<EventsBody>({
     parishId: 1,
     name: '',
     description: '',
     address: '',
-    startDate: new Date(),
-    endDate: new Date(),
-    startTime: '',
-    endTime: '',
+    startDate: defaultDate,
+    endDate: defaultDate,
+    startTime: defaultTime,
+    endTime: defaultTime,
     providersId: [],
     cambio_proveedores: false,
   })
