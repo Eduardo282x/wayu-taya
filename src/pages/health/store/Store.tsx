@@ -103,7 +103,7 @@ export const Store = () => {
           />
           <Button variant={"animated"} className="h-full" onClick={openAddForm}>
             <MdOutlineStore className="size-6" />
-            Registrar Almacén
+            <span className="hidden lg:block">Registrar Almacén</span>
           </Button>
         </div>
       </div>

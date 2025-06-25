@@ -61,7 +61,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
 
   return (
     <StyledDialog open={open} onOpenChange={onOpenChange}>
-      <StyledDialogContent>
+      <StyledDialogContent className="w-[30rem] ">
         <StyledDialogHeader>
           <StyledDialogTitle>{isEdit ? "Editar Usuario" : "Crear Usuario"}</StyledDialogTitle>
           <StyledDialogDescription>

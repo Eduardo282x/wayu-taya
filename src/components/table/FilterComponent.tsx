@@ -61,7 +61,7 @@ export const FilterComponent = ({ data, setDataFilter, columns, placeholder }: F
             <input
                 type="search"
                 placeholder={placeholder}
-                className="w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+                className="w-40 lg:w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-gray-200 rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
                 value={filter}
                 onChange={onChange}
             />
