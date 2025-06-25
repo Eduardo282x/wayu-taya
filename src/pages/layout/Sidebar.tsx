@@ -57,12 +57,12 @@ export const Sidebar = () => {
             </div>
 
             <div className='flex flex-col items-start justify-between h-[83%] w-full'>
-                <div className='flex flex-col items-start justify-start gap-3 w-full'>
+                <div className='flex flex-col items-start justify-start gap-1 w-full'>
                     {menuData && menuData.map((me: IMenu, index: number) => (
                         <div
                             key={index}
                             onClick={() => navigate(me.url)}
-                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
+                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent  hover:border-white ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
                         >
                             <me.icon className='text-3xl' /> {me.label}
                         </div>
