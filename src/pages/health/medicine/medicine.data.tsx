@@ -101,3 +101,16 @@ export const medicineColumns: Column[] = [
     visible: true
   }
 ];
+
+export const baseMedicine = {
+  name: "",
+  description: "",
+  categoryId: 0,
+  medicine: true,
+  unit: "",
+  amount: 0,
+  temperate: "",
+  manufacturer: "",
+  activeIngredient: "",
+  formId: 0,
+}

@@ -11,6 +11,6 @@ export const getDonationsReport = async (id: number) => {
     return await getDataFileApi(`${donationsUrl}/download/${id}`);
 }
 
-export const postInventory = async (data: DonationBody) => {
+export const postDonation = async (data: DonationBody) => {
     return await postDataApi(donationsUrl, data)
 }

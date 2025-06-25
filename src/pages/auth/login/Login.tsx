@@ -78,7 +78,18 @@ export const Login = () => {
           {/* Solo mostrar en móvil o en desktop cuando showLoginForm es true */}
           {(isMobile && showLoginForm) || !isMobile ? (
             <div className={`${!isMobile && !showLoginForm ? "invisible" : "visible"}`}>
-              <div className="flex items-center w-full cursor-default mb-14">
+              <div className="flex items-center w-full cursor-default lg:mb-14">
+              </div>
+
+              <div className="flex items-center w-full cursor-default lg:hidden">
+                <img
+                  src={logo || "/placeholder.svg"}
+                  alt="logo"
+                  className="w-12 mx-2  drop-shadow-gray-500 drop-shadow-lg"
+                />
+                <div className="julius-sans-one-regular text-[#34A8D5] text-shadow2">
+                  WAYUU TAYA
+                </div>
               </div>
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
@@ -93,13 +104,13 @@ export const Login = () => {
           {/* Mostrar formulario de recuperación solo en móvil cuando showLoginForm es false */}
           {isMobile && !showLoginForm ? (
             <div>
-              <div className="flex items-center w-full cursor-default -mb-3">
+              <div className="flex items-center w-full ml-4 cursor-default lg:hidden">
                 <img
                   src={logo || "/placeholder.svg"}
                   alt="logo"
-                  className="w-12 m-2 lg:w-20 lg:h-20 drop-shadow-gray-500 drop-shadow-lg"
+                  className="w-12 mx-2 drop-shadow-gray-500 drop-shadow-lg"
                 />
-                <div className="lg:ml-2 text-[1rem] mr-2 julius-sans-one-regular lg:text-[2.5rem] text-[#34A8D5] text-shadow2">
+                <div className="text-[1rem] julius-sans-one-regular text-[#34A8D5] text-shadow2">
                   WAYUU TAYA
                 </div>
               </div>

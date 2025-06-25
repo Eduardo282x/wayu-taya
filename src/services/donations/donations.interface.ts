@@ -4,9 +4,10 @@ import { IProviders } from "../provider/provider.interface";
 export type TypeDonation = "Entrada" | "Salida";
 
 export interface DonationBody {
-    providerId: number;
+    providerId: number | null;
+    institutionId: number | null;
     type: TypeDonation;
-    date: Date,
+    date: Date | string,
     lote: string,
     medicines: DonationMedicine[]
 }
@@ -15,8 +16,8 @@ export interface DonationMedicine {
     medicineId: number;
     amount: number;
     storageId: number;
-    admissionDate: Date;
-    expirationDate: Date;
+    admissionDate: Date | string;
+    expirationDate: Date | string;
 }
 
 
@@ -34,7 +35,7 @@ export interface IDonations {
     providerId: number;
     provider: IProviders;
     institution: IProviders;
-    type: string;
+    type: TypeDonation;
     date: Date;
     lote: string;
     createAt: Date;
@@ -48,8 +49,8 @@ export interface DetDonation {
     medicineId: number;
     amount: number;
     medicine: IMedicine;
-    admissionDate?: Date;
-    expirationDate?: Date;
+    admissionDate: Date;
+    expirationDate: Date;
 }
 
 export type DonationType = "Entrada" | "Salida";
@@ -58,5 +59,5 @@ export interface DonationForm {
     providerName: string;
     type: DonationType;
     lote: string;
-    date: Date;
+    date: Date | string;
 }

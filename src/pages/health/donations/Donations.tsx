@@ -1,11 +1,11 @@
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/pages/layout/Header"
-import type { GroupDonations, IDonations } from "@/services/donations/donations.interface"
-import { getDonations, getDonationsReport } from "@/services/donations/donations.service"
+import { DonationBody, GroupDonations, IDonations } from "@/services/donations/donations.interface"
+import { getDonations, getDonationsReport, postDonation } from "@/services/donations/donations.service"
 import { useEffect, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
-import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data"
+import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data.tsx"
 import { FilterComponent } from "@/components/table/FilterComponent"
 import { Button } from "@/components/ui/button"
 import { DonationsForm } from "./DonationsForm"
@@ -39,11 +39,11 @@ export const Donations = () => {
   })
 
   useEffect(() => {
-    getDonationsApi()
-    getProvidersApi()
-    getStoresApi()
-    getMedicinesApi()
-    getInstitutionsApi()
+    getStoresApi();
+    getDonationsApi();
+    getProvidersApi();
+    getMedicinesApi();
+    getInstitutionsApi();
   }, [])
 
   const getProvidersApi = async () => {
@@ -128,10 +128,10 @@ export const Donations = () => {
     setDonationSelected(null)
   }
 
-  const handleSaveDonation = () => {
-    // Aquí puedes agregar la lógica para guardar la donación
-    handleCloseDialog()
-    getDonationsApi() // Refrescar la lista
+  const handleSaveDonation = async (donationData: DonationBody) => {
+    await postDonation(donationData);
+    handleCloseDialog();
+    getDonationsApi();
   }
 
   useEffect(() => {

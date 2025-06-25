@@ -1,4 +1,4 @@
-import { DonationForm, DonationType, IDonations } from "@/services/donations/donations.interface"
+import { DonationBody, DonationMedicine, DonationType, IDonations } from "@/services/donations/donations.interface"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { Button } from "@/components/ui/button"
 import { StyledDialogFooter } from "@/components/StyledDialog/StyledDialog"
@@ -11,6 +11,7 @@ import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCusto
 import { IStore } from "@/services/store/store.interface"
 import { IMedicine } from "@/services/medicine/medicine.interface"
 import { IInstitution } from "@/services/institution/institution.interface"
+import { DonationTypeForm } from "./donations.data"
 
 interface DonationsFormProps {
   donation: IDonations | null;
@@ -18,25 +19,24 @@ interface DonationsFormProps {
   stores: IStore[];
   medicines: IMedicine[];
   institutions: IInstitution[];
-  onSave: () => void
+  onSave: (donation: DonationBody) => void
   onCancel: () => void
-}
-
-interface MedicineDetail {
-  medicineId: number
-  amount: number
-  admissionDate: string
-  expirationDate: string
 }
 
 export const DonationsForm = ({ donation, providers, stores, medicines, institutions, onSave, onCancel }: DonationsFormProps) => {
   // const [medicineFilter, setMedicineFilter] = useState<IMedicine[]>([]);
-  const { register, handleSubmit, reset, watch } = useForm<DonationForm>({
+  const today = new Date();
+  const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  // const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
+
+  const { register, handleSubmit, reset, watch, setValue, getValues } = useForm<DonationBody>({
     defaultValues: {
-      providerName: "",
+      providerId: 0,
+      institutionId: 0,
       type: "Entrada",
       lote: "",
-      date: new Date(),
+      date: defaultDate,
+      medicines: []
     },
   })
 
@@ -46,38 +46,43 @@ export const DonationsForm = ({ donation, providers, stores, medicines, institut
     console.log(typeDonation);
   }, [typeDonation])
 
-  const [medicineDetails, setMedicineDetails] = useState<MedicineDetail[]>([
+  const [medicineDetails, setMedicineDetails] = useState<DonationMedicine[]>([
     {
       medicineId: 0,
       amount: 0,
-      admissionDate: "",
-      expirationDate: "",
+      storageId: 0,
+      admissionDate: new Date(),
+      expirationDate: new Date(),
     },
   ])
 
   useEffect(() => {
     if (donation) {
       reset({
-        providerName: donation.provider.name || "",
+        providerId: donation.type === 'Entrada' ? Number(donation.providerId) : 0,
+        institutionId: donation.type === 'Salida' ? Number(donation.institutionId) : 0,
         type: donation.type as DonationType || "Entrada",
-        lote: donation.lote || "",
-        date: donation.date,
-      })
+        lote: donation.lote,
+        date: new Date(donation.date).toISOString().split('T')[0],
+      });
 
       if (donation.detDonation && donation.detDonation.length > 0) {
         setMedicineDetails(
           donation.detDonation.map((det) => ({
             medicineId: det.medicine?.id || 0,
             amount: det.amount || 0,
-            admissionDate: det.admissionDate ? new Date(det.admissionDate).toISOString().split("T")[0] : "",
-            expirationDate: det.expirationDate ? new Date(det.expirationDate).toISOString().split("T")[0] : "",
+            storageId: 0,
+            admissionDate: new Date(det.admissionDate),
+            expirationDate: new Date(det.expirationDate)
           })),
         )
       }
     }
   }, [donation])
 
-  const handleMedicineDetailChange = (index: number, field: string, value: string | number) => {
+  const handleMedicineDetailChange = (index: number, field: DonationTypeForm, value: string | number) => {
+    console.log(value);
+
     setMedicineDetails((prev) => prev.map((detail, i) => (i === index ? { ...detail, [field]: value } : detail)))
   }
 
@@ -87,8 +92,9 @@ export const DonationsForm = ({ donation, providers, stores, medicines, institut
       {
         medicineId: 0,
         amount: 0,
-        admissionDate: "",
-        expirationDate: "",
+        storageId: 0,
+        admissionDate: defaultDate,
+        expirationDate: defaultDate,
       },
     ])
   }
@@ -99,13 +105,25 @@ export const DonationsForm = ({ donation, providers, stores, medicines, institut
     }
   }
 
-  const onSubmit = (data: DonationForm) => {
-    // Aquí puedes agregar la lógica para enviar los datos al servidor
-    console.log("Datos del formulario:", { data, medicineDetails })
-    onSave()
+  const onSubmit = (data: DonationBody) => {
+    const parseData = {
+      providerId: data.providerId == 0 ? null : Number(data.providerId),
+      institutionId: data.institutionId == 0 ? null : Number(data.institutionId),
+      type: data.type,
+      lote: data.lote,
+      date: new Date(data.date),
+      medicines: medicineDetails.map(det => {
+        return {
+          ...det,
+          admissionDate: new Date(det.admissionDate),
+          expirationDate: new Date(det.expirationDate),
+        }
+      })
+    };
+    onSave(parseData);
   }
 
-  const filteredOptions = (detail: MedicineDetail, index: number): { value: string; label: string }[] => {
+  const filteredOptions = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
     return medicines
       .filter(med => {
         // Obtén los ids seleccionados en otros campos (excepto el actual)
@@ -151,25 +169,23 @@ export const DonationsForm = ({ donation, providers, stores, medicines, institut
               <FormAutocompleteV2
                 label="Proveedor"
                 placeholder="Selecciona un proveedor"
+                valueDefault={Number(getValues('providerId'))}
                 data={providers.map(provider => ({
                   value: provider.id.toString(),
                   label: provider.name,
                 }))}
-                onChange={(value) => {
-                  console.log(value);
-                }}
+                onChange={(value) => setValue('providerId', Number(value))}
               />
               :
               <FormAutocompleteV2
                 label="Institución"
                 placeholder="Selecciona una institución"
+                valueDefault={Number(getValues('institutionId'))}
                 data={institutions.map(institution => ({
                   value: institution.id.toString(),
                   label: institution.name,
                 }))}
-                onChange={(value) => {
-                  console.log(value);
-                }}
+                onChange={(value) => setValue('institutionId', Number(value))}
               />
             }
           </div>
@@ -228,9 +244,8 @@ export const DonationsForm = ({ donation, providers, stores, medicines, institut
                   label="Medicina"
                   placeholder="Nombre de la medicina"
                   data={filteredOptions(detail, index)}
-                  onChange={(value) => {
-                    handleMedicineDetailChange(index, "medicineId", value);
-                  }}
+                  valueDefault={detail.medicineId}
+                  onChange={(value) => handleMedicineDetailChange(index, "medicineId", Number(value))}
                 />
               </div>
               <div className="w-20">
@@ -248,22 +263,26 @@ export const DonationsForm = ({ donation, providers, stores, medicines, institut
                   label="Almacén"
                   id={`store-${index}`}
                   options={stores.map(store => {
-                    return { value: store.id.toString(), label: `${store.name} ${store.address}` }
+                    return {
+                      label: `${store.name} ${store.address}`,
+                      value: store.id.toString()
+                    }
                   })}
+                  onChange={(value) => handleMedicineDetailChange(index, "storageId", Number(value.target.value))}
                 />
               </div>
               <FormInputCustom
                 label="Fecha de Ingreso"
                 id={`admissionDate-${index}`}
                 type="date"
-                value={detail.admissionDate}
+                value={detail.admissionDate.toLocaleString()}
                 onChange={(e) => handleMedicineDetailChange(index, "admissionDate", e.target.value)}
               />
               <FormInputCustom
                 label="Fecha de Expiración"
                 id={`expirationDate-${index}`}
                 type="date"
-                value={detail.expirationDate}
+                value={detail.expirationDate.toLocaleString()}
                 onChange={(e) => handleMedicineDetailChange(index, "expirationDate", e.target.value)}
               />
             </div>

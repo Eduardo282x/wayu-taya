@@ -3,9 +3,10 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 // import { MdAccessTime } from "react-icons/md";
 // import { FaBuilding } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
-import { MdOutlineInventory2, MdOutlineWarehouse } from "react-icons/md";
+import { MdOutlineCategory, MdOutlineInventory2, MdOutlineWarehouse } from "react-icons/md";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BiDonateHeart } from "react-icons/bi";
+import { FaUserTie } from "react-icons/fa6";
 
 export interface IMenu {
     label: string;
@@ -94,6 +95,12 @@ export const menuDocuments: IMenu[] = [
         icon: FaRegCalendarAlt,
     },
     {
+        label: 'Proveedores',
+        active: false,
+        url: '/documentos/proveedores',
+        icon: FaUserTie,
+    },
+    {
         label: 'Documentos',
         active: false,
         url: '/documentos/documentos',
@@ -120,6 +127,12 @@ export const menuHealth: IMenu[] = [
         icon: BiDonateHeart,
     },
     {
+        label: 'Proveedores',
+        active: false,
+        url: '/salud/proveedores',
+        icon: FaUserTie,
+    },
+    {
         label: 'Inventario',
         active: false,
         url: '/salud/inventario',
@@ -130,6 +143,12 @@ export const menuHealth: IMenu[] = [
         active: false,
         url: '/salud/medicamentos',
         icon: AiOutlineProduct,
+    },
+    {
+        label: 'Categorías',
+        active: false,
+        url: '/salud/categorías',
+        icon: MdOutlineCategory,
     },
     {
         label: 'Almacenes',

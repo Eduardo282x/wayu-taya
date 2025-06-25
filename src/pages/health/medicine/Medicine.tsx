@@ -2,7 +2,7 @@ import { GroupMedicine, IMedicine, MedicineBody, Category, Form } from "@/servic
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
-import { getMedicine, postMedicine, putMedicine, deleteMedicine, getMedicineTemplate } from "@/services/medicine/medicine.service";
+import { getMedicine, postMedicine, putMedicine, deleteMedicine, getMedicineTemplate, getCategories, getForms } from "@/services/medicine/medicine.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { Column } from "@/components/table/table.interface";
 import { MedicineForm } from "./MedicineForm";
@@ -43,37 +43,10 @@ export const Medicine = () => {
 
   const getCategoriesAndForms = async () => {
     try {
-      setCategories([
-        { id: 1, category: "Analgésicos" },
-        { id: 2, category: "Antibióticos" },
-        { id: 3, category: "Antiinflamatorios" },
-        { id: 4, category: "Vitaminas" },
-        { id: 5, category: "Higiene Personal" },
-        { id: 6, category: "Cuidado de la Piel" },
-        { id: 7, category: "Cuidado Dental" },
-        { id: 8, category: "Suplementos Nutricionales" },
-        { id: 9, category: "Accesorios Médicos" },
-        { id: 10, category: "Material de Curación" },
-        { id: 11, category: "Otros" },
-      ]);
-
-      setForms([
-        { id: 1, forms: "Tableta" },
-        { id: 2, forms: "Cápsula" },
-        { id: 3, forms: "Jarabe" },
-        { id: 4, forms: "Inyección" },
-        { id: 5, forms: "Crema" },
-        { id: 6, forms: "Gotas" },
-        { id: 7, forms: "Polvo" },
-        { id: 8, forms: "Supositorio" },
-        { id: 9, forms: "Spray" },
-        { id: 10, forms: "Gel" },
-        { id: 11, forms: "Parche" },
-        { id: 12, forms: "Solución" },
-        { id: 13, forms: "Ampolla" },
-        { id: 14, forms: "Inhalador" },
-        { id: 15, forms: "Otro" },
-      ]);
+      const responseCategory: Category[] = await getCategories();
+      setCategories(responseCategory)
+      const responseForms: Form[] = await getForms();
+      setForms(responseForms)
     } catch (error) {
       console.error("Error al cargar categorías o formas:", error);
     }
@@ -84,7 +57,7 @@ export const Medicine = () => {
     setIsAddFormOpen(true);
   };
 
-  const handleAddOrEditMedicineSubmit = async (formData: MedicineBody) => {
+  const handleMedicineSubmit = async (formData: MedicineBody) => {
     setLoading(true);
     try {
       if (medicineSelected) {
@@ -182,8 +155,8 @@ export const Medicine = () => {
       <MedicineForm
         open={isAddFormOpen}
         onOpenChange={setIsAddFormOpen}
-        onSubmit={handleAddOrEditMedicineSubmit}
-        medicine={medicineSelected}
+        onSubmit={handleMedicineSubmit}
+        medicineData={medicineSelected}
         categories={categories}
         forms={forms}
       />

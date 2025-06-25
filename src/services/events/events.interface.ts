@@ -3,9 +3,12 @@ export interface EventsBody {
     name: string;
     description: string;
     address: string;
-    date: Date;
+    startDate: Date | string;
+    startTime: string;
+    endDate: Date | string;
+    endTime: string;
     providersId: number[];
-    cambio_proveedores: boolean;
+    cambio_proveedores?: boolean;
 }
 
 export interface GroupEvents {
@@ -19,7 +22,8 @@ export interface IEvents {
     description: string;
     address: string;
     parishId: number;
-    date: Date;
+    startDate: Date;
+    endDate: Date;
     deleted: boolean;
     createAt: Date;
     updateAt: Date;

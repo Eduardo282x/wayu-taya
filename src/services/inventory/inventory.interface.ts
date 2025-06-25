@@ -14,6 +14,34 @@ export interface IInventory {
     lotes: string[];
 }
 
+export interface IInventoryHistory {
+    id:             number;
+    medicineId:     number;
+    storeId:        number;
+    type:           string;
+    amount:         number;
+    date:           Date;
+    donationId:     number;
+    observations:   string;
+    admissionDate:  Date;
+    expirationDate: Date;
+    createAt:       Date;
+    updateAt:       Date;
+    medicine:       IMedicine;
+    store:          Store;
+    donation:       Donation;
+}
+
+export interface Donation {
+    id:            number;
+    institutionId: null;
+    providerId:    number;
+    type:          string;
+    date:          Date;
+    lote:          string;
+    createAt:      Date;
+    updateAt:      Date;
+}
 export interface DatesMedicine {
     admissionDate: Date;
     expirationDate: Date;

@@ -119,6 +119,10 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
                 )}
               </p>
             ))}
+
+            {dataFiltered.length == 0 && (
+              <p className="text-[.85rem] py-2 text-center text-gray-600">No se encontraron datos.</p>
+            )}
           </div>
         </div>
       )}

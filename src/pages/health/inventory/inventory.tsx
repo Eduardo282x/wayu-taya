@@ -1,15 +1,19 @@
 import { MdOutlineProductionQuantityLimits } from "react-icons/md"
 import { InventoryDetailsMedicine } from "./InventoryDetailsMedicine"
 import { FilterComponent } from "@/components/table/FilterComponent"
-import { inventoryColumns } from "./inventory.data"
+import { historyColumns, inventoryColumns } from "./inventory.data"
 import { useState, useEffect } from "react"
 import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/pages/layout/Header"
-import { getInventory } from "@/services/inventory/inventory.service"
-import { GroupInventory, IInventory } from "@/services/inventory/inventory.interface"
+import { getInventory, getInventoryHistorial } from "@/services/inventory/inventory.service"
+import { GroupInventory, IInventory, IInventoryHistory } from "@/services/inventory/inventory.interface"
 import { TableComponents } from "@/components/table/TableComponents"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import { FaHistory } from "react-icons/fa"
+import { Button } from "@/components/ui/button"
+
+
 
 export const Inventory = () => {
   const [inventory, setInventory] = useState<GroupInventory>({ allInventory: [], inventory: [] })
@@ -17,9 +21,12 @@ export const Inventory = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [inventorySelected, setInventorySelected] = useState<IInventory | null>(null)
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentView, setCurrentView] = useState<'inventory' | 'history'>('inventory')
+  const [historyData, setHistoryData] = useState<IInventoryHistory[]>([])
 
   useEffect(() => {
     getInventoryApi();
+    getInventoryHistorialApi();
   }, []);
 
   const getInventoryApi = async () => {
@@ -31,6 +38,15 @@ export const Inventory = () => {
       console.log(err);
     }
     setLoading(false)
+  }
+
+  const getInventoryHistorialApi = async () => {
+    try {
+      const response: IInventoryHistory[] = await getInventoryHistorial();
+      setHistoryData(response)
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   const getActionTable = (action: string, data: IInventory) => {
@@ -64,19 +80,49 @@ export const Inventory = () => {
             placeholder="Buscar medicina..."
           />
         </div>
+        <div className="flex items-center gap-2 ml-4">
+          <Button
+            variant={currentView === 'inventory' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setCurrentView('inventory')}
+            className="flex items-center gap-2"
+          >
+            <MdOutlineProductionQuantityLimits className="w-4 h-4" />
+            Inventario
+          </Button>
+          <Button
+            variant={currentView === 'history' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setCurrentView('history')}
+            className="flex items-center gap-2"
+          >
+            <FaHistory className="w-4 h-4" />
+            Historial
+          </Button>
+        </div>
       </div>
 
       <div className="mt-3">
-        <TableComponents
-          data={inventory.inventory}
-          column={inventoryColumns}
-          actionTable={getActionTable}
-          colSpanColumns={true}
-          isExpansible={true}
-          renderRow={(inventory: IInventory, index: number) => (
-            <InventoryDetailsMedicine inventory={inventory} key={index} />
-          )}
-        />
+        {currentView === 'inventory' ? (
+          <TableComponents
+            data={inventory.inventory}
+            column={inventoryColumns}
+            actionTable={getActionTable}
+            colSpanColumns={true}
+            isExpansible={true}
+            renderRow={(inventory: IInventory, index: number) => (
+              <InventoryDetailsMedicine inventory={inventory} key={index} />
+            )}
+          />
+        ) : (
+          <TableComponents
+            data={historyData}
+            column={historyColumns}
+            actionTable={() => { }}
+            colSpanColumns={false}
+            isExpansible={false}
+          />
+        )}
 
         <ConfirmDeleteDialog
           open={isDeleteDialogOpen}
