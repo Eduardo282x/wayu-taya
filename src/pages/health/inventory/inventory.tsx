@@ -10,6 +10,68 @@ import { getInventory } from "@/services/inventory/inventory.service"
 import { GroupInventory, IInventory } from "@/services/inventory/inventory.interface"
 import { TableComponents } from "@/components/table/TableComponents"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import { FaHistory } from "react-icons/fa"
+import { Button } from "@/components/ui/button"
+
+const historyColumns = [
+  {
+    label: "Medicina",
+    column: "medicine.name",
+    visible: true,
+    isIcon: false,
+    element: (data: any) => `${data.medicine.name} ${data.medicine.amount}${data.medicine.unit}`,
+  },
+  {
+    label: "Tipo",
+    column: "type",
+    visible: true,
+    isIcon: false,
+    element: (data: any) => (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        data.type === 'entrada'
+          ? 'bg-green-100 text-green-800'
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {data.type.charAt(0).toUpperCase() + data.type.slice(1)}
+      </span>
+    ),
+  },
+  {
+    label: "Cantidad",
+    column: "quantity",
+    visible: true,
+    isIcon: false,
+    element: (data: any) => `${data.quantity} unidades`,
+  },
+  {
+    label: "Fecha",
+    column: "date",
+    visible: true,
+    isIcon: false,
+    element: (data: any) => new Date(data.date).toLocaleDateString(),
+  },
+  {
+    label: "Almacén",
+    column: "store",
+    visible: true,
+    isIcon: false,
+    element: (data: any) => data.store,
+  },
+  {
+    label: "Lote",
+    column: "lote",
+    visible: true,
+    isIcon: false,
+    element: (data: any) => data.lote,
+  },
+  {
+    label: "Motivo",
+    column: "reason",
+    visible: true,
+    isIcon: false,
+    element: (data: any) => data.reason,
+  },
+]
 
 export const Inventory = () => {
   const [inventory, setInventory] = useState<GroupInventory>({ allInventory: [], inventory: [] })
@@ -17,6 +79,39 @@ export const Inventory = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [inventorySelected, setInventorySelected] = useState<IInventory | null>(null)
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentView, setCurrentView] = useState<'inventory' | 'history'>('inventory')
+  const [historyData, setHistoryData] = useState([
+    {
+      id: 1,
+      medicine: { name: "Paracetamol", amount: "500", unit: "mg" },
+      type: "entrada",
+      quantity: 100,
+      date: "2024-01-15",
+      store: "Almacén Principal",
+      lote: "LOT001",
+      reason: "Compra mensual"
+    },
+    {
+      id: 2,
+      medicine: { name: "Ibuprofeno", amount: "400", unit: "mg" },
+      type: "salida",
+      quantity: 25,
+      date: "2024-01-14",
+      store: "Farmacia Norte",
+      lote: "LOT002",
+      reason: "Dispensación"
+    },
+    {
+      id: 3,
+      medicine: { name: "Amoxicilina", amount: "250", unit: "mg" },
+      type: "entrada",
+      quantity: 200,
+      date: "2024-01-13",
+      store: "Almacén Secundario",
+      lote: "LOT003",
+      reason: "Transferencia interna"
+    }
+  ])
 
   useEffect(() => {
     getInventoryApi();
@@ -64,19 +159,49 @@ export const Inventory = () => {
             placeholder="Buscar medicina..."
           />
         </div>
+        <div className="flex items-center gap-2 ml-4">
+          <Button
+            variant={currentView === 'inventory' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setCurrentView('inventory')}
+            className="flex items-center gap-2"
+          >
+            <MdOutlineProductionQuantityLimits className="w-4 h-4" />
+            Inventario
+          </Button>
+          <Button
+            variant={currentView === 'history' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setCurrentView('history')}
+            className="flex items-center gap-2"
+          >
+            <FaHistory className="w-4 h-4" />
+            Historial
+          </Button>
+        </div>
       </div>
 
       <div className="mt-3">
-        <TableComponents
-          data={inventory.inventory}
-          column={inventoryColumns}
-          actionTable={getActionTable}
-          colSpanColumns={true}
-          isExpansible={true}
-          renderRow={(inventory: IInventory, index: number) => (
-            <InventoryDetailsMedicine inventory={inventory} key={index} />
-          )}
-        />
+        {currentView === 'inventory' ? (
+          <TableComponents
+            data={inventory.inventory}
+            column={inventoryColumns}
+            actionTable={getActionTable}
+            colSpanColumns={true}
+            isExpansible={true}
+            renderRow={(inventory: IInventory, index: number) => (
+              <InventoryDetailsMedicine inventory={inventory} key={index} />
+            )}
+          />
+        ) : (
+          <TableComponents
+            data={historyData}
+            column={historyColumns}
+            actionTable={() => { }}
+            colSpanColumns={false}
+            isExpansible={false}
+          />
+        )}
 
         <ConfirmDeleteDialog
           open={isDeleteDialogOpen}
