@@ -8,7 +8,7 @@ export interface Column {
     visible: boolean;
     isIcon?: boolean;
     icon?: Icon;
-    element: (data: any) => string;
+    element: (data: any) => string | React.ReactNode;
     className?: (data: any) => string;
 }
 

@@ -6,6 +6,9 @@ const inventoryUrl = "/inventory";
 export const getInventory = async () => {
     return await getDataApi(inventoryUrl);
 }
+export const getInventoryHistorial = async () => {
+    return await getDataApi(`${inventoryUrl}/historial`)
+}
 // export const postInventory = async (data: InventoryBody) => {
 //     return await postDataApi(inventoryUrl, data)
 // }

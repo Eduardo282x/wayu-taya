@@ -4,7 +4,7 @@ import { EventsBody } from "./events.interface";
 const eventsUrl = "/events";
 
 export const getEvents = async () => {
-    return await getDataApi(eventsUrl);
+    return await getDataApi(`${eventsUrl}/fixed`);
 }
 export const postEvents = async (data: EventsBody) => {
     return await postDataApi(eventsUrl, data)

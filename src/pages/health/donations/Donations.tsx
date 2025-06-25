@@ -1,7 +1,7 @@
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/pages/layout/Header"
-import type { GroupDonations, IDonations } from "@/services/donations/donations.interface"
+import { GroupDonations, IDonations } from "@/services/donations/donations.interface"
 import { getDonations, getDonationsReport } from "@/services/donations/donations.service"
 import { useEffect, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
@@ -39,11 +39,11 @@ export const Donations = () => {
   })
 
   useEffect(() => {
-    getDonationsApi()
-    getProvidersApi()
-    getStoresApi()
-    getMedicinesApi()
-    getInstitutionsApi()
+    getStoresApi();
+    getDonationsApi();
+    getProvidersApi();
+    getMedicinesApi();
+    getInstitutionsApi();
   }, [])
 
   const getProvidersApi = async () => {
