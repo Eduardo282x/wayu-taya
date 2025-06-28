@@ -11,8 +11,9 @@ export interface IProviders {
 
 export interface ProviderBody {
     name: string;
-    rif: string;
+    dateofdelivery: string;
     address: string;
-    country: string;
-    correo: string;
+    phone: string;
+    email: string;
+    
 }
