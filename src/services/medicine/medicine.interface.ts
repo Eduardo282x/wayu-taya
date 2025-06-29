@@ -29,16 +29,24 @@ export interface IMedicine {
     activeIngredient: string;
     countryOfOrigin: string;
     formId:           number;
-    category:         Category;
-    form:             Form;
+    category:         ICategory;
+    form:             IForm;
 }
 
-export interface Category {
+export interface GroupCategory {
+    allcategories: ICategory[];
+    categories: ICategory[];
+}
+export interface GroupForm {
+    allForms: IForm[];
+    forms: IForm[];
+}
+export interface ICategory {
     id:       number;
     category: string;
 }
 
-export interface Form {
+export interface IForm {
     id:    number;
     forms: string;
 }

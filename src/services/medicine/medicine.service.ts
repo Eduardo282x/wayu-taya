@@ -9,8 +9,20 @@ export const getMedicine = async () => {
 export const getCategories = async () => {
     return await getDataApi(`${medicineUrl}/category`);
 }
+export const postCategories = async (data: any) => {
+    return await postDataApi(`${medicineUrl}/category`, data);
+}
+export const putCategories = async (id:number, data: any) => {
+    return await putDataApi(`${medicineUrl}/category/${id}`,data);
+}
 export const getForms = async () => {
     return await getDataApi(`${medicineUrl}/forms`);
+}
+export const postForms = async (data: any) => {
+    return await postDataApi(`${medicineUrl}/forms`, data);
+}
+export const putForms = async (id: number, data: any) => {
+    return await putDataApi(`${medicineUrl}/forms/${id}`, data);
 }
 export const getMedicineTemplate = async () => {
     return await getDataFileApi(`${medicineUrl}/template`);
