@@ -13,7 +13,6 @@ import { Events } from './pages/documents/events/Events';
 import { Documents } from './pages/documents/Documents';
 // import { Doc } from './pages/documents/doc/Doc';
 
-import { Communities } from './pages/documents/communities/Communities';
 import { Activities } from './pages/documents/activities/Activities';
 
 import { Inventory } from './pages/health/inventory/inventory';
@@ -27,9 +26,9 @@ import { Toaster } from 'react-hot-toast';
 import './App.css'
 import { DocumentosTable } from './pages/documents/doc/documentos-table';
 import { Store } from './pages/health/store/Store';
-import { Category } from './pages/health/category/Category';
 import { Providers } from './pages/documents/providers/Providers';
-
+import { Category } from './pages/health/category/Category';
+import { Institutions } from './pages/health/institutions/Institutions'
 
 function App() {
 
@@ -43,10 +42,8 @@ function App() {
           <Route path='/' element={<Home />}></Route>
 
           <Route element={<Layout />}>
-
             <Route path='/documentos' element={<Documents />}></Route>
             <Route path='/documentos/personas' element={<People />}></Route>
-            <Route path='/documentos/comunidades' element={<Communities />}></Route>
             <Route path='/documentos/actividades' element={<Activities />}></Route>
             <Route path='/documentos/documentos' element={<DocumentosTable />}></Route>
             <Route path='/documentos/eventos' element={<Events />}></Route>
@@ -57,9 +54,10 @@ function App() {
             <Route path='/salud/eventos' element={<Events />}></Route>
             <Route path='/salud/inventario' element={<Inventory />}></Route>
             <Route path='/salud/medicamentos' element={<Medicine />}></Route>
-            <Route path='/salud/categorías' element={<Category />}></Route>
             <Route path='/salud/almacenes' element={<Store />}></Route>
+            <Route path='/salud/categorías' element={<Category />}></Route>
             <Route path='/salud/proveedores' element={<Providers />}></Route>
+            <Route path='/salud/instituciones' element={<Institutions />} />
 
             <Route path='/musica' element={<Music />}></Route>
             <Route path='/alimentos' element={<Food />}></Route>
