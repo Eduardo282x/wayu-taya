@@ -1,6 +1,5 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api"
 import { ProviderBody } from "./provider.interface";
-import { getProviders, postProviders, putProviders, deleteProviders } from "@/services/provider/provider.service";
 
 const providersUrl = "/proveedores";
 

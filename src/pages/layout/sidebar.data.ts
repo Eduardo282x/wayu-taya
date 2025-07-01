@@ -162,6 +162,12 @@ export const menuHealth: IMenu[] = [
         url: '/usuarios',
         icon: PiUsersThree,
     },
+    {
+        label: 'Instituciones',
+        active: false,
+        url: '/salud/instituciones',
+        icon: FaUserTie,
+    },
 ];
 export const menuMusic: IMenu[] = [
     {

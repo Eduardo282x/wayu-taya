@@ -2,30 +2,21 @@ import { useEffect, useState } from "react";
 import { Column } from "@/components/table/table.interface";
 import { FaRegTrashAlt, FaRegEdit, FaPlus } from "react-icons/fa";
 import { TableComponents } from "@/components/table/TableComponents";
-import { getProviders } from "@/services/provider/provider.service"; // Importa el servicio
 
-export const providerColumns: Column[] = [
+export const institutionColumns: Column[] = [
     {
-        label: "Nombre del proveedor",
+        label: "Nombre de la institución",
         column: "name",
         visible: true,
         isIcon: false,
         element: (data: any) => data.name,
     },
     {
-        label: "Fecha de entrega",
-        column: "deliveryDate",
+        label: "Ubicación",
+        column: "location",
         visible: true,
         isIcon: false,
-        element: (data: any) =>
-            new Date(data.deliveryDate).toLocaleDateString(),
-    },
-    {
-        label: "Dirección",
-        column: "address",
-        visible: true,
-        isIcon: false,
-        element: (data: any) => data.address,
+        element: (data: any) => data.location,
     },
     {
         label: "Teléfono",
@@ -35,11 +26,11 @@ export const providerColumns: Column[] = [
         element: (data: any) => data.phone,
     },
     {
-        label: "Correo",
-        column: "email",
+        label: "Donación",
+        column: "donation",
         visible: true,
         isIcon: false,
-        element: (data: any) => data.email,
+        element: (data: any) => data.donation,
     },
     {
         label: "Editar",
@@ -48,7 +39,7 @@ export const providerColumns: Column[] = [
         isIcon: true,
         element: () => "",
         icon: {
-            label: "Editar proveedor",
+            label: "Editar institución",
             icon: FaRegEdit,
             className: "text-blue-600",
             variant: "ghost",
@@ -61,7 +52,7 @@ export const providerColumns: Column[] = [
         isIcon: true,
         element: () => "",
         icon: {
-            label: "Eliminar proveedor",
+            label: "Eliminar institución",
             icon: FaRegTrashAlt,
             className: "text-red-600",
             variant: "ghost",
@@ -71,13 +62,12 @@ export const providerColumns: Column[] = [
 
 const initialForm = {
     name: "",
-    deliveryDate: "",
-    address: "",
+    location: "",
     phone: "",
-    email: "",
+    donation: "",
 };
 
-export const Providers = () => {
+export const Institutions = () => {
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -85,12 +75,12 @@ export const Providers = () => {
     const [editIndex, setEditIndex] = useState<number | null>(null);
 
     useEffect(() => {
-        getProviders()
-            .then((res) => setData(res))
-            .finally(() => setLoading(false));
+        // getInstitutions()
+        //     .then((res) => setData(res))
+        //     .finally(() => setLoading(false));
+        setLoading(false); // Quitar esto cuando uses el servicio real
     }, []);
 
-    // Maneja acciones de la tabla
     const handleActionTable = (action: string, row: any) => {
         if (action === "edit") {
             setForm(row);
@@ -105,23 +95,19 @@ export const Providers = () => {
         }
     };
 
-    // Abre modal para agregar
     const handleAdd = () => {
         setForm(initialForm);
         setEditIndex(null);
         setShowModal(true);
     };
 
-    // Guardar proveedor (nuevo o editado)
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
         if (editIndex !== null) {
-            // Editar
             const newData = [...data];
             newData[editIndex] = form;
             setData(newData);
         } else {
-            // Agregar
             setData([...data, form]);
         }
         setShowModal(false);
@@ -130,24 +116,23 @@ export const Providers = () => {
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Proveedores</h2>
+                <h2 className="text-2xl font-bold">Instituciones</h2>
                 <button
                     className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                     onClick={handleAdd}
                 >
-                    <FaPlus /> Agregar proveedor
+                    <FaPlus /> Agregar institución
                 </button>
             </div>
             {loading ? (
                 <div>Cargando...</div>
             ) : (
                 <TableComponents
-                    column={providerColumns}
+                    column={institutionColumns}
                     data={data}
                     actionTable={handleActionTable}
                 />
             )}
-
             {/* Modal simple */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -156,28 +141,20 @@ export const Providers = () => {
                         onSubmit={handleSave}
                     >
                         <h3 className="text-lg font-bold mb-2">
-                            {editIndex !== null ? "Editar proveedor" : "Agregar proveedor"}
+                            {editIndex !== null ? "Editar institución" : "Agregar institución"}
                         </h3>
                         <input
                             className="border p-2 rounded"
-                            placeholder="Nombre"
+                            placeholder="Nombre de la institución"
                             value={form.name}
                             onChange={e => setForm({ ...form, name: e.target.value })}
                             required
                         />
                         <input
                             className="border p-2 rounded"
-                            type="date"
-                            placeholder="Fecha de entrega"
-                            value={form.deliveryDate}
-                            onChange={e => setForm({ ...form, deliveryDate: e.target.value })}
-                            required
-                        />
-                        <input
-                            className="border p-2 rounded"
-                            placeholder="Dirección"
-                            value={form.address}
-                            onChange={e => setForm({ ...form, address: e.target.value })}
+                            placeholder="Ubicación"
+                            value={form.location}
+                            onChange={e => setForm({ ...form, location: e.target.value })}
                             required
                         />
                         <input
@@ -189,10 +166,9 @@ export const Providers = () => {
                         />
                         <input
                             className="border p-2 rounded"
-                            placeholder="Correo"
-                            type="email"
-                            value={form.email}
-                            onChange={e => setForm({ ...form, email: e.target.value })}
+                            placeholder="Donación"
+                            value={form.donation}
+                            onChange={e => setForm({ ...form, donation: e.target.value })}
                             required
                         />
                         <div className="flex gap-2 mt-2">
