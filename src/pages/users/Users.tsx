@@ -74,7 +74,7 @@ export const Users = () => {
   }
 
   return (
-    <div className=''>
+    <div className='px-3 lg:p-0 '>
       {loading && (
         <ScreenLoader />
       )}
@@ -90,16 +90,16 @@ export const Users = () => {
           />
           <Button
             variant={"animated"}
-            className="h-full"
+            className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
             onClick={newUser}
           >
-            <TiUserAddOutline className='size-6 ' />
+            <TiUserAddOutline className='size-4 lg:size-6 ' />
             Crear Usuario
           </Button>
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-1 lg:mt-4 ">
         <TableComponents
           data={users.users}
           column={usersColumns}

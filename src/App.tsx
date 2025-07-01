@@ -22,6 +22,7 @@ import { Donations } from './pages/health/donations/Donations';
 import { Health } from './pages/health/Health';
 
 import { Users } from './pages/users/Users';
+import { Profile } from './pages/users/profile/Profile';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
 import { DocumentosTable } from './pages/documents/doc/documentos-table';
@@ -65,6 +66,7 @@ function App() {
             <Route path='/agua' element={<Water />}></Route>
 
             <Route path='/usuarios' element={<Users />}></Route>
+            <Route path='/perfil' element={<Profile />}></Route>
           </Route>
 
         </Routes>
