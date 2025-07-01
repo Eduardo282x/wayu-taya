@@ -66,13 +66,13 @@ export const Inventory = () => {
   };
 
   return (
-    <div className="min-h-[90vh] w-[79.5vw] pr-7 overflow-auto">
+    <div className="lg:min-h-[90vh] max-h-[77vh] w-[79.5vw] pl-2 lg:pl-0 overflow-auto ">
       {loading && <ScreenLoader />}
       <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits} />
 
       {/* Barra de herramientas con filtros */}
-      <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-2 px-2 justify-end">
-        <div className="flex items-center gap-4">
+      <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-2 px-2 lg:justify-end flex-col lg:flex-row gap-2 lg:gap-0">
+        <div className="flex items-center  gap-4">
           <FilterComponent
             data={inventory.allInventory}
             setDataFilter={(data) => setInventory((prev) => { return { ...prev, inventory: data } })}

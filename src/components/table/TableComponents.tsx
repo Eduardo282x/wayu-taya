@@ -41,7 +41,7 @@ export const TableComponents: FC<TableProps> = ({
   const totalItems = data.length;
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <div>
         <Table>
           <TableHeader>
