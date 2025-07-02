@@ -31,8 +31,8 @@ export const FilterComponent = ({ data, setDataFilter, columns, placeholder }: F
         }
 
         const keys = columns
-            .filter((col: Column) => col.isIcon === false)
-            .map((col: Column) => col.column)
+        .filter((col: Column) => col.isIcon === false)
+        .map((col: Column) => col.column)
 
         const filtered = data.filter((item) =>
             keys.some((key) =>

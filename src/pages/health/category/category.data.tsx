@@ -5,7 +5,7 @@ import { FaRegTrashAlt, FaEdit } from "react-icons/fa";
 export const categoryColumns: Column[] = [
   {
     label: "Categoría",
-    column: "name",
+    column: "category",
     visible: true,
     isIcon: false,
     element: (data: ICategory) => data.category,

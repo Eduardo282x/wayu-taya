@@ -6,7 +6,7 @@ import { BiCartAdd } from "react-icons/bi";
 import FormInput from "@/components/formInput/FormInputCustom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
-import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface";
+import { IMedicine, MedicineBody, ICategory, IForm } from "@/services/medicine/medicine.interface";
 import { baseMedicine } from "./medicine.data";
 
 
@@ -15,8 +15,8 @@ interface MedicineFormProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: MedicineBody) => void;
   medicineData: IMedicine | null;
-  categories: Category[];
-  forms: Form[];
+  categories: ICategory[];
+  forms: IForm[];
 }
 
 const unitOptions = [

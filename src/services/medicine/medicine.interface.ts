@@ -17,24 +17,24 @@ export interface GroupMedicine {
 }
 
 export interface IMedicine {
-    id:               number;
-    name:             string;
-    description:      string;
-    categoryId:       number;
-    medicine:         boolean;
-    unit:             string;
-    amount:           number;
-    temperate:        string;
-    manufacturer:     string;
+    id: number;
+    name: string;
+    description: string;
+    categoryId: number;
+    medicine: boolean;
+    unit: string;
+    amount: number;
+    temperate: string;
+    manufacturer: string;
     activeIngredient: string;
     countryOfOrigin: string;
-    formId:           number;
-    category:         ICategory;
-    form:             IForm;
+    formId: number;
+    category: ICategory;
+    form: IForm;
 }
 
 export interface GroupCategory {
-    allcategories: ICategory[];
+    allCategories: ICategory[];
     categories: ICategory[];
 }
 export interface GroupForm {
@@ -42,11 +42,15 @@ export interface GroupForm {
     forms: IForm[];
 }
 export interface ICategory {
-    id:       number;
+    id: number;
     category: string;
+    initialTab?: TabOptionCategoryForm;
 }
 
 export interface IForm {
-    id:    number;
+    id: number;
     forms: string;
+    initialTab?: TabOptionCategoryForm;
 }
+
+export type TabOptionCategoryForm = "category" | "form"

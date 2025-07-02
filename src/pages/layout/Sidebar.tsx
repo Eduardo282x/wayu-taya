@@ -4,6 +4,16 @@ import { menuDocuments, menuHealth, menuMusic, menuWater, menuFeed, IMenu, Secti
 import { TbLogout2 } from "react-icons/tb";
 import logo from '@/assets/images/logo1.png';
 
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { FaRegUser } from 'react-icons/fa6';
+import { FiUser } from 'react-icons/fi';
+import { IoIosArrowDown } from 'react-icons/io';
+
 export const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -44,6 +54,14 @@ export const Sidebar = () => {
         }))
     }, [location.pathname])
 
+    const nameUser = (): string => {
+        const getUser = JSON.parse(localStorage.getItem('token') as string);
+        return `${getUser.name} ${getUser.lastName}`;
+    }
+
+    const goProfile = () => {
+        navigate('/perfil')
+    }
     const logout = () => {
         localStorage.removeItem('token');
         navigate('/login')
@@ -51,12 +69,12 @@ export const Sidebar = () => {
 
     return (
         <div className='w-full h-full bg-transparent py-4'>
-            <div className='flex items-center justify-center cursor-pointer w-full mb-6' onClick={() => navigate('/')}>
+            <div className='flex items-center justify-center cursor-pointer w-full' onClick={() => navigate('/')}>
                 <img src={logo} alt="" className='w-16' />
                 <h2 className='text-lg text-white font-medium julius-sans-one-regular'>WAYUU TAYA</h2>
             </div>
 
-            <div className='flex flex-col items-start justify-between h-[83%] w-full'>
+            <div className='flex flex-col items-start justify-between h-[90%] w-full'>
                 <div className='flex flex-col items-start justify-start gap-1 w-full'>
                     {menuData && menuData.map((me: IMenu, index: number) => (
                         <div
@@ -69,12 +87,19 @@ export const Sidebar = () => {
                     ))}
                 </div>
 
-                <div
-                    onClick={logout}
-                    className={`flex items-center justify-start gap-3 cursor-pointer text-white w-full p-2  transition-all manrope`}
-                >
-                    <TbLogout2 className='text-2xl ' /> Cerrar Sesión
-                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger className={`flex items-center justify-around cursor-pointer bg-gray-200 hover:bg-gray-100 rounded-lg text-black w-full p-2  transition-all manrope`}>
+                        <FiUser /> {nameUser()} <IoIosArrowDown />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className='w-52 bg-gray-200'>
+                        <DropdownMenuItem onClick={goProfile} className='flex items-center justify-start gap-3  cursor-pointer'>
+                            <FaRegUser className='text-2xl ' />Perfil
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={logout} className='flex items-center justify-start gap-3  cursor-pointer'>
+                            <TbLogout2 className='text-2xl ' /> Cerrar Sesión
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </div>
     )

@@ -1,3 +1,8 @@
+export interface GroupInstitution {
+    allInstitution: IInstitution[];
+    institution: IInstitution[];
+}
+
 export interface IInstitution {
     id:      number;
     name:    string;

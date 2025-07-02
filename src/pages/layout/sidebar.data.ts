@@ -7,7 +7,7 @@ import { MdOutlineCategory, MdOutlineInventory2, MdOutlineWarehouse } from "reac
 import { AiOutlineProduct } from "react-icons/ai";
 import { BiDonateHeart } from "react-icons/bi";
 import { FaUserTie } from "react-icons/fa6";
-
+import { LuChartNoAxesCombined } from "react-icons/lu";
 export interface IMenu {
     label: string;
     url: string;
@@ -127,7 +127,13 @@ export const menuHealth: IMenu[] = [
         icon: BiDonateHeart,
     },
     {
-        label: 'Proveedores',
+        label: 'Reportes',
+        active: false,
+        url: '/salud/reportes',
+        icon: LuChartNoAxesCombined ,
+    },
+    {
+        label: 'Proveedores Instituciones',
         active: false,
         url: '/salud/proveedores',
         icon: FaUserTie,
@@ -161,12 +167,6 @@ export const menuHealth: IMenu[] = [
         active: false,
         url: '/usuarios',
         icon: PiUsersThree,
-    },
-    {
-        label: 'Instituciones',
-        active: false,
-        url: '/salud/instituciones',
-        icon: FaUserTie,
     },
 ];
 export const menuMusic: IMenu[] = [

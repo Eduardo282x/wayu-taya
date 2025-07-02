@@ -1,28 +1,20 @@
-// src/pages/health/category/CategoryAndFormDialog.tsx
-
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FaRegSave } from "react-icons/fa";
 import { MdOutlineAddShoppingCart } from "react-icons/md";
 import FormInputCustom from "@/components/formInput/FormInputCustom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ICategory, IForm } from "@/services/medicine/medicine.interface";
+import { ICategory, IForm, TabOptionCategoryForm } from "@/services/medicine/medicine.interface";
 
 interface CategoryAndFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: any, id?: number) => void;
+  onSubmit: (data: ICategory | IForm) => void;
   itemData: ICategory | IForm | null;
-  initialTab?: "category" | "form";
+  initialTab: TabOptionCategoryForm;
 }
 
 export const CategoryAndFormDialog: React.FC<CategoryAndFormDialogProps> = ({
@@ -33,67 +25,39 @@ export const CategoryAndFormDialog: React.FC<CategoryAndFormDialogProps> = ({
   initialTab = "category",
 }) => {
   const isEdit = !!itemData;
-  const [currentTab, setCurrentTab] = useState<"category" | "form">(initialTab);
+  const [currentTab, setCurrentTab] = useState<TabOptionCategoryForm>(initialTab);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<any>({
+  const { register, handleSubmit, reset, } = useForm<ICategory | IForm>({
     defaultValues: {
-      name: "",
-      description: "",
-      type: initialTab,
+      category: "",
+      forms: "",
     },
   });
 
   useEffect(() => {
-    if (open) {
-      if (itemData) {
-        if ("category" in itemData && itemData.category) {
-          reset({
-            name: (itemData as any).category || "",
-            type: "category",
-          });
-          setCurrentTab("category");
-        } else if ("forms" in itemData && itemData.forms) {
-          reset({
-            name: (itemData as any).forms || "",
-            type: "form",
-          });
-          setCurrentTab("form");
-        } else {
-          reset({
-            type: initialTab,
-          });
-          setCurrentTab(initialTab);
-        }
-      } else {
-        reset({
-          name: "",
-          description: "",
-          type: initialTab,
-        });
-        setCurrentTab(initialTab);
-      }
+    setCurrentTab(initialTab);
+    if (itemData && initialTab == 'category') {
+      const parseData: ICategory = itemData as ICategory;
+      reset({ category: parseData.category })
+    }
+    if (itemData && initialTab == 'form') {
+      const parseData: IForm = itemData as IForm;
+      reset({ forms: parseData.forms })
     }
   }, [open, itemData, reset, initialTab]);
 
   const handleTabChange = (value: string) => {
-    const newType = value as "category" | "form";
+    const newType = value as TabOptionCategoryForm;
     setCurrentTab(newType);
-    reset({
-      name: "",
-      description: "",
-      type: newType,
-    });
   };
 
-  const handleSubmitForm = (data: any) => {
-    onSubmit({ ...data, type: currentTab }, itemData?.id);
-    onOpenChange(false);
-  };
+  const handleSubmitCategoryForm = (data: ICategory | IForm) => {
+    const sendData = {
+      ...data,
+      initialTab
+    }
+    onSubmit(sendData)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,20 +66,17 @@ export const CategoryAndFormDialog: React.FC<CategoryAndFormDialogProps> = ({
           <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
             {isEdit
               ? `Editar ${currentTab === "category" ? "Categoría" : "Forma"}`
-              : `Agregar ${
-                  currentTab === "category" ? "Nueva Categoría" : "Nueva Forma"
-                }`}
+              : `Agregar ${currentTab === "category" ? "Nueva Categoría" : "Nueva Forma"
+              }`}
           </DialogTitle>
           <DialogDescription className="manrope">
             {isEdit
-              ? `Modifica los datos de ${
-                  currentTab === "category" ? "la categoría" : "la forma"
-                } y guarda los cambios.`
-              : `Ingresa los datos para agregar ${
-                  currentTab === "category"
-                    ? "una nueva categoría"
-                    : "una nueva forma"
-                }.`}
+              ? `Modifica los datos de ${currentTab === "category" ? "la categoría" : "la forma"
+              } y guarda los cambios.`
+              : `Ingresa los datos para agregar ${currentTab === "category"
+                ? "una nueva categoría"
+                : "una nueva forma"
+              }.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -140,65 +101,30 @@ export const CategoryAndFormDialog: React.FC<CategoryAndFormDialogProps> = ({
             </TabsTrigger>
           </TabsList>
 
-          <form
-            onSubmit={handleSubmit(handleSubmitForm)}
-            className="grid gap-2 pt-2"
-          >
+          <form onSubmit={handleSubmit(handleSubmitCategoryForm)} className="pt-2">
             <TabsContent value="category" className="mt-0 flex flex-col gap-2">
               <FormInputCustom
-                label={`Nombre de la ${
-                  currentTab === "category" ? "Categoría" : "Forma"
-                }`}
+                label={`Nombre de la ${currentTab === "category" ? "Categoría" : "Forma"}`}
                 id="name"
                 autoFocus
-                placeholder={`E.g., ${
-                  currentTab === "category" ? "Analgésicos" : "Tableta"
-                }`}
-                {...register("name", {
-                  required: `El nombre de la ${
-                    currentTab === "category" ? "categoría" : "forma"
-                  } es obligatorio`,
+                placeholder={`E.g., ${currentTab === "category" ? "Analgésicos" : "Tableta"}`}
+                {...register("category", {
+                  required: `El nombre de la ${currentTab === "category" ? "categoría" : "forma"} es obligatorio`,
                   minLength: { value: 2, message: "Mínimo 2 caracteres" },
                 })}
-              />
-              <FormInputCustom
-                label="Descripción (Opcional)"
-                id="description"
-                placeholder={`E.g., Para ${
-                  currentTab === "category"
-                    ? "tratar el dolor y la fiebre"
-                    : "administración oral"
-                }`}
-                {...register("description")}
               />
             </TabsContent>
 
             <TabsContent value="form" className="mt-0 flex flex-col gap-2">
               <FormInputCustom
-                label={`Nombre de la ${
-                  currentTab === "category" ? "Categoría" : "Forma"
-                }`}
+                label={`Nombre de la ${currentTab === "category" ? "Categoría" : "Forma"}`}
                 id="name-form"
                 autoFocus
-                placeholder={`E.g., ${
-                  currentTab === "category" ? "Analgésicos" : "Jarabe"
-                }`}
-                {...register("name", {
-                  required: `El nombre de la ${
-                    currentTab === "category" ? "categoría" : "forma"
-                  } es obligatorio`,
+                placeholder={`E.g., ${currentTab === "category" ? "Analgésicos" : "Jarabe"}`}
+                {...register("forms", {
+                  required: `El nombre de la ${currentTab === "category" ? "categoría" : "forma"} es obligatorio`,
                   minLength: { value: 2, message: "Mínimo 2 caracteres" },
                 })}
-              />
-              <FormInputCustom
-                label="Descripción (Opcional)"
-                id="description-form"
-                placeholder={`E.g., Para ${
-                  currentTab === "category"
-                    ? "tratar el dolor y la fiebre"
-                    : "administración oral"
-                }`}
-                {...register("description")}
               />
             </TabsContent>
 

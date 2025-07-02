@@ -1,229 +1,127 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MdOutlineCategory } from "react-icons/md";
-// import { FaVial } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { categoryColumns } from "./category.data";
 import { formColumns } from "./form.data";
 import { useState, useEffect } from "react";
 import ConfirmDeleteCategoryOrFormDialog from "./ConfirmDeleteCategoryOrFormDialog"; // Nuevo nombre
-import AlertDialog from "./alert-dialog";
 import { HeaderPages } from "@/pages/layout/Header";
 import { TableComponents } from "@/components/table/TableComponents";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { Button } from "@/components/ui/button";
 import { CategoryAndFormDialog } from "./CategoryAndFormDialog"; // Nuevo diálogo unificado
-import {
-    GroupCategory,
-    GroupForm,
-    ICategory,
-    IForm,
-} from "@/services/medicine/medicine.interface";
-import {
-    getCategories,
-    getForms,
-    postCategories,
-    postForms,
-    putCategories,
-    putForms,
-} from "@/services/medicine/medicine.service";
+import { GroupCategory, GroupForm, ICategory, IForm, TabOptionCategoryForm } from "@/services/medicine/medicine.interface";
+import { getCategories, getForms, postCategories, postForms, putCategories, putForms } from "@/services/medicine/medicine.service";
 
 export const Category = () => {
-    const [categories, setCategories] = useState<GroupCategory>({
-        allcategories: [],
-        categories: [],
-    });
+    const [categories, setCategories] = useState<GroupCategory>({ allCategories: [], categories: [], });
     const [forms, setForms] = useState<GroupForm>({ allForms: [], forms: [] });
-    const [alertOpen, setAlertOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState("");
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [selectedItemToDelete, setSelectedItemToDelete] = useState<
-        ICategory | IForm | null
-    >(null);
+    const [categoryFormSelected, setCategoryFormSelected] = useState<ICategory | IForm | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [currentView, setCurrentView] = useState<"category" | "form">(
-        "category"
-    );
-
-    const [isAddEditFormOpen, setIsAddEditFormOpen] = useState(false);
-    const [itemToEdit, setItemToEdit] = useState<ICategory | IForm | null>(null);
+    const [currentView, setCurrentView] = useState<TabOptionCategoryForm>("category");
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        fetchDataForCurrentView();
-    }, [currentView]);
+        getDataCategoryFormApi();
+    }, []);
 
-    const fetchDataForCurrentView = async () => {
+    const getDataCategoryFormApi = async () => {
         setLoading(true);
         try {
-            if (currentView === "category") {
-                const response: ICategory[] = await getCategories();
-                setCategories({ allcategories: response, categories: response });
-            } else {
-                const response: IForm[] = await getForms();
-                setForms({ allForms: response, forms: response });
-            }
-        } catch (err: any) {
+            const responseCategory: ICategory[] = await getCategories();
+            setCategories({ allCategories: responseCategory, categories: responseCategory });
+            const responseForm: IForm[] = await getForms();
+            setForms({ allForms: responseForm, forms: responseForm });
+        } catch (err) {
             console.error("Error al cargar datos:", err);
-            setAlertMessage(
-                err.response?.data?.message ||
-                `Error al cargar ${currentView === "category" ? "categorías" : "formas"
-                }.`
-            );
-            setAlertOpen(true);
         }
         setLoading(false);
     };
 
     const getActionTable = (action: string, data: ICategory | IForm) => {
-        setSelectedItemToDelete(data);
-        setItemToEdit(data);
-
+        setCategoryFormSelected(data);
         if (action === "delete") {
             setIsDeleteDialogOpen(true);
-        } else if (action === "edit") {
-            setIsAddEditFormOpen(true);
         }
-    };
-
-    const handleConfirmDelete = async () => {
-        if (selectedItemToDelete) {
-            setLoading(true);
-            try {
-                if (currentView === "category") {
-                    setAlertMessage("Categoría eliminada exitosamente.");
-                } else {
-                    setAlertMessage("Forma farmacéutica eliminada exitosamente.");
-                }
-                setAlertOpen(true);
-                fetchDataForCurrentView();
-            } catch (err: any) {
-                console.error("Error al eliminar:", err);
-                setAlertMessage(
-                    err.response?.data?.message ||
-                    `Error al eliminar ${currentView === "category" ? "categoría" : "forma"
-                    }.`
-                );
-                setAlertOpen(true);
-            } finally {
-                setSelectedItemToDelete(null);
-                setIsDeleteDialogOpen(false);
-                setLoading(false);
-            }
+        if (action === "edit") {
+            setOpen(true);
         }
-    };
-
-    const handleAddEditSubmit = async (data: any, id?: number) => {
-        setLoading(true);
-        try {
-            if (data.type === "category") {
-                if (id) {
-                    await putCategories(id, {
-                        name: data.name,
-                        description: data.description,
-                    });
-                    setAlertMessage("Categoría actualizada exitosamente.");
-                } else {
-                    await postCategories({
-                        name: data.name,
-                        description: data.description,
-                    });
-                    setAlertMessage("Categoría agregada exitosamente.");
-                }
-            } else {
-                if (id) {
-                    await putForms(id, {
-                        name: data.name,
-                        description: data.description,
-                    });
-                    setAlertMessage("Forma farmacéutica actualizada exitosamente.");
-                } else {
-                    await postForms({ name: data.name, description: data.description });
-                    setAlertMessage("Forma farmacéutica agregada exitosamente.");
-                }
-            }
-            setAlertOpen(true);
-            setIsAddEditFormOpen(false);
-            setItemToEdit(null);
-            fetchDataForCurrentView();
-        } catch (err: any) {
-            console.error("Error al guardar:", err);
-            setAlertMessage(
-                err.response?.data?.message ||
-                `Error al guardar ${data.type === "category" ? "la categoría" : "la forma"
-                }.`
-            );
-            setAlertOpen(true);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleCloseAddEditForm = () => {
-        setIsAddEditFormOpen(false);
-        setItemToEdit(null);
     };
 
     const handleOpenAddForm = () => {
-        setItemToEdit(null); // Asegúrate de que no hay datos preexistentes para editar
-        setIsAddEditFormOpen(true);
+        setCategoryFormSelected(null);
+        setOpen(true);
     };
+
+    const handleConfirmDelete = async () => {
+
+    };
+
+    const handleAddEditSubmit = async (data: IForm | ICategory) => {
+        setLoading(true);
+        if (data.initialTab === "category") {
+            if (categoryFormSelected) {
+                await putCategories(categoryFormSelected.id, data);
+            } else {
+                await postCategories(data);
+            }
+        } else {
+            if (categoryFormSelected) {
+                await putForms(categoryFormSelected.id, data);
+            } else {
+                await postForms(data);
+            }
+        }
+        setLoading(false);
+        setOpen(false)
+        getDataCategoryFormApi();
+    };
+
+    const tabSelected = (tab: TabOptionCategoryForm): string => {
+        if (tab == currentView) {
+            return 'bg-gradient-to-r from-blue-800 to-[#58c0e9] text-white'
+        }
+        return 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+    }
+
+    const setFilters = (data: ICategory[] | IForm[]) => {
+        if (currentView === "category") {
+            setCategories((prev) => ({ ...prev, categories: data as ICategory[] }));
+        } else {
+            setForms((prev) => ({ ...prev, forms: data as IForm[] }));
+        }
+    }
 
     return (
         <div className="min-h-[90vh] w-[79.5vw] pr-7 overflow-auto">
             {loading && <ScreenLoader />}
-            <HeaderPages
-                title="Gestión de Categorías y Formas"
-                Icon={MdOutlineCategory}
-            />{" "}
+            <HeaderPages title="Gestión de Categorías y Formas" Icon={MdOutlineCategory} />
+
             <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-2 px-2 justify-between">
-                <div className="flex items-center gap-2">
-                    <FilterComponent
-                        data={
-                            currentView === "category"
-                                ? categories.allcategories
-                                : forms.allForms
-                        }
-                        setDataFilter={(data) => {
-                            if (currentView === "category") {
-                                setCategories((prev) => ({
-                                    ...prev,
-                                    categories: data as ICategory[],
-                                }));
-                            } else {
-                                setForms((prev) => ({ ...prev, forms: data as IForm[] }));
-                            }
-                        }}
-                        columns={currentView === "category" ? categoryColumns : formColumns}
-                        placeholder={
-                            currentView === "category"
-                                ? "Buscar categoría..."
-                                : "Buscar forma..."
-                        }
-                    />
-                </div>
                 <div className="flex items-center gap-2">
                     <Button
                         variant={currentView === "category" ? "animated" : "outline"}
-                        className={
-                            currentView === "category"
-                                ? "bg-gradient-to-r from-blue-800 to-[#58c0e9] text-white"
-                                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
-                        }
+                        className={tabSelected('category')}
                         onClick={() => setCurrentView("category")}
                     >
                         Categorías
                     </Button>
                     <Button
                         variant={currentView === "form" ? "animated" : "outline"}
-                        className={
-                            currentView === "form"
-                                ? "bg-gradient-to-r from-blue-800 to-[#58c0e9] text-white"
-                                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
-                        }
+                        className={tabSelected('form')}
                         onClick={() => setCurrentView("form")}
                     >
                         Formas
                     </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                    <FilterComponent
+                        data={currentView === "category" ? categories.allCategories : forms.allForms}
+                        columns={currentView === "category" ? categoryColumns : formColumns}
+                        placeholder={currentView === "category" ? "Buscar categoría..." : "Buscar forma..."}
+                        setDataFilter={setFilters}
+                    />
 
                     <Button
                         variant="default"
@@ -237,55 +135,25 @@ export const Category = () => {
                 </div>
             </div>
             <div className="mt-3">
-                {currentView === "category" && (
-                    <TableComponents
-                        data={categories.categories}
-                        column={categoryColumns}
-                        actionTable={getActionTable}
-                        colSpanColumns={false}
-                        isExpansible={false}
-                    />
-                )}
-
-                {currentView === "form" && (
-                    <TableComponents
-                        data={forms.forms}
-                        column={formColumns}
-                        actionTable={getActionTable}
-                        colSpanColumns={false}
-                        isExpansible={false}
-                    />
-                )}
+                <TableComponents
+                    data={currentView == 'category' ? categories.categories : forms.forms}
+                    column={currentView == 'category' ? categoryColumns : formColumns}
+                    actionTable={getActionTable}
+                />
 
                 <ConfirmDeleteCategoryOrFormDialog
                     open={isDeleteDialogOpen}
                     onOpenChange={setIsDeleteDialogOpen}
                     onConfirm={handleConfirmDelete}
-                    itemName={
-                        selectedItemToDelete
-                            ? ""
-                            : //   ? (selectedItemToDelete as ICategory | IForm).name
-                            ""
-                    }
-                    itemType={
-                        currentView === "category"
-                            ? "esta categoría"
-                            : "esta forma farmacéutica"
-                    }
-                />
-
-                <AlertDialog
-                    open={alertOpen}
-                    onOpenChange={setAlertOpen}
-                    title="Notificación"
-                    description={alertMessage}
+                    itemName={categoryFormSelected ? "" : ""}
+                    itemType={currentView === "category" ? "esta categoría" : "esta forma farmacéutica"}
                 />
 
                 <CategoryAndFormDialog
-                    open={isAddEditFormOpen}
-                    onOpenChange={handleCloseAddEditForm}
+                    open={open}
+                    onOpenChange={setOpen}
                     onSubmit={handleAddEditSubmit}
-                    itemData={itemToEdit}
+                    itemData={categoryFormSelected}
                     initialTab={currentView}
                 />
             </div>
