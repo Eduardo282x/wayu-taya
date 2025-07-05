@@ -41,6 +41,9 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
   });
 
   useEffect(() => {
+
+    console.log(categories);
+    
     if (medicineData) {
       reset({
         name: medicineData.name,

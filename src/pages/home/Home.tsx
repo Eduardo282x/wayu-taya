@@ -15,7 +15,7 @@ export default function Home() {
       {/* Header with logo */}
       <header className="w-full p-2">
         <div className="p-8 text-center flex items-center justify-center gap-8">
-          <img src={logo} alt="Fundación Wayuu Taya Logo" width={80} height={80} className="mt-2" />
+          <img src={logo} alt="Fundación Wayuu Taya Logo" width={100} height={100} className="mt-2 border flex items-center justify-center object-contain" />
           <h1 className="text-2xl font-bold text-[#fff] md:text-3xl">
             FUNDACIÓN
             <div className="mt-1 border-b-2 border-t-2 border-[#fff] text-3xl md:text-5xl">WAYUU TAYA</div>
