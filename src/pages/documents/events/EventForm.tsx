@@ -22,7 +22,6 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
   const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
   const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
 
-
   const [formData, setFormData] = useState<EventsBody>({
     parishId: 1,
     name: '',
@@ -63,13 +62,16 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
   }
 
   const handleProviderSelect = (provider: string | number) => {
-    if (!formData.providersId.includes(Number(provider))) {
+    // if (!formData.providersId.includes(Number(provider))) {
+      const providerArray = formData.providersId.find(item => item == provider)
+        ? formData.providersId.filter(pro => pro != provider)
+        : [...formData.providersId, Number(provider)]
       setFormData((prev) => ({
         ...prev,
         cambio_proveedores: true,
-        providersId: [...prev.providersId, Number(provider)],
+        providersId: providerArray,
       }))
-    }
+    // }
   }
 
   const removeProvider = (providerToRemove: string | number) => {
@@ -192,7 +194,10 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
             value: provider.id.toString(),
             label: provider.name,
           }))}
+          holdOpen={true}
           onChange={(value) => handleProviderSelect(value)}
+          multiple={true}
+          dataSelected={formData.providersId.map(item => item.toString())}
         />
 
         {/* {unselectedProviders.length > 0 && (

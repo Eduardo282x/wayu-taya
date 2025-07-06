@@ -187,23 +187,25 @@ const ColumnNormal = ({ col, item }: ColumnCellProps) => {
 const ColumnIcon = ({ col, item, actionTable }: ColumnCellProps) => {
   return (
     <TableCell className={col.className ? col.className(item) : ""}>
-      <Tooltip>
-        <TooltipTrigger>
-          <Button
-            size={"icon"}
-            className="py-[0.4rem] pl-[0.2rem] "
-            variant={"icon"}
-            onClick={() => actionTable && actionTable(col.column, item)}
-          >
-            {col.icon && (
-              <col.icon.icon className={`${col.icon.className} size-4.5`} />
-            )}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent className="opacity-70" side="left">
-          <span>{col.icon?.label}</span>
-        </TooltipContent>
-      </Tooltip>
+      {!(col.hiddenIcon && col.hiddenIcon(item)) && (
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              size={"icon"}
+              className="py-[0.4rem] pl-[0.2rem] "
+              variant={"icon"}
+              onClick={() => actionTable && actionTable(col.column, item)}
+            >
+              {col.icon && (
+                <col.icon.icon className={`${col.icon.className} size-4.5`} />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="opacity-70" side="left">
+            <span>{col.icon?.label}</span>
+          </TooltipContent>
+        </Tooltip>
+      )}
     </TableCell>
   );
 };

@@ -133,7 +133,7 @@ export const menuHealth: IMenu[] = [
         icon: LuChartNoAxesCombined ,
     },
     {
-        label: 'Proveedores Instituciones',
+        label: 'Proveedores e Instituciones',
         active: false,
         url: '/salud/proveedores',
         icon: FaUserTie,

@@ -68,6 +68,7 @@ export const donationsColumns: Column[] = [
         visible: true,
         isIcon: true,
         element: () => "",
+        hiddenIcon: (data: IDonations) => data.type == 'Entrada',
         icon: {
             label: "Descargar donación",
             icon: Download,

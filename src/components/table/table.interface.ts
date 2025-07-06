@@ -9,6 +9,7 @@ export interface Column {
     isIcon?: boolean;
     icon?: Icon;
     element: (data: any) => string | React.ReactNode;
+    hiddenIcon?: (data: any) => boolean;
     className?: (data: any) => string;
     disabledClassName?: boolean;
 }

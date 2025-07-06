@@ -8,6 +8,6 @@ export const authLogin = async (auth: Login) => {
     return await postDataApi(authUrl, auth)
 }
 
-export const recoverPasswordLogin = async (paswword: BodyRecoverPassword) => {
-    return await postDataApi(`${authUrl}/recover`, paswword)
+export const recoverPasswordLogin = async (password: BodyRecoverPassword) => {
+    return await postDataApi(`${authUrl}/recover`, password)
 }

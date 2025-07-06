@@ -28,9 +28,10 @@ import { DocumentosTable } from './pages/documents/doc/documentos-table';
 import { Store } from './pages/health/store/Store';
 import { Category } from './pages/health/category/Category';
 import { ProvidersInstitutions } from './pages/documents/providers/ProvidersInstitutions';
+import { useAxiosInterceptor } from './services/Interceptor';
 
 function App() {
-
+  useAxiosInterceptor();
   return (
     <>
       <Toaster />

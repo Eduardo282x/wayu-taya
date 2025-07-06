@@ -13,11 +13,16 @@ export interface DonationBody {
 }
 
 export interface DonationMedicine {
+    id: number;
     medicineId: number;
-    amount: number;
-    storageId: number;
+    details: DetailDonationMedicine[];
     admissionDate: Date | string;
     expirationDate: Date | string;
+}
+
+export interface DetailDonationMedicine {
+    amount: number;
+    storageId: number;
 }
 
 

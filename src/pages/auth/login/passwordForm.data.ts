@@ -1,11 +1,5 @@
 import { z } from 'zod'
 
-export interface passwordform {
-    email: string;
-    password: string;
-    confirmPassword: string;
-}
-
 export const passwordSchema = z.object({
     email: z.string().email({
         message: "Ingresa un correo electrónico válido"

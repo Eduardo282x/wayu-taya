@@ -222,6 +222,7 @@ export const Donations = () => {
             donation={donationSelected}
             providers={providers}
             stores={stores}
+            lotes={['Mayo 2025', 'Junio 2025']}
             medicines={medicines}
             institutions={institutions}
             onSave={handleSaveDonation}
