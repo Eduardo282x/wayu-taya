@@ -9,6 +9,7 @@ export interface MedicineBody {
     manufacturer: string;
     activeIngredient: string;
     formId: number;
+    benefited: number;
 }
 
 export interface GroupMedicine {

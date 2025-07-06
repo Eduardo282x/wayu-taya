@@ -43,7 +43,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
   useEffect(() => {
 
     console.log(categories);
-    
+
     if (medicineData) {
       reset({
         name: medicineData.name,
@@ -267,7 +267,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
                   )}
                 />
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   <FormInput
                     label="Cantidad"
                     id="cantidad"
@@ -332,6 +332,26 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
                     )}
                   />
                 </div>
+
+                <FormInput
+                  label="Beneficiados"
+                  id="benefited"
+                  type="number"
+                  min="0"
+                  placeholder="500"
+                  {...register("benefited", {
+                    required:
+                      currentTab === "medicamento"
+                        ? "La cantidad es obligatoria"
+                        : false,
+                    min: {
+                      value: 1,
+                      message: "La cantidad no puede ser negativa",
+                    },
+                    valueAsNumber: true,
+                  })}
+                  error={errors.benefited?.message}
+                />
               </TabsContent>
             )}
 

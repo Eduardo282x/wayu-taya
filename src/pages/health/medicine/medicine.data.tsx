@@ -1,5 +1,5 @@
 import { Column } from "@/components/table/table.interface";
-import { IMedicine } from "@/services/medicine/medicine.interface";
+import { IMedicine, MedicineBody } from "@/services/medicine/medicine.interface";
 import { FiTrash2 } from "react-icons/fi";
 import { MdEdit } from "react-icons/md";
 
@@ -102,7 +102,7 @@ export const medicineColumns: Column[] = [
   }
 ];
 
-export const baseMedicine = {
+export const baseMedicine: MedicineBody = {
   name: "",
   description: "",
   categoryId: 0,
@@ -113,4 +113,5 @@ export const baseMedicine = {
   manufacturer: "",
   activeIngredient: "",
   formId: 0,
+  benefited: 1,
 }
