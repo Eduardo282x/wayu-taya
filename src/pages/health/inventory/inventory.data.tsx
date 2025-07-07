@@ -94,6 +94,20 @@ export const historyColumns: Column[] = [
     element: (data: IInventoryHistory) => new Date(data.date).toLocaleDateString(),
   },
   {
+    label: "Fecha Creación",
+    column: "date",
+    visible: true,
+    isIcon: false,
+    element: (data: IInventoryHistory) => new Date(data.admissionDate).toLocaleDateString(),
+  },
+  {
+    label: "Fecha Vencimiento",
+    column: "date",
+    visible: true,
+    isIcon: false,
+    element: (data: IInventoryHistory) => new Date(data.expirationDate).toLocaleDateString(),
+  },
+  {
     label: "Almacén",
     column: "store",
     visible: true,

@@ -1,5 +1,3 @@
-import type React from "react"
-
 import type { GroupMedicine, IMedicine, MedicineBody, ICategory, IForm } from "@/services/medicine/medicine.interface"
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter"
 import { TableComponents } from "@/components/table/TableComponents"
@@ -12,6 +10,7 @@ import {
   getMedicineTemplate,
   getCategories,
   getForms,
+  uploadMedicineFile,
 } from "@/services/medicine/medicine.service"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import type { Column } from "@/components/table/table.interface"
@@ -24,9 +23,7 @@ import { useEffect, useState } from "react"
 import { FaPills } from "react-icons/fa"
 import ConfirmDeleteMedicineDialog from "./ConfirmDeleteMedicineDialog"
 import { FaDownload, FaUpload } from "react-icons/fa6"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Upload, X } from "lucide-react"
+import { UploadMedicineDialog } from "./UploadMedicineDialog"
 
 export const Medicine = () => {
   const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: [], medicine: [] })
@@ -38,10 +35,9 @@ export const Medicine = () => {
   const [categories, setCategories] = useState<ICategory[]>([])
   const [forms, setForms] = useState<IForm[]>([])
 
-  const [isUploadOpen, setIsUploadOpen] = useState(false)
-  const [dragActive, setDragActive] = useState(false)
+  const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+  const [dragActive, setDragActive] = useState<boolean>(false)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [selectedDescription, setSelectedDescription] = useState("")
 
   useEffect(() => {
     getMedicineApi()
@@ -169,16 +165,18 @@ export const Medicine = () => {
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
   }
 
-  const handleSaveMedicineFile = () => {
+  const handleSaveMedicineFile = async () => {
     if (!uploadedFile) return
-
-    console.log("Procesando archivo de medicinas:", uploadedFile.name)
-    console.log("Descripción:", selectedDescription)
-
+    setLoading(true);
+    
+    const formData = new FormData();
+    formData.append('file', uploadedFile);
+    
+    await uploadMedicineFile(formData);
     setUploadedFile(null)
-    setSelectedDescription("")
-    setIsUploadOpen(false)
-
+    setIsUploadOpen(false);
+    getMedicineApi();
+    setLoading(false);
   }
 
   const removeUploadedFile = () => {
@@ -242,86 +240,20 @@ export const Medicine = () => {
         onConfirm={handleConfirmDeleteMedicine}
         medicineName={medicineSelected?.name}
       />
+
       {isUploadOpen && (
-        <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Cargar datos de medicinas</DialogTitle>
-              <DialogDescription>Sube un archivo Excel con los datos de las medicinas</DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive ? "border-blue-800 bg-blue-50" : "border-gray-300 hover:border-gray-400"
-                  }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-              >
-                <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p className="text-lg font-medium text-gray-900 mb-2">Arrastra tu archivo aquí</p>
-                <p className="text-sm text-gray-500 mb-4">o haz clic para seleccionar un archivo Excel</p>
-                <input
-                  type="file"
-                  className="hidden"
-                  id="medicine-file-upload"
-                  accept=".xlsx,.xls,.csv"
-                  onChange={handleFileInput}
-                />
-                <Label
-                  htmlFor="medicine-file-upload"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900 cursor-pointer"
-                >
-                  Seleccionar archivo
-                </Label>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">Descripción del archivo</Label>
-                <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-800 focus:border-blue-800 text-sm"
-                  rows={3}
-                  value={selectedDescription}
-                  onChange={(e) => setSelectedDescription(e.target.value)}
-                  placeholder="Describe el contenido del archivo de medicinas..."
-                />
-              </div>
-
-              {uploadedFile && (
-                <div className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 flex items-center justify-center">
-                        <FaPills className="text-blue-800" size={24} />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{uploadedFile.name}</p>
-                        <p className="text-xs text-gray-500">{formatFileSize(uploadedFile.size)}</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={removeUploadedFile} className="h-8 w-8 p-0">
-                      <X size={16} />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsUploadOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleSaveMedicineFile}
-                  disabled={!uploadedFile}
-                  className="bg-blue-800 hover:bg-blue-900"
-                >
-                  Cargar medicinas
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <UploadMedicineDialog
+          isUploadOpen={isUploadOpen}
+          setIsUploadOpen={setIsUploadOpen}
+          dragActive={dragActive}
+          handleDrag={handleDrag}
+          handleDrop={handleDrop}
+          handleFileInput={handleFileInput}
+          formatFileSize={formatFileSize}
+          uploadedFile={uploadedFile}
+          handleSaveMedicineFile={handleSaveMedicineFile}
+          removeUploadedFile={removeUploadedFile}
+        />
       )}
     </>
   )

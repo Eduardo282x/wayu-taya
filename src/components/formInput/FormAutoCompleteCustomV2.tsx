@@ -9,9 +9,12 @@ interface AutoCompleteProps {
   onChange: (value: string) => void;
   valueDefault?: string | number;
   resetValues?: boolean
+  holdOpen?: boolean
+  multiple?: boolean
+  dataSelected?: string[]
 }
 
-export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues }) => {
+export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string | number>(valueDefault ? valueDefault : "");
   const [inputValue, setInputValue] = useState<string>("");
@@ -29,7 +32,9 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
     if (resetValues) {
       setValue('')
     }
-    setOpen(false);
+    if (!holdOpen) {
+      setOpen(false);
+    }
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -95,7 +100,7 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
       </div>
 
       {open && (
-        <div className="border rounded-lg overflow-hidden absolute animationOpacity z-50 mt-1 bg-white">
+        <div className="border rounded-lg overflow-hidden absolute animationOpacity z-50 mt-1 w-full bg-white">
           <div className="flex items-center justify-start px-2 border-b-2">
             <SearchIcon className="size-4 shrink-0 opacity-50" />
             <input
@@ -108,17 +113,23 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
             />
           </div>
           <div className="max-h-60 overflow-y-auto px-2 w-full">
-            {dataFiltered && dataFiltered.map((option: { label: string, value: string }, index: number) => (
-              <p
-                key={index}
-                onClick={() => handleSelect(option.value.toString())}
-                className="text-sm flex items-center justify-between py-1 px-2 hover:bg-gray-100 rounded-md transition-all cursor-pointer">
-                {option.label}
-                {option.value.toString() === value && (
-                  <Check className="ml-auto h-4 w-4" />
-                )}
-              </p>
-            ))}
+            {dataFiltered && dataFiltered.map((option: { label: string, value: string }, index: number) => {
+              const isSelected = multiple
+                ? dataSelected?.includes(option.value)
+                : option.value.toString() === value;
+              return (
+                <p
+                  key={index}
+                  onClick={() => handleSelect(option.value.toString())}
+                  className="text-sm flex items-center justify-between py-1 px-2 hover:bg-gray-100 rounded-md transition-all cursor-pointer"
+                >
+                  {option.label}
+                  {isSelected && (
+                    <Check className="ml-auto h-4 w-4 text-blue-600" />
+                  )}
+                </p>
+              );
+            })}
 
             {dataFiltered.length == 0 && (
               <p className="text-[.85rem] py-2 text-center text-gray-600">No se encontraron datos.</p>

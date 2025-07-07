@@ -62,15 +62,15 @@ export const Category = () => {
         setLoading(true);
         if (data.initialTab === "category") {
             if (categoryFormSelected) {
-                await putCategories(categoryFormSelected.id, data);
+                await putCategories(categoryFormSelected.id, data as ICategory);
             } else {
-                await postCategories(data);
+                await postCategories(data as ICategory);
             }
         } else {
             if (categoryFormSelected) {
-                await putForms(categoryFormSelected.id, data);
+                await putForms(categoryFormSelected.id, data as IForm);
             } else {
-                await postForms(data);
+                await postForms(data as IForm);
             }
         }
         setLoading(false);

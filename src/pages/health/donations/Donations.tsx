@@ -20,6 +20,8 @@ import { IMedicine } from "@/services/medicine/medicine.interface"
 import { IInstitution } from "@/services/institution/institution.interface"
 import { getInstitutions } from "@/services/institution/institution.service"
 import { DonationFilterDropDown } from "./DonationFilters"
+import { IInventory } from "@/services/inventory/inventory.interface.ts"
+import { getInventory } from "@/services/inventory/inventory.service.ts"
 
 export const Donations = () => {
   const [donations, setDonations] = useState<GroupDonations>({ allDonations: [], donations: [] })
@@ -28,6 +30,7 @@ export const Donations = () => {
   const [institutions, setInstitutions] = useState<IInstitution[]>([])
   const [stores, setStores] = useState<IStore[]>([])
   const [medicines, setMedicines] = useState<IMedicine[]>([])
+  const [inventory, setInventory] = useState<IInventory[]>([])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
   const [loading, setLoading] = useState<boolean>(false)
@@ -43,6 +46,7 @@ export const Donations = () => {
     getDonationsApi();
     getProvidersApi();
     getMedicinesApi();
+    getInventoryApi();
     getInstitutionsApi();
   }, [])
 
@@ -76,6 +80,15 @@ export const Donations = () => {
     try {
       const response: IMedicine[] = await getMedicine()
       setMedicines(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const getInventoryApi = async () => {
+    try {
+      const response: IInventory[] = await getInventory()
+      setInventory(response)
     } catch (err) {
       console.log(err)
     }
@@ -222,6 +235,7 @@ export const Donations = () => {
             donation={donationSelected}
             providers={providers}
             stores={stores}
+            inventory={inventory}
             medicines={medicines}
             institutions={institutions}
             onSave={handleSaveDonation}

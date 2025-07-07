@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Column } from "@/components/table/table.interface";
 import { FaPlus, FaUserTie } from "react-icons/fa";
-import { getProviders, postProviders, putProviders } from "@/services/provider/provider.service"; // Importa el servicio
+import { deleteProviders, getProviders, postProviders, putProviders } from "@/services/provider/provider.service"; // Importa el servicio
 import { GroupProviders, IProviders, ProviderBody } from "@/services/provider/provider.interface";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { HeaderPages } from "@/pages/layout/Header";
@@ -9,11 +9,12 @@ import { FilterComponent } from "@/components/table/FilterComponent";
 import { Button } from "@/components/ui/button";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 import { GroupInstitution, IInstitution, InstitutionsBody } from "@/services/institution/institution.interface";
-import { getInstitutions, postInstitutions, putInstitutions } from "@/services/institution/institution.service";
+import { deleteInstitutions, getInstitutions, postInstitutions, putInstitutions } from "@/services/institution/institution.service";
 import { TableComponents } from "@/components/table/TableComponents";
 import { ProviderForm } from "./ProviderForm";
 import { InstitutionForm } from "./InstitutionForm";
 import { institutionColumns, providerColumns } from "./providerInstitution.data";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 
 type view = 'provider' | 'institution';
 
@@ -23,6 +24,7 @@ export const ProvidersInstitutions = () => {
 	const [institution, setInstitution] = useState<GroupInstitution>({ allInstitution: [], institution: [] });
 	const [loading, setLoading] = useState(true);
 	const [currentView, setCurrentView] = useState<view>('provider');
+	const [openDialogDelete, setOpenDialogDelete] = useState(false);
 	const [openProvider, setOpenProvider] = useState(false);
 	const [openInstitution, setOpenInstitution] = useState(false);
 	const [providerSelected, setProviderSelected] = useState<IProviders | null>(null);
@@ -100,8 +102,18 @@ export const ProvidersInstitutions = () => {
 		if (action === "edit" && currentView == 'provider') setOpenProvider(true);
 		if (action === "edit" && currentView == 'institution') setOpenInstitution(true);
 		if (action === "delete") {
-			console.log(data);
+			setOpenDialogDelete(true);
 		}
+	};
+
+	const confirmDelete = async () => {
+		if (currentView == 'provider') await deleteProviders(Number(providerSelected?.id))
+		if (currentView == 'institution') await deleteInstitutions(Number(institutionSelected?.id))
+
+		setOpenDialogDelete(false);
+
+		if (currentView == 'provider') await getProvidersApi();
+		if (currentView == 'institution') await getInstitutionsApi();
 	};
 
 	return (
@@ -168,6 +180,13 @@ export const ProvidersInstitutions = () => {
 					onOpenChange={setOpenInstitution}
 					institution={institutionSelected}
 					onSubmit={getActionForm}
+				/>
+
+				<ConfirmDeleteDialog
+					open={openDialogDelete}
+					onOpenChange={setOpenDialogDelete}
+					onConfirm={confirmDelete}
+					name={currentView == 'provider' ? providerSelected?.name : institutionSelected?.name}
 				/>
 			</div>
 		</div>

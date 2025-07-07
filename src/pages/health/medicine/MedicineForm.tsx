@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { IMedicine, MedicineBody, ICategory, IForm } from "@/services/medicine/medicine.interface";
 import { baseMedicine } from "./medicine.data";
+import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2";
 
 
 interface MedicineFormProps {
@@ -20,30 +21,40 @@ interface MedicineFormProps {
 }
 
 const unitOptions = [
-  "Unidad(es)",
-  "Caja(s)",
-  "Paquete(s)",
-  "Litro(s)",
-  "Mililitro(s)",
-  "Gramo(s)",
-  "Kilogramo(s)",
-  "Metro(s)",
-  "Centímetro(s)",
-  "Galón(es)",
+  "Unidad(es) (ud)",
+  "Caja(s) (caja)",
+  "Blíster(s) (bl)",
+  "Dosis (dosis)",
+  "Vial(es) (vial)",
+  "Ampolla(s) (amp)",
+  "Miligramos (mg)",
+  "Gramos (g)",
+  "Microgramos (μg)",
+  "Mililitros (mL)",
+  "Litros (L)",
+  "Tabletas (tab)",
+  "Cápsulas (cap)",
+  "Supositorios (sup)",
+  "Óvulos (óv)",
+  "Parches (pch)",
+  "Inhaladores (inh)",
+  "Frascos (frasco)",
+  "Tubos (tubo)",
+  "Jeringas (jer)",
+  "Gotas (gtt)",
+  "Sprays (spr)",
+  "Sobres (sobre)",
   "Otros",
 ];
 
 export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, onSubmit, medicineData, categories, forms }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">("medicamento");
 
-  const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<MedicineBody>({
+  const { register, handleSubmit, reset, control, setValue, watch, formState: { errors } } = useForm<MedicineBody>({
     defaultValues: baseMedicine,
   });
 
   useEffect(() => {
-
-    console.log(categories);
-    
     if (medicineData) {
       reset({
         name: medicineData.name,
@@ -56,6 +67,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
         manufacturer: medicineData.manufacturer,
         activeIngredient: medicineData.activeIngredient,
         formId: medicineData.formId || 0,
+        benefited: medicineData.benefited || 0,
       });
 
       setCurrentTab(medicineData.medicine ? "medicamento" : "producto");
@@ -77,14 +89,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
   };
 
   const handleFormSubmit = (formData: MedicineBody) => {
-    const findCategory = categories.find(cat => cat.category == formData.categoryId.toString());
-    const findForm = forms.find(form => form.forms == formData.formId.toString());
-    const parseData: MedicineBody = {
-      ...formData,
-      categoryId: findCategory ? findCategory.id : 0,
-      formId: findForm ? findForm.id : 0,
-    }
-    onSubmit(parseData);
+    onSubmit(formData);
     onOpenChange(false);
   };
 
@@ -146,40 +151,12 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
               error={errors.description?.message}
             />
 
-            <Controller
-              name="categoryId"
-              control={control}
-              rules={{ required: "La categoría es obligatoria" }}
-              render={({ field }) => (
-                <div className="space-y-1">
-                  <label
-                    htmlFor="categoria-select"
-                    className="text-sm font-medium leading-none text-blue-800"
-                  >
-                    Categoría
-                  </label>
-                  <Select onValueChange={field.onChange} value={field.value.toString()}>
-                    <SelectTrigger className="w-full" id="categoria-select">
-                      <SelectValue placeholder="Selecciona una categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Categorías</SelectLabel>
-                        {categories.map((option) => (
-                          <SelectItem key={option.id} value={option.category}>
-                            {option.category}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  {errors.categoryId && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.categoryId.message}
-                    </p>
-                  )}
-                </div>
-              )}
+            <FormAutocompleteV2
+              data={categories.map(ca => ({ label: ca.category, value: ca.id.toString() }))}
+              label={"Categorías"}
+              valueDefault={watch('categoryId')}
+              placeholder={"Seleccionar una categoría"}
+              onChange={(value) => setValue('categoryId', Number(value))}
             />
 
             {currentTab === "medicamento" && (
@@ -233,41 +210,17 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
                         : false,
                   }}
                   render={({ field }) => (
-                    <div className="space-y-1">
-                      <label
-                        htmlFor="forma-select"
-                        className="text-sm font-medium leading-none text-blue-800"
-                      >
-                        Forma
-                      </label>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value.toString()}
-                      >
-                        <SelectTrigger className="w-full" id="forma-select">
-                          <SelectValue placeholder="Selecciona una forma" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Formas de Medicamentos</SelectLabel>
-                            {forms.map((option) => (
-                              <SelectItem key={option.id} value={option.forms}>
-                                {option.forms}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      {errors.formId && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.formId.message}
-                        </p>
-                      )}
-                    </div>
+                    <FormAutocompleteV2
+                      data={forms.map(ca => ({ label: ca.forms, value: ca.id.toString() }))}
+                      label={"Forma"}
+                      valueDefault={field.value}
+                      placeholder={"Seleccionar una Forma"}
+                      onChange={(value) => setValue('formId', Number(value))}
+                    />
                   )}
                 />
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   <FormInput
                     label="Cantidad"
                     id="cantidad"
@@ -332,8 +285,30 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
                     )}
                   />
                 </div>
+
+
               </TabsContent>
             )}
+
+            <FormInput
+              label="Beneficiados"
+              id="benefited"
+              type="number"
+              min="0"
+              placeholder="1"
+              {...register("benefited", {
+                required:
+                  currentTab === "medicamento"
+                    ? "La cantidad es obligatoria"
+                    : false,
+                min: {
+                  value: 1,
+                  message: "La cantidad no puede ser negativa",
+                },
+                valueAsNumber: true,
+              })}
+              error={errors.benefited?.message}
+            />
 
             {currentTab === "producto" && (
               <TabsContent value="producto" className="mt-0">

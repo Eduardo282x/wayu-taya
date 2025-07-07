@@ -4,8 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { type Login, userSchema } from "./login.data"
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
 import { useNavigate } from "react-router"
-import { Snackbar } from "@/components/snackbar/Snackbar"
-import toast from "react-hot-toast"
 import { authLogin } from "@/services/auth/auth.service"
 import { SnackbarProps } from "@/components/snackbar/Snackbar"
 
@@ -34,11 +32,6 @@ export const LoginForm = ({ onForgotPassword, setLoading }: LoginFormProps) => {
   const onSubmit = async (data: Login) => {
     setLoading(true)
     await authLogin(data).then((res: SnackbarProps) => {
-      toast.custom(<Snackbar success={res.success} message={res.message} />, {
-        duration: 1500,
-        position: 'bottom-center'
-      });
-
       if (res.success) {
         localStorage.setItem('token', String(res.token))
         setTimeout(() => {

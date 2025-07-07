@@ -44,16 +44,7 @@ export const Login = () => {
 
   // Función para volver al formulario de login
   const handleBackToLogin = () => {
-    if (isMobile) {
-      // En móvil, simplemente cambiamos el formulario
-      setShowLoginForm(true)
-    } else {
-      // Después de un breve retraso, cambiamos el formulario
-      setTimeout(() => {
-        setShowLoginForm(true)
-      }, 300) // Mitad del tiempo de la transición
-
-    }
+    setShowLoginForm(true)
   }
 
   // Cuando la animación termina y volvemos al login, resetear el estado
