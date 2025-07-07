@@ -75,6 +75,13 @@ export const medicineColumns: Column[] = [
     isIcon: false,
   },
   {
+    label: "Beneficiados",
+    column: "benefited",
+    element: (data: IMedicine) => data.benefited,
+    visible: false,
+    isIcon: false,
+  },
+  {
     label: 'Editar',
     column: 'edit',
     element: () => '',

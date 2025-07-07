@@ -23,6 +23,7 @@ export interface DonationMedicine {
 export interface DetailDonationMedicine {
     amount: number;
     storageId: number;
+    lote?: string;
 }
 
 

@@ -11,7 +11,7 @@ export interface IDonationsFilters {
     institutionId: number | null;
 }
 
-export type DonationTypeForm = 'medicineId' | 'amount' | 'storageId' | 'admissionDate' | 'expirationDate';
+export type DonationTypeForm = 'medicineId' | 'amount' | 'storageId' | 'lote' | 'admissionDate' | 'expirationDate';
 
 export const donationsColumns: Column[] = [
     {

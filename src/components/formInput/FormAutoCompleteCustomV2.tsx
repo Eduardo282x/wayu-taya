@@ -100,7 +100,7 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
       </div>
 
       {open && (
-        <div className="border rounded-lg overflow-hidden absolute animationOpacity z-50 mt-1 bg-white">
+        <div className="border rounded-lg overflow-hidden absolute animationOpacity z-50 mt-1 w-full bg-white">
           <div className="flex items-center justify-start px-2 border-b-2">
             <SearchIcon className="size-4 shrink-0 opacity-50" />
             <input

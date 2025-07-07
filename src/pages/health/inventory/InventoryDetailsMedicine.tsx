@@ -29,7 +29,7 @@ export const InventoryDetailsMedicine = ({ inventory }: InventoryDetailsMedicine
         <h4 className="font-medium flex items-center gap-2 text-blue-600"><FaLayerGroup /> Lotes</h4>
         <ul className="list-disc list-inside ml-2 text-gray-800">
           {lotes.map((lote, index) => (
-            <li key={index}>{lote}</li>
+            <li key={index}>{lote.name}</li>
           ))}
         </ul>
       </div>

@@ -1,4 +1,5 @@
-import { deleteDataApi, getDataApi } from "@/services/api"
+import { MoveMedicineFormData } from "@/pages/health/inventory/move-medicine-dialog";
+import { deleteDataApi, getDataApi, putDataApi } from "@/services/api"
 // import { InventoryBody } from "./user.interface";
 
 const inventoryUrl = "/inventory";
@@ -8,6 +9,9 @@ export const getInventory = async () => {
 }
 export const getInventoryHistorial = async () => {
     return await getDataApi(`${inventoryUrl}/historial`)
+}
+export const moveInventoryStorage = async (data: MoveMedicineFormData) => {
+    return await putDataApi(`${inventoryUrl}/move`, data)
 }
 // export const postInventory = async (data: InventoryBody) => {
 //     return await postDataApi(inventoryUrl, data)

@@ -32,6 +32,7 @@ export interface IMedicine {
     formId: number;
     category: ICategory;
     form: IForm;
+    benefited: number;
 }
 
 export interface GroupCategory {

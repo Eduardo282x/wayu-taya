@@ -12,19 +12,21 @@ import { IStore } from "@/services/store/store.interface"
 import { IMedicine } from "@/services/medicine/medicine.interface"
 import { IInstitution } from "@/services/institution/institution.interface"
 import { DonationTypeForm } from "./donations.data"
+import { IInventory } from "@/services/inventory/inventory.interface"
+import { formatDate } from "@/utils/formatters"
 
 interface DonationsFormProps {
   donation: IDonations | null;
   providers: IProviders[];
   stores: IStore[];
-  lotes: string[];
+  inventory: IInventory[];
   medicines: IMedicine[];
   institutions: IInstitution[];
   onSave: (donation: DonationBody) => void
   onCancel: () => void
 }
 
-export const DonationsForm = ({ donation, providers, stores, lotes, medicines, institutions, onSave, onCancel }: DonationsFormProps) => {
+export const DonationsForm = ({ donation, providers, stores, inventory, medicines, institutions, onSave, onCancel }: DonationsFormProps) => {
   // const [medicineFilter, setMedicineFilter] = useState<IMedicine[]>([]);
   const today = new Date();
   const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
@@ -43,10 +45,6 @@ export const DonationsForm = ({ donation, providers, stores, lotes, medicines, i
 
   const typeDonation = watch("type");
 
-  useEffect(() => {
-    console.log(typeDonation);
-  }, [typeDonation])
-
   const [medicineDetails, setMedicineDetails] = useState<DonationMedicine[]>([
     {
       id: 1,
@@ -54,6 +52,7 @@ export const DonationsForm = ({ donation, providers, stores, lotes, medicines, i
       details: [{
         amount: 0,
         storageId: 0,
+        lote: ''
       }],
       admissionDate: new Date(),
       expirationDate: new Date(),
@@ -162,14 +161,42 @@ export const DonationsForm = ({ donation, providers, stores, lotes, medicines, i
     );
   }
 
+  // const addMedicineDetailAmountStorageExit = (index: number) => {
+  //   setMedicineDetails((prev) =>
+  //     prev.map((detail, i) =>
+  //       i === index
+  //         ? {
+  //           ...detail,
+  //           details: [
+  //             ...detail.details,
+  //             {
+  //               amount: 0,
+  //               storageId: 0,
+  //             },
+  //           ],
+  //         }
+  //         : detail
+  //     )
+  //   );
+  // }
+
   const onSubmit = (data: DonationBody) => {
+    const parseMedicineDetails = medicineDetails.map(item => 
+      item.details.map(det => {
+        return {
+          ...item,
+          ...det
+        }
+      }).flat()
+    ).flat()
+
     const parseData = {
       providerId: data.providerId == 0 ? null : Number(data.providerId),
       institutionId: data.institutionId == 0 ? null : Number(data.institutionId),
       type: data.type,
       lote: data.lote,
       date: new Date(data.date),
-      medicines: medicineDetails.map(det => {
+      medicines: parseMedicineDetails.map(det => {
         return {
           ...det,
           admissionDate: new Date(det.admissionDate),
@@ -198,6 +225,27 @@ export const DonationsForm = ({ donation, providers, stores, lotes, medicines, i
       .map(med => ({
         value: med.id.toString(),
         label: `${med.name} ${med.amount}${med.unit}`,
+      }))
+  }
+
+  const filteredOptionsExit = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
+    return inventory
+      .filter(inv => {
+        // Obtén los ids seleccionados en otros campos (excepto el actual)
+        const selectedIds = medicineDetails
+          .filter((_, i) => i !== index)
+          .map(item => item.medicineId?.toString());
+        // Muestra la opción si:
+        // - No está seleccionada en otro campo
+        // - O es la seleccionada actualmente en este campo
+        return (
+          !selectedIds.includes(inv.medicine.id.toString()) ||
+          inv.medicine.id.toString() === detail.medicineId?.toString()
+        );
+      })
+      .map(med => ({
+        value: med.medicine.id.toString(),
+        label: `${med.medicine.name} ${med.medicine.amount}${med.medicine.unit}`,
       }))
   }
 
@@ -300,10 +348,10 @@ export const DonationsForm = ({ donation, providers, stores, lotes, medicines, i
               key={index}
               addMedicineDetailAmountStorage={addMedicineDetailAmountStorage}
               removeMedicineDetail={removeMedicineDetail}
-              filteredOptions={filteredOptions}
+              filteredOptions={filteredOptionsExit}
               index={index}
               detail={detail}
-              lotes={lotes}
+              inventory={inventory}
               medicineDetails={medicineDetails}
               stores={stores}
               handleMedicineDetailChange={handleMedicineDetailChange}
@@ -349,7 +397,6 @@ const DonationDetailFormEntry = ({
   medicineDetails,
   detail,
   stores,
-
   handleMedicineDetailChange,
   removeMedicineDetailAmountStorage
 }: DonationDetailFormEntryProps) => {
@@ -444,7 +491,7 @@ const DonationDetailFormEntry = ({
 
 
 interface DonationDetailFormExitProps extends DonationDetailFormEntryProps {
-  lotes: string[];
+  inventory: IInventory[];
 }
 const DonationDetailFormExit = ({
   addMedicineDetailAmountStorage,
@@ -453,18 +500,38 @@ const DonationDetailFormExit = ({
   index,
   medicineDetails,
   detail,
-  stores,
-  lotes,
+  // stores,
+  inventory,
   handleMedicineDetailChange,
   removeMedicineDetailAmountStorage
 }: DonationDetailFormExitProps) => {
+
+  const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
+
+  const changeMedicine = (value: string) => {
+
+
+    const setInventory = inventory.find(item => item.medicine.id == Number(value));
+    if (setInventory) {
+      setMedicineSelected(setInventory);
+    }
+
+    console.log(value);
+    console.log(inventory.map(item => item.medicine));
+    console.log(setInventory);
+
+    handleMedicineDetailChange(index, "medicineId", Number(value))
+  }
+
   return (
     <div className="border border-gray-400 rounded-lg p-4 space-y-4 bg-white">
       <div className="grid grid-cols-3">
         <h4 className="font-medium bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">Medicina {index + 1}</h4>
-        <div className="flex items-center justify-end">
-          <Button onClick={() => addMedicineDetailAmountStorage(index)} className="w-40 mr-18" type="button">Agregar almacén</Button>
-        </div>
+        {medicineSelected && medicineSelected.stores.length > 1 && (
+          <div className="flex items-center justify-end">
+            <Button onClick={() => addMedicineDetailAmountStorage(index)} className="w-40 mr-18" type="button">Agregar almacén</Button>
+          </div>
+        )}
         {medicineDetails.length > 1 && (
           <div className="flex justify-end">
             <Button
@@ -487,74 +554,84 @@ const DonationDetailFormExit = ({
             placeholder="Nombre de la medicina"
             data={filteredOptions(detail, index)}
             valueDefault={detail.medicineId}
-            onChange={(value) => handleMedicineDetailChange(index, "medicineId", Number(value))}
+            onChange={(value) => changeMedicine(value)}
           />
         </div>
 
-        <div className="w-32">
-          <FormSelectCustom
-            label="Lote"
-            id={`lote-${index}`}
-            options={lotes.map((lo: string) => {
-              return {
-                label: lo,
-                value: lo
-              }
-            })}
-          />
-        </div>
         <div className="flex flex-col gap-2">
-          {detail.details && detail.details.map((det, indexDet: number) => (
-            <div className="flex items-center gap-2 relative" key={indexDet}>
-              <div className="w-20">
-                <FormInputCustom
-                  label="Cantidad"
-                  id={`amount-${index}-${indexDet}`}
-                  type="number"
-                  value={det.amount.toString()}
-                  onChange={(e) => handleMedicineDetailChange(index, "amount", Number.parseInt(e.target.value) || 0, indexDet)}
-                  placeholder="Cantidad"
-                />
-              </div>
-              <div className="w-40">
-                <FormSelectCustom
-                  label="Almacén"
-                  id={`store-${index}-${indexDet}`}
-                  options={stores.map(store => {
-                    return {
-                      label: `${store.name} ${store.address}`,
-                      value: store.id.toString()
+          {detail.details.map((det, indexDet: number) => {
+
+            return (
+              <div className="flex items-center gap-4 relative" key={indexDet}>
+                <div className="w-20">
+                  <FormInputCustom
+                    label="Cantidad"
+                    id={`amount-${index}-${indexDet}`}
+                    type="number"
+
+                    value={det.amount.toString()}
+                    onChange={(e) =>
+                      handleMedicineDetailChange(index, "amount", Number(e.target.value), indexDet)
                     }
-                  })}
-                  onChange={(value) => handleMedicineDetailChange(index, "storageId", Number(value.target.value), indexDet)}
-                />
-              </div>
-
-              {detail.details.length > 1 && indexDet != 0 &&
-                <div className="absolute top-0 right-0">
-                  <button
-                    onClick={() => removeMedicineDetailAmountStorage(index, indexDet)}
-                    type="button"
-                    className="cursor-pointer rounded-full bg-red-800 text-white text-center w-5 h-5 text-xs">X</button>
+                    placeholder="Cantidad"
+                  />
                 </div>
-              }
-            </div>
-          ))}
-        </div>
 
-        <div className="w-48">
-          <FormSelectCustom
-            label="Fecha de Expiración"
-            id={`lote-${index}`}
-            options={lotes.map((lo: string) => {
-              return {
-                label: lo,
-                value: lo
-              }
-            })}
-          />
+                <div className="w-40">
+                  <FormSelectCustom
+                    label="Almacén"
+                    id={`store-${index}-${indexDet}`}
+                    options={medicineSelected ? medicineSelected.stores.map(store => ({
+                      label: `${store.name} ${store.address}`,
+                      value: store.id.toString(),
+                    })) : []}
+                    onChange={(value) =>
+                      handleMedicineDetailChange(index, "storageId", Number(value.target.value), indexDet)
+                    }
+                  />
+                </div>
+
+                <div className="w-40">
+                  <FormSelectCustom
+                    label="Lote"
+                    id={`lote-${index}-${indexDet}`}
+                    options={medicineSelected ? medicineSelected.lotes.map(lo => ({
+                      label: lo.name,
+                      value: lo.name.toString(),
+                    })) : []}
+                    onChange={(value) =>
+                      handleMedicineDetailChange(index, "lote", value.target.value, indexDet)
+                    }
+                  />
+                </div>
+
+                {/* Mostrar fecha de expiración */}
+                <div className="w-40">
+                  <FormInputCustom
+                    label="Expira"
+                    id={`fecha-${index}-${indexDet}`}
+                    value={medicineSelected ? formatDate(medicineSelected.datesMedicine[0].expirationDate.toString()) : ''}
+                    readOnly
+                  />
+                </div>
+
+                {detail.details.length > 1 && indexDet !== 0 && (
+                  <div className="absolute top-0 right-0">
+                    <button
+                      onClick={() => removeMedicineDetailAmountStorage(index, indexDet)}
+                      type="button"
+                      className="cursor-pointer rounded-full bg-red-800 text-white text-center w-5 h-5 text-xs"
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
+
     </div>
   )
 }
