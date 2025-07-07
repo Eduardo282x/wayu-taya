@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "vercel-build": "npm rebuild --platform=linux --arch=x64 && npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
