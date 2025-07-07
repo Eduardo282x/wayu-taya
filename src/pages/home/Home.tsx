@@ -3,6 +3,7 @@ import logo from '@/assets/img/logo.png';
 import { CategoryCardProps, optionsMenu } from "./menu.data";
 import toast from "react-hot-toast";
 import { Snackbar } from "@/components/snackbar/Snackbar";
+import { IoBuildOutline } from "react-icons/io5";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ function CategoryCard({ title, description, icon: Icon, buttonText, url, section
   }
 
   const showAlert = () => {
-    toast.custom(<Snackbar success={true} message={'Modulo en desarrollo...'} />, {
+    toast.custom(<Snackbar success={true} message={'Modulo en desarrollo...'} Icon={IoBuildOutline } className="bg-gray-600" />, {
       duration: 1500,
       position: 'bottom-center'
     });

@@ -29,6 +29,7 @@ import { Store } from './pages/health/store/Store';
 import { Category } from './pages/health/category/Category';
 import { ProvidersInstitutions } from './pages/documents/providers/ProvidersInstitutions';
 import { useAxiosInterceptor } from './services/Interceptor';
+import { Reports } from './pages/health/reports/Reports';
 
 function App() {
   useAxiosInterceptor();
@@ -51,7 +52,7 @@ function App() {
 
             <Route path='/salud' element={<Health />}></Route>
             <Route path='/salud/donaciones' element={<Donations />}></Route>
-            <Route path='/salud/reportes' element={<div>Reportes</div>}></Route>
+            <Route path='/salud/reportes' element={<Reports/>}></Route>
             <Route path='/salud/eventos' element={<Events />}></Route>
             <Route path='/salud/inventario' element={<Inventory />}></Route>
             <Route path='/salud/medicamentos' element={<Medicine />}></Route>
