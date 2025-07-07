@@ -1,5 +1,5 @@
 import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, postFilesDataApi, putDataApi } from "@/services/api"
-import { MedicineBody } from "./medicine.interface";
+import { ICategory, IForm, MedicineBody } from "./medicine.interface";
 
 const medicineUrl = "/medicine";
 
@@ -9,19 +9,19 @@ export const getMedicine = async () => {
 export const getCategories = async () => {
     return await getDataApi(`${medicineUrl}/category`);
 }
-export const postCategories = async (data: { category: string }) => {
+export const postCategories = async (data: ICategory) => {
     return await postDataApi(`${medicineUrl}/category`, data);
 }
-export const putCategories = async (id: number, data: { category: string }) => {
+export const putCategories = async (id: number, data: ICategory) => {
     return await putDataApi(`${medicineUrl}/category/${id}`, data);
 }
 export const getForms = async () => {
     return await getDataApi(`${medicineUrl}/forms`);
 }
-export const postForms = async (data: { forms: string }) => {
+export const postForms = async (data: IForm) => {
     return await postDataApi(`${medicineUrl}/forms`, data);
 }
-export const putForms = async (id: number, data: { forms: string }) => {
+export const putForms = async (id: number, data: IForm) => {
     return await putDataApi(`${medicineUrl}/forms/${id}`, data);
 }
 export const getMedicineTemplate = async () => {

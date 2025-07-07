@@ -4,6 +4,7 @@ import { FC } from "react"
 export interface SnackbarProps {
     success: boolean;
     message: string;
+    token?: string;
     Icon?: React.ComponentType<{ className?: string }>;
     className?: string;
 }
