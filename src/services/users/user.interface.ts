@@ -5,6 +5,9 @@ export interface UsersBody {
     password: string;
     correo: string;
 }
+export interface UsersBodyPassword {
+    newPassword: string;
+}
 
 export interface GroupUsers {
     allUsers: IUsers[];

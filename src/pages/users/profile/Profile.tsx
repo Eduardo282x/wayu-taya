@@ -1,225 +1,342 @@
-import { PiUser } from "react-icons/pi"
+import { useEffect, useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MdClear, MdSave } from "react-icons/md"
-import { useState } from "react"
-import { HeaderPages } from "../../layout/Header"
-import { ScreenLoader } from "@/components/loaders/ScreenLoader"
-import FormInputCustom from "@/components/formInput/FormInputCustom"
-import { useForm } from "react-hook-form"
-import ConfirmDialog from "./ConfirmDialog"
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
-
-interface ProfileData {
-  name: string
-  lastName: string
-  correo: string
-  username: string
-  password: string
-}
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+// import { Separator } from "@/components/ui/separator"
+import { User, Mail, Edit3, Save, X, Lock } from "lucide-react"
+import { FaRegSave, FaRegUser } from "react-icons/fa"
+import { UserToken } from "@/services/auth/auth.interfaces"
+import { baseUser } from "./profile.data"
+import { putPassword, putProfile } from "@/services/users/user.service"
+import {
+  StyledDialog,
+  StyledDialogContent,
+  StyledDialogHeader,
+  StyledDialogTitle,
+  StyledDialogDescription,
+} from "@/components/StyledDialog/StyledDialog"
 
 export const Profile = () => {
-  const [loading, setLoading] = useState<boolean>(false)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [confirmDialog, setConfirmDialog] = useState({ open: false, message: "" })
-  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [userData, setUserData] = useState<UserToken | null>(null);
+  const [editUserData, setEditUserData] = useState<UserToken>(baseUser);
+  const [isEditing, setIsEditing] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [messageAlert, setMessageAlert] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors, isDirty },
-  } = useForm<ProfileData>({
-    defaultValues: {
-      name: "Juan",
-      lastName: "Pérez",
-      correo: "juan.perez@email.com",
-      username: "juanperez",
-      password: "miPassword123",
-    },
-  })
+  useEffect(() => {
+    const localUser = JSON.parse(localStorage.getItem('token') as string);
+    setUserData(localUser);
+    setEditUserData(localUser);
+  }, [])
 
-  const saveProfile = async (data: ProfileData) => {
-    setLoading(true)
+  const handleEdit = () => {
+    setIsEditing(true)
+    setNewPassword("")
+    setConfirmPassword("")
+  }
 
-    // Simular llamada a API
-    setTimeout(() => {
-      console.log("Datos del perfil guardados:", data)
-      setConfirmDialog({
-        open: true,
-        message: "Perfil actualizado correctamente",
-      })
-      setIsEditing(false) 
-      setValue("password", "miPassword123")
-      setLoading(false)
-    }, 1500)
+  const handleCancel = () => {
+    setIsEditing(false)
+    setNewPassword("")
+    setConfirmPassword("")
+  }
+
+  const updateUser = async () => {
+    const response = await putProfile(Number(userData?.id), editUserData);
+    localStorage.setItem('token', response.token);
+    setUserData(JSON.parse(response.token));
+    setIsEditing(false);
+  }
+
+  const savePassword = () => {
+    if (newPassword == '' || confirmPassword == '') {
+      setShowAlert(true)
+      setMessageAlert('Las contraseña no pueden estar vacias.')
+    }
+    if (newPassword === confirmPassword) {
+      updatePassword();
+    } else {
+      setShowAlert(true)
+      setMessageAlert('Las contraseña no coinciden.')
+    }
+  }
+
+  const closeDialog = (value: boolean) => {
+    setOpen(value);
+    setShowAlert(false)
+    setMessageAlert('')
+  }
+
+  const updatePassword = async () => {
+    await putPassword(Number(userData?.id), { newPassword });
+    closeDialog(false);
+  }
+
+  const handleInputChange = (field: keyof UserToken, value: string) => {
+    setEditUserData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
   }
 
   return (
-    <div className="px-3 lg:p-0">
-      {loading && <ScreenLoader />}
-
-      <HeaderPages title="Mi Perfil" Icon={PiUser} />
-
-      <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-        <div className="flex items-center gap-2">
-          {!isEditing ? (
-            <Button
-              variant="animated"
-              className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
-              onClick={() => {
-                setIsEditing(true)
-                setValue("password", "")
-              }}
-            >
-              <PiUser className="size-4 lg:size-6" />
-              Editar Datos
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem] bg-transparent"
-                onClick={() => {
-                  setIsEditing(false)
-                  reset({
-                    name: "Juan",
-                    lastName: "Pérez",
-                    correo: "juan.perez@email.com",
-                    username: "juanperez",
-                    password: "miPassword123",
-                  })
-                }}
-              >
-                <MdClear className="size-4 lg:size-6" />
-                Cancelar
-              </Button>
-              <Button
-                variant="animated"
-                className={`w-fit lg:h-full text-[0.8rem] lg:text-[1rem] transition-all duration-300 ${
-                  isDirty
-                    ? "opacity-100 bg-gradient-to-r from-green-600 to-green-400 shadow-lg scale-105"
-                    : "opacity-50 cursor-not-allowed bg-gray-400"
-                }`}
-                onClick={handleSubmit(saveProfile)}
-                disabled={!isDirty}
-              >
-                <MdSave className="size-4 lg:size-6" />
-                Guardar Cambios
-              </Button>
-            </>
-          )}
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 text-2xl gap-4 text-white manrope">
+        <FaRegUser size={60} />
+        <div className="">
+          <h1 className="text-3xl font-bold mb-2">Mi Perfil</h1>
+          <p className="text-blue-100">Fundación Wayu Tayaa - Gestión de Cuenta</p>
         </div>
       </div>
 
-      <div className="mt-4 lg:mt-8 max-w-2xl mx-auto border border-solid rounded-xl border-gray-300">
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <form onSubmit={handleSubmit(saveProfile)} className="grid gap-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <FormInputCustom
-                  label="Nombre"
-                  id="nombre"
-                  autoFocus={isEditing}
-                  readOnly={!isEditing}
-                  {...register("name", {
-                    required: "El nombre es obligatorio",
-                    pattern: {
-                      value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
-                      message: "El nombre no puede contener números ni caracteres especiales",
-                    },
-                  })}
-                  error={errors.name?.message}
-                />
+      <div className="p-6 space-y-4">
+        <Card className="py-4">
+          <CardHeader className="">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={"/placeholder.svg"} alt="Foto de perfil" />
+                    <AvatarFallback className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] text-white text-xl">
+                      {userData && getInitials(userData.name, userData.lastName)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div>
+                  <CardTitle className="text-2xl">
+                    {userData ? `${userData.name} ${userData.lastName}` : ''}
+                  </CardTitle>
+                  <CardDescription className="text-base mt-1">{userData && userData.username}</CardDescription>
+                  <Badge variant="secondary" className="mt-2 bg-blue-100 text-blue-800">
+                    {userData && userData.rol.rol}
+                  </Badge>
+                </div>
               </div>
-
-              <div>
-                <FormInputCustom
-                  label="Apellido"
-                  id="apellido"
-                  readOnly={!isEditing}
-                  {...register("lastName", {
-                    required: "El apellido es obligatorio",
-                    pattern: {
-                      value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
-                      message: "El apellido no puede contener números ni caracteres especiales",
-                    },
-                  })}
-                  error={errors.lastName?.message}
-                />
+              <div className="flex space-x-2">
+                {!isEditing ? (
+                  <Button
+                    onClick={handleEdit}
+                    className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] hover:from-[#023a8a] hover:to-[#4bc5cc]"
+                  >
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Editar Perfil
+                  </Button>
+                ) : (
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={updateUser}
+                      className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] hover:from-[#023a8a] hover:to-[#4bc5cc]"
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Guardar
+                    </Button>
+                    <Button onClick={handleCancel} variant="outline">
+                      <X className="h-4 w-4 mr-2" />
+                      Cancelar
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
+          </CardHeader>
+        </Card>
 
-            <div>
-              <FormInputCustom
-                label="Usuario"
-                id="usuario"
-                readOnly={!isEditing}
-                {...register("username", {
-                  required: "El usuario es obligatorio",
-                  minLength: {
-                    value: 3,
-                    message: "El usuario debe tener al menos 3 caracteres",
-                  },
-                })}
-                error={errors.username?.message}
-              />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Información Personal */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <User className="h-5 w-5 text-[#024dae]" />
+                  <span>Información Personal</span>
+                </CardTitle>
+                <CardDescription>
+                  {isEditing ? "Edita tu información personal" : "Tu información personal actual"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Nombre */}
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Nombre *</Label>
+                    {isEditing ? (
+                      <Input
+                        id="firstName"
+                        value={editUserData ? editUserData.name : ''}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        placeholder="Ingresa tu nombre"
+                      />
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{userData && userData.name}</div>
+                    )}
+                  </div>
 
-            <div>
-              <FormInputCustom
-                label="Correo Electrónico"
-                id="correo"
-                type="email"
-                readOnly={!isEditing}
-                {...register("correo", {
-                  required: "El correo es obligatorio",
-                  pattern: {
-                    value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                    message: "Correo inválido",
-                  },
-                })}
-                error={errors.correo?.message}
-              />
-            </div>
+                  {/* Apellido */}
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Apellido *</Label>
+                    {isEditing ? (
+                      <Input
+                        id="lastName"
+                        value={editUserData ? editUserData.lastName : ''}
+                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        placeholder="Ingresa tu apellido"
+                      />
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{userData && userData.lastName}</div>
+                    )}
+                  </div>
+                </div>
 
-            <div className="relative">
-              <FormInputCustom
-                label={isEditing ? "Nueva Contraseña" : "Contraseña"}
-                id="password"
-                type={isEditing ? (showPassword ? "text" : "password") : "text"}
-                placeholder={isEditing ? "Dejar vacío para mantener la contraseña actual" : ""}
-                readOnly={!isEditing}
-                {...register("password", {
-                  minLength: {
-                    value: 6,
-                    message: "La contraseña debe tener al menos 6 caracteres",
-                  },
-                })}
-                error={errors.password?.message}
-              />
-              {isEditing && (
-                <div
-                  className="absolute right-3 top-8 cursor-pointer z-10"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <FaRegEye className="text-blue-500 text-lg" />
+                {/* Usuario */}
+                <div className="space-y-2">
+                  <Label htmlFor="username">Nombre de Usuario *</Label>
+                  {isEditing ? (
+                    <Input
+                      id="username"
+                      value={editUserData ? editUserData.username : ''}
+                      onChange={(e) => handleInputChange("username", e.target.value)}
+                      placeholder="Ingresa tu nombre de usuario"
+                    />
                   ) : (
-                    <FaRegEyeSlash className="text-blue-500 text-lg" />
+                    <div className="p-3 bg-gray-50 rounded-md text-gray-800">{userData && userData.username}</div>
                   )}
                 </div>
-              )}
-            </div>
-          </form>
+
+                {/* Correo Electrónico */}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Correo Electrónico *</Label>
+                  {isEditing ? (
+                    <Input
+                      id="email"
+                      type="email"
+                      value={editUserData ? editUserData.correo : ''}
+                      onChange={(e) => handleInputChange("correo", e.target.value)}
+                      placeholder="Ingresa tu correo electrónico"
+                    />
+                  ) : (
+                    <div className="p-3 bg-gray-50 rounded-md text-gray-800 flex items-center">
+                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                      {userData && userData.correo}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Información Adicional */}
+          <div className="space-y-6">
+            {/* Estadísticas de Cuenta */}
+            {/* <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Shield className="h-5 w-5 text-[#024dae]" />
+                  <span>Información de Cuenta</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <div>
+                    <p className="text-sm font-medium">Miembro desde</p>
+                    <p className="text-sm text-gray-600">{userData.joinDate}</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center space-x-3">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  <div>
+                    <p className="text-sm font-medium">Ubicación</p>
+                    <p className="text-sm text-gray-600">{userData.location}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card> */}
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Lock className="h-5 w-5 text-[#024dae]" />
+                  <span>Seguridad</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="">
+                <Button variant="animated" onClick={() => setOpen(true)} size="sm" className="w-full">
+                  Cambiar Contraseña
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
-      <ConfirmDialog
-        open={confirmDialog.open}
-        onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}
-        description={confirmDialog.message}
-      />
+
+      <StyledDialog open={open} onOpenChange={closeDialog}>
+        <StyledDialogContent className="w-[30rem] ">
+          <StyledDialogHeader>
+            <StyledDialogTitle>Actualizar contraseña</StyledDialogTitle>
+            <StyledDialogDescription>
+              Actualiza tu nueva contraseña
+            </StyledDialogDescription>
+          </StyledDialogHeader>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col items-start justify-start gap-2">
+              <Label>
+                Nueva contraseña
+              </Label>
+              <Input
+                id="password"
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Nueva contraseña"
+                className="bg-white"
+              />
+            </div>
+
+            <div className="flex flex-col items-start justify-start gap-2">
+              <Label>
+                Confirmar contraseña
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="text"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirmar contraseña"
+                className="bg-white"
+              />
+            </div>
+
+            {showAlert && (
+              <p className="text-red-500">{messageAlert}</p>
+            )}
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button
+                onClick={savePassword}
+                variant="animated"
+                type="submit"
+              >
+                <FaRegSave className="self-center size-5" /> Actualizar contraseña
+              </Button>
+            </div>
+          </div>
+        </StyledDialogContent>
+      </StyledDialog>
     </div>
   )
 }
