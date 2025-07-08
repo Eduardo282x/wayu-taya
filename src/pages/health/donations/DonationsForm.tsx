@@ -505,18 +505,12 @@ const DonationDetailFormExit = ({
 }: DonationDetailFormExitProps) => {
 
   const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
-
   const changeMedicine = (value: string) => {
-
 
     const setInventory = inventory.find(item => item.medicine.id == Number(value));
     if (setInventory) {
       setMedicineSelected(setInventory);
     }
-
-    console.log(value);
-    console.log(inventory.map(item => item.medicine));
-    console.log(setInventory);
 
     handleMedicineDetailChange(index, "medicineId", Number(value))
   }

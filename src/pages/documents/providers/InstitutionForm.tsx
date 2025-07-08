@@ -29,8 +29,6 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution }: I
     })
 
     useEffect(() => {
-        console.log(institution);
-        
         if (institution && isEdit) {
             const institutionData = {
                 name: institution.name,

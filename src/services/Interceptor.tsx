@@ -14,12 +14,6 @@ export const useAxiosInterceptor = () => {
     useEffect(() => {
         const interceptor = api.interceptors.response.use(
             (response) => {
-                console.log(response);
-
-                if (response.status === 401) {
-                    // navigate('/login')
-                }
-
                 if (['post', 'put', 'delete'].includes(response.config.method || '')) {
                     const message = response.data;
                     if (isValidMessage(message.message)) {
@@ -34,7 +28,6 @@ export const useAxiosInterceptor = () => {
             (error) => {
                 if (['post', 'put', 'delete'].includes(error.config?.method || '')) {
                     const message = error.response?.data;
-                    console.log(error.response);
                     const parseMessage = message.message.length > 0 ? message.message[0] : message.message
                     console.log(parseMessage);
 
