@@ -10,6 +10,7 @@ import { LuChartNoAxesCombined } from "react-icons/lu"
 import { BiDonateHeart } from "react-icons/bi"
 import { generateReportDonations, getReport } from "@/services/reports/report.service"
 import { BodyReport, GraphicStorage, IReports, ProductByStorage } from "@/services/reports/report.interface"
+import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 
 // Datos de ejemplo
 const reportTypes = [
@@ -45,9 +46,9 @@ const monthlyDonations = [
     { month: "Jun", amount: 19800 },
 ]
 
-
 export const Reports = () => {
     const now = new Date();
+    const [loading, setLoading] = useState<boolean>(false);
     const [report, setReport] = useState<IReports>();
     const [warehouseData, setWarehouseData] = useState<GraphicStorage[]>([])
     const [filtersDate, setFiltersDate] = useState<BodyReport>({
@@ -89,6 +90,7 @@ export const Reports = () => {
     }, [filtersDate])
 
     const getReportApi = async () => {
+        setLoading(true)
         const response = await getReport(filtersDate) as IReports;
         if (response) {
             setReport(response);
@@ -103,6 +105,7 @@ export const Reports = () => {
 
             setWarehouseData(warehouseData)
         }
+        setLoading(false)
     }
 
     function getRandomColorCode(): string {
@@ -131,6 +134,7 @@ export const Reports = () => {
 
     return (
         <div className="h-full overflow-x-hidden">
+            {loading && <ScreenLoader/>}
             {/* Header */}
             <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 text-2xl gap-4 text-white manrope">
                 <LuChartNoAxesCombined size={60} />

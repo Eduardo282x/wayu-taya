@@ -6,14 +6,15 @@ import UsersForm from "./UserForms";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { HeaderPages } from "../layout/Header"
 import { TableComponents } from "@/components/table/TableComponents";
-import { GroupUsers, IUsers, UsersBody } from "@/services/users/user.interface";
+import { GroupUsers, IUsers, Role, UsersBody } from "@/services/users/user.interface";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { usersColumns } from "./user.data";
-import { getUsers, postUsers, putUsers } from "@/services/users/user.service";
+import { deleteUsers, getRoles, getUsers, postUsers, putUsers } from "@/services/users/user.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 
 export const Users = () => {
   const [users, setUsers] = useState<GroupUsers>({ allUsers: [], users: [] });
+  const [roles, setRoles] = useState<Role[]>([]);
   const [userSelected, setUserSelected] = useState<IUsers | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -22,8 +23,17 @@ export const Users = () => {
 
   useEffect(() => {
     getUsersApi()
+    getRolesApi()
   }, [])
 
+  const getRolesApi = async () => {
+    try {
+      const response: Role[] = await getRoles();
+      setRoles(response)
+    } catch (err) {
+      console.log(err);
+    }
+  }
   const getUsersApi = async () => {
     setLoading(true)
     try {
@@ -45,11 +55,10 @@ export const Users = () => {
     setOpen(true);
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (userSelected) {
-      // setUsers(users.filter((u) => u.id !== userToDelete.id));
-      // setUserToDelete(null);
-      // setIsDeleteDialogOpen(false);
+      await deleteUsers(userSelected.id);
+      setIsDeleteDialogOpen(false)
     }
   };
 
@@ -64,10 +73,14 @@ export const Users = () => {
   }
 
   const getActionForm = async (user: UsersBody) => {
+    const parseData = {
+      ...user,
+      rolId: Number(user.rolId)
+    }
     if (userSelected) {
-      await putUsers(userSelected.id, user);
+      await putUsers(userSelected.id, parseData);
     } else {
-      await postUsers(user);
+      await postUsers(parseData);
     }
     getUsersApi();
     setOpen(false);
@@ -110,6 +123,7 @@ export const Users = () => {
           open={open}
           onOpenChange={setOpen}
           user={userSelected}
+          roles={roles}
           onSubmit={getActionForm}
         />
 

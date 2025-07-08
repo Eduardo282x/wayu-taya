@@ -24,7 +24,7 @@ export const Layout = () => {
                 <div className='block lg:hidden'>
                     <HeaderMobile />
                 </div>
-                <div className='lg:py-4 px-2 lg:px-0 h-full overflow-y-auto bg-gray-100 rounded-2xl'>
+                <div className='lg:py-4 px-2 lg:px-0 h-full overflow-y-hidden bg-gray-100 rounded-2xl'>
                     <Outlet />
                 </div>
             </div>
