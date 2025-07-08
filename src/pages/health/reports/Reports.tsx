@@ -1,13 +1,15 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { XAxis, YAxis, PieChart, Pie, Cell, LineChart, Line } from "recharts"
-import { Download, Eye, TrendingUp, Package, Heart, Warehouse, Users } from "lucide-react"
+import { Download, TrendingUp, Package, Heart, Warehouse } from "lucide-react"
 import { LuChartNoAxesCombined } from "react-icons/lu"
 import { BiDonateHeart } from "react-icons/bi"
+import { generateReportDonations, getReport } from "@/services/reports/report.service"
+import { BodyReport, GraphicStorage, IReports, ProductByStorage } from "@/services/reports/report.interface"
 
 // Datos de ejemplo
 const reportTypes = [
@@ -24,13 +26,6 @@ const reportTypes = [
         description: "Estado actual del inventario y productos disponibles",
         icon: Package,
         color: "bg-green-500",
-    },
-    {
-        id: "impact",
-        title: "Reporte de Impacto",
-        description: "Análisis del impacto social y beneficiarios alcanzados",
-        icon: Users,
-        color: "bg-purple-500",
     },
     {
         id: "warehouses",
@@ -50,33 +45,88 @@ const monthlyDonations = [
     { month: "Jun", amount: 19800 },
 ]
 
-const warehouseData = [
-    { name: "Almacén Central", value: 45, fill: "#024dae" },
-    { name: "Almacén Norte", value: 25, fill: "#1e5bb8" },
-    { name: "Almacén Sur", value: 20, fill: "#3a6bc2" },
-    { name: "Almacén Este", value: 10, fill: "#5cdee5" },
-]
-
-const topImpactItems = [
-    { item: "Alimentos básicos", impact: 85, donations: 245 },
-    { item: "Medicamentos", impact: 78, donations: 156 },
-    { item: "Ropa de abrigo", impact: 72, donations: 189 },
-    { item: "Material escolar", impact: 65, donations: 134 },
-]
 
 export const Reports = () => {
-    // const [selectedReport, setSelectedReport] = useState("")
-    const [timeRange, setTimeRange] = useState("month")
+    const now = new Date();
+    const [report, setReport] = useState<IReports>();
+    const [warehouseData, setWarehouseData] = useState<GraphicStorage[]>([])
+    const [filtersDate, setFiltersDate] = useState<BodyReport>({
+        from: new Date(now.getFullYear(), now.getMonth(), 1),
+        to: new Date(now.getFullYear(), now.getMonth() + 1, 0),
+    });
 
-    const handleViewReport = (reportId: string) => {
-        // setSelectedReport(reportId)
-        // Aquí iría la lógica para mostrar el reporte
-        console.log(`Visualizando reporte: ${reportId}`)
+    function getMonthsFrom2025() {
+        const months = [];
+        const now = new Date();
+        const startYear = 2025;
+        const startMonth = 0; // Enero
+        const endYear = now.getFullYear();
+        const endMonth = now.getMonth(); // 0-indexed
+
+        for (let year = startYear; year <= endYear; year++) {
+            const firstMonth = year === startYear ? startMonth : 0;
+            const lastMonth = year === endYear ? endMonth : 11;
+            for (let month = firstMonth; month <= lastMonth; month++) {
+                months.push({
+                    value: `${year}-${month + 1}`,
+                    label: `${new Date(year, month).toLocaleString('es-ES', { month: 'long' })} ${year}`,
+                    year,
+                    month
+                });
+            }
+        }
+        return months;
+    }
+
+    const [month, setMonth] = useState(() => {
+        const months = getMonthsFrom2025();
+        return months[months.length - 1]?.value; // mes actual por defecto
+    });
+    const monthsList = getMonthsFrom2025();
+
+    useEffect(() => {
+        getReportApi()
+    }, [filtersDate])
+
+    const getReportApi = async () => {
+        const response = await getReport(filtersDate) as IReports;
+        if (response) {
+            setReport(response);
+
+            const warehouseData = response.productByStorage.map((item: ProductByStorage) => {
+                return {
+                    name: item.storage,
+                    value: item.totalProducts,
+                    fill: getRandomColorCode(), // O puedes asignar colores específicos si quieres consistencia
+                }
+            });
+
+            setWarehouseData(warehouseData)
+        }
+    }
+
+    function getRandomColorCode(): string {
+        const colorCodes = ["#024dae", "#1e5bb8", "#3a6bc2", "#5cdee5"];
+        const randomIndex = Math.floor(Math.random() * colorCodes.length);
+        return colorCodes[randomIndex];
     }
 
     const handleDownloadReport = (reportId: string) => {
         // Aquí iría la lógica para descargar el reporte
         console.log(`Descargando reporte: ${reportId}`)
+        generateReportApi();
+    }
+
+    const generateReportApi = async () => {
+        const response = await generateReportDonations({ provider: 'CALOX', lotes: ['Mayo 2025'] });
+        const url = URL.createObjectURL(response)
+        const link = window.document.createElement("a")
+        link.href = url
+        link.download = `Reporte de donaciones`
+        window.document.body.appendChild(link)
+        link.click()
+        window.document.body.removeChild(link)
+        URL.revokeObjectURL(url)
     }
 
     return (
@@ -95,20 +145,30 @@ export const Reports = () => {
                 <section>
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-2xl font-semibold text-gray-800">Generar Reportes</h2>
-                        <Select value={timeRange} onValueChange={setTimeRange}>
-                            <SelectTrigger className="w-48">
-                                <SelectValue placeholder="Período de tiempo" />
+
+                        <Select value={month} onValueChange={(val) => {
+                            setMonth(val);
+                            const [year, m] = val.split('-').map(Number);
+                            setFiltersDate({
+                                from: new Date(year, m - 1, 1),
+                                to: new Date(year, m, 0),
+                            });
+                            getReportApi(); // Si quieres recargar los datos al cambiar el mes
+                        }}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Fecha" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="week">Esta semana</SelectItem>
-                                <SelectItem value="month">Este mes</SelectItem>
-                                <SelectItem value="quarter">Este trimestre</SelectItem>
-                                <SelectItem value="year">Este año</SelectItem>
+                                {monthsList.map((m) => (
+                                    <SelectItem key={m.value} value={m.value}>
+                                        {m.label.charAt(0).toUpperCase() + m.label.slice(1)}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {reportTypes.map((report) => {
                             const IconComponent = report.icon
                             return (
@@ -128,20 +188,12 @@ export const Reports = () => {
                                         <div className="flex space-x-2">
                                             <Button
                                                 size="sm"
-                                                className="flex-1 bg-gradient-to-r from-[#024dae] to-[#5cdee5] hover:from-[#023a8a] hover:to-[#4bc5cc]"
-                                                onClick={() => handleViewReport(report.id)}
-                                            >
-                                                <Eye className="h-4 w-4 mr-1" />
-                                                Ver
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
+                                                variant="animated"
                                                 className="flex-1 bg-transparent"
                                                 onClick={() => handleDownloadReport(report.id)}
                                             >
                                                 <Download className="h-4 w-4 mr-1" />
-                                                Descargar
+                                                Generar
                                             </Button>
                                         </div>
                                     </CardContent>
@@ -156,58 +208,26 @@ export const Reports = () => {
                     <h2 className="text-2xl font-semibold text-gray-800 mb-6">Dashboard de Métricas</h2>
 
                     {/* Métricas Principales */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                         <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0">
                                 <CardTitle className="text-sm font-medium">Donaciones Este Mes</CardTitle>
-                                <BiDonateHeart className="h-4 w-4 text-muted-foreground" />
+                                <BiDonateHeart className="text-blue-800 h-4 w-4" />
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-[#024dae]">$19,800</div>
-                                <p className="text-xs text-muted-foreground">
-                                    <span className="text-green-600">+12.5%</span> vs mes anterior
-                                </p>
+                            <CardContent className="-mt-3">
+                                <div className="text-2xl font-bold text-[#024dae]">{report?.donations.length}</div>
                             </CardContent>
                         </Card>
 
                         <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0">
                                 <CardTitle className="text-sm font-medium">Items en Inventario</CardTitle>
-                                <Package className="h-4 w-4 text-muted-foreground" />
+                                <Package className="text-blue-800 h-4 w-4" />
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-[#024dae]">1,247</div>
-                                <p className="text-xs text-muted-foreground">
-                                    <span className="text-blue-600">+8.2%</span> nuevos ingresos
-                                </p>
+                            <CardContent className="-mt-3">
+                                <div className="text-2xl font-bold text-[#024dae]">{report?.totalInventory}</div>
                             </CardContent>
                         </Card>
-
-                        {/* <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Beneficiarios Activos</CardTitle>
-                                <Users className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-[#024dae]">342</div>
-                                <p className="text-xs text-muted-foreground">
-                                    <span className="text-green-600">+15.3%</span> este mes
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Tasa de Impacto</CardTitle>
-                                <Activity className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-[#024dae]">94.2%</div>
-                                <p className="text-xs text-muted-foreground">
-                                    <span className="text-green-600">+2.1%</span> efectividad
-                                </p>
-                            </CardContent>
-                        </Card> */}
                     </div>
 
                     {/* Gráficas */}
@@ -305,15 +325,15 @@ export const Reports = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {topImpactItems.map((item, index) => (
+                                {report && report.productMostDonated.map((item, index) => (
                                     <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                                         <div className="flex-1">
-                                            <h4 className="font-medium text-gray-800">{item.item}</h4>
-                                            <p className="text-sm text-gray-600">{item.donations} donaciones</p>
+                                            <h4 className="font-medium text-gray-800">{item.product}</h4>
+                                            <p className="text-sm text-gray-600">{item.amount} donaciones</p>
                                         </div>
                                         <div className="flex items-center space-x-3">
                                             <div className="text-right">
-                                                <div className="text-lg font-bold text-[#024dae]">{item.impact}%</div>
+                                                <div className="text-lg font-bold text-[#024dae]">{item.percentage}%</div>
                                                 <div className="text-xs text-gray-500">Impacto</div>
                                             </div>
                                             <Badge variant="secondary" className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] text-white">
