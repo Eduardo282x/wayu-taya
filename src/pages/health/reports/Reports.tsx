@@ -9,8 +9,9 @@ import { Download, TrendingUp, Package, Heart, Warehouse } from "lucide-react"
 import { LuChartNoAxesCombined } from "react-icons/lu"
 import { BiDonateHeart } from "react-icons/bi"
 import { generateReportDonations, getReport } from "@/services/reports/report.service"
-import { BodyReport, GraphicStorage, IReports, ProductByStorage } from "@/services/reports/report.interface"
+import { BodyReport, GraphicStorage, IReports, ProductByStorage, ReportDonations } from "@/services/reports/report.interface"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import { ReportDialogs } from "./ReportDialogs"
 
 // Datos de ejemplo
 const reportTypes = [
@@ -52,6 +53,7 @@ const monthlyDonations = [
 export const Reports = () => {
     const now = new Date();
     const [loading, setLoading] = useState<boolean>(false);
+    const [open, setOpen] = useState<boolean>(false);
     const [report, setReport] = useState<IReports>();
     const [warehouseData, setWarehouseData] = useState<GraphicStorage[]>([])
     const [filtersDate, setFiltersDate] = useState<BodyReport>({
@@ -121,11 +123,12 @@ export const Reports = () => {
     const handleDownloadReport = (reportId: string) => {
         // Aquí iría la lógica para descargar el reporte
         console.log(`Descargando reporte: ${reportId}`)
-        generateReportApi();
+        // generateReportApi();
+        setOpen(true)
     }
 
-    const generateReportApi = async () => {
-        const response = await generateReportDonations({ provider: 'CALOX', lotes: ['Mayo 2025'] });
+    const generateReportApi = async (data: ReportDonations) => {
+        const response = await generateReportDonations(data);
         const url = URL.createObjectURL(response)
         const link = window.document.createElement("a")
         link.href = url
@@ -133,7 +136,8 @@ export const Reports = () => {
         window.document.body.appendChild(link)
         link.click()
         window.document.body.removeChild(link)
-        URL.revokeObjectURL(url)
+        URL.revokeObjectURL(url);
+        setOpen(false);
     }
 
     return (
@@ -360,6 +364,15 @@ export const Reports = () => {
                     </Card>
                 </section>
             </div>
+
+
+            <ReportDialogs
+            open={open}
+            setOpen={setOpen}
+            lotes={report ? report.lotes : []}
+            provider={report ? report.providers : []}
+            onSubmitData={generateReportApi}
+            />
         </div>
     )
 }

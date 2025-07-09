@@ -1,4 +1,5 @@
-import { getDataApi, getDataFileApi } from "../api";
+import { deleteDataApi, getDataApi, getDataFileApi, postDataFileApi } from "../api";
+// import { DocumentUploadFileBody } from "./document.interface";
 
 const documentUrl = "/documents";
 
@@ -12,4 +13,13 @@ export const getDocumentAdult = async () => {
 
 export const getDocumentLegalRepresentative = async () => {
     return await getDataFileApi(`${documentUrl}/pdf/representante-legal`);
+}
+export const downloadFile = async (id: number) => {
+    return await getDataFileApi(`${documentUrl}/download/${id}`);
+}
+export const uploadFileDocument = async (data: FormData) => {
+    return await postDataFileApi(`${documentUrl}/upload`, data);
+}
+export const deleteDocument = async (id: number) => {
+    return await deleteDataApi(`${documentUrl}/${id}`);
 }

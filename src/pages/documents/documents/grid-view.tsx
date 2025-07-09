@@ -1,3 +1,4 @@
+import { IDocument } from "@/services/document/document.interface"
 import { Button } from "../../../components/ui/button"
 import {
   DropdownMenu,
@@ -6,16 +7,16 @@ import {
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu"
 import { MoreVertical, Edit, Trash2, Download, Eye } from "lucide-react"
-import { DocumentData } from "./documents.data"
 import { BsFiletypePdf } from "react-icons/bs"
 import { BsFiletypePng } from "react-icons/bs"
 import { BsFiletypeDocx } from "react-icons/bs"
+import { formatDate } from "@/utils/formatters"
 
 interface GridViewProps {
-  data: DocumentData[]
-  onViewDocument: (document: DocumentData) => void
-  onEditDocument: (document: DocumentData) => void
-  onDownloadDocument: (document: DocumentData) => void
+  data: IDocument[]
+  onViewDocument: (document: IDocument) => void
+  onEditDocument: (document: IDocument) => void
+  onDownloadDocument: (document: IDocument) => void
   onDeleteDocument: (id: number) => void
 }
 
@@ -26,8 +27,8 @@ export function GridView({
   onDownloadDocument,
   onDeleteDocument,
 }: GridViewProps) {
-  const getFileIcon = (tipo: string) => {
-    switch (tipo) {
+  const getFileIcon = (type: string) => {
+    switch (type) {
       case "pdf":
         return <BsFiletypePdf size={48} className="text-red-500" />
       case "png":
@@ -39,8 +40,8 @@ export function GridView({
     }
   }
 
-  const getContentBadgeColor = (contenido: string) => {
-    switch (contenido) {
+  const getContentBadgeColor = (content: string) => {
+    switch (content) {
       case "personas":
         return "bg-blue-100 text-blue-800"
       case "comida":
@@ -99,35 +100,35 @@ export function GridView({
           </div>
 
           <div className="flex flex-col items-center text-center space-y-3">
-            <div className="flex-shrink-0">{getFileIcon(document.tipo)}</div>
+            <div className="flex-shrink-0">{getFileIcon(document.type)}</div>
 
             <div className="w-full">
-              <h3 className="font-medium text-gray-900 truncate" title={document.nombre}>
-                {document.nombre}
+              <h3 className="font-medium text-gray-900 truncate" title={document.name}>
+                {document.name}
               </h3>
-              <p className="text-sm text-gray-500 uppercase">{document.tipo}</p>
+              <p className="text-sm text-gray-500 uppercase">{document.type}</p>
             </div>
 
             <div className="w-full">
               <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getContentBadgeColor(document.contenido)}`}
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getContentBadgeColor(document.content)}`}
               >
-                {document.contenido.charAt(0).toUpperCase() + document.contenido.slice(1)}
+                {document.content.charAt(0).toUpperCase() + document.content.slice(1)}
               </span>
             </div>
 
-            {document.descripcion && (
+            {document.description && (
               <div className="w-full">
-                <p className="text-xs text-gray-600 line-clamp-2" title={document.descripcion}>
-                  {document.descripcion}
+                <p className="text-xs text-gray-600 line-clamp-2" title={document.description}>
+                  {document.description}
                 </p>
               </div>
             )}
 
             <div className="w-full pt-2 border-t border-gray-100">
               <div className="flex justify-between items-center text-xs text-gray-500">
-                <span>{document.tamano}</span>
-                <span>{document.fecha}</span>
+                {/* <span>{document.tamano}</span> */}
+                <span>{formatDate(document.date)}</span>
               </div>
             </div>
           </div>

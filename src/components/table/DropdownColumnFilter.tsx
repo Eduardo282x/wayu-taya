@@ -34,6 +34,7 @@ export const DropdownColumnFilter = ({ columns, setColumns }: DropdownColumnFilt
                         className="bg-white text-[#0350af] border border-[#0350af] hover:bg-[#e6fafd] hover:text-[#0350af]"
                     >
                         <FaFilter />
+                        Ver Columnas
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">

@@ -510,9 +510,12 @@ const DonationDetailFormExit = ({
     const setInventory = inventory.find(item => item.medicine.id == Number(value));
     if (setInventory) {
       setMedicineSelected(setInventory);
+
+      handleMedicineDetailChange(index, "medicineId", Number(value))
+      handleMedicineDetailChange(index, "storageId", Number(setInventory.stores[0].id), 0)
+      handleMedicineDetailChange(index, "lote", setInventory.lotes[0].name, 0)
     }
 
-    handleMedicineDetailChange(index, "medicineId", Number(value))
   }
 
   return (
@@ -573,6 +576,7 @@ const DonationDetailFormExit = ({
                   <FormSelectCustom
                     label="Almacén"
                     id={`store-${index}-${indexDet}`}
+                    value={det.storageId}
                     options={medicineSelected ? medicineSelected.stores.map(store => ({
                       label: `${store.name} ${store.address}`,
                       value: store.id.toString(),
@@ -591,6 +595,7 @@ const DonationDetailFormExit = ({
                       label: lo.name,
                       value: lo.name.toString(),
                     })) : []}
+                    value={det.lote}
                     onChange={(value) =>
                       handleMedicineDetailChange(index, "lote", value.target.value, indexDet)
                     }

@@ -10,7 +10,6 @@ import Home from './pages/home/Home';
 
 import { People } from './pages/documents/people/People';
 import { Events } from './pages/documents/events/Events';
-import { Documents } from './pages/documents/Documents';
 // import { Doc } from './pages/documents/doc/Doc';
 
 import { Activities } from './pages/documents/activities/Activities';
@@ -24,12 +23,12 @@ import { Users } from './pages/users/Users';
 import { Profile } from './pages/users/profile/Profile';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
-import { DocumentosTable } from './pages/documents/doc/documentos-table';
 import { Store } from './pages/health/store/Store';
 import { Category } from './pages/health/category/Category';
 import { ProvidersInstitutions } from './pages/documents/providers/ProvidersInstitutions';
 import { useAxiosInterceptor } from './services/Interceptor';
 import { Reports } from './pages/health/reports/Reports';
+import { Documents } from './pages/documents/documents/Documents';
 
 function App() {
   useAxiosInterceptor();
@@ -46,7 +45,7 @@ function App() {
             <Route path='/documentos' element={<Documents />}></Route>
             <Route path='/documentos/personas' element={<People />}></Route>
             <Route path='/documentos/actividades' element={<Activities />}></Route>
-            <Route path='/documentos/documentos' element={<DocumentosTable />}></Route>
+            <Route path='/documentos/documentos' element={<Documents />}></Route>
             <Route path='/documentos/eventos' element={<Events />}></Route>
             <Route path='/documentos/proveedores' element={<ProvidersInstitutions />}></Route>
 
