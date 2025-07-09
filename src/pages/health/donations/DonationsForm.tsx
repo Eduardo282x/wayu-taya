@@ -30,6 +30,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   // const [medicineFilter, setMedicineFilter] = useState<IMedicine[]>([]);
   const today = new Date();
   const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const [alert, setAlert] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
   // const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
 
   const { register, handleSubmit, reset, watch, setValue, getValues } = useForm<DonationBody>({
@@ -161,27 +163,14 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     );
   }
 
-  // const addMedicineDetailAmountStorageExit = (index: number) => {
-  //   setMedicineDetails((prev) =>
-  //     prev.map((detail, i) =>
-  //       i === index
-  //         ? {
-  //           ...detail,
-  //           details: [
-  //             ...detail.details,
-  //             {
-  //               amount: 0,
-  //               storageId: 0,
-  //             },
-  //           ],
-  //         }
-  //         : detail
-  //     )
-  //   );
-  // }
-
   const onSubmit = (data: DonationBody) => {
-    const parseMedicineDetails = medicineDetails.map(item => 
+    if (data.lote == '' || data.date == '') {
+      setAlert(true)
+      setMessage('Alguno de los campos esta vacio.')
+      return;
+    }
+
+    const parseMedicineDetails = medicineDetails.map(item =>
       item.details.map(det => {
         return {
           ...item,
@@ -199,6 +188,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       medicines: parseMedicineDetails.map(det => {
         return {
           ...det,
+          storageId: det.storageId == 0 ? 1 : det.storageId,
           admissionDate: new Date(det.admissionDate),
           expirationDate: new Date(det.expirationDate),
         }
@@ -362,17 +352,25 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
       </div>
 
-      <StyledDialogFooter className="flex justify-end space-x-2 pt-4">
-        <Button
-          type="button"
-          variant={'destructive'}
-          onClick={onCancel}
-        >
-          Cancelar
-        </Button>
-        <Button type="submit" variant={'animated'}>
-          {donation ? "Actualizar" : "Registrar"} Donación
-        </Button>
+      <StyledDialogFooter className="flex justify-between pt-4 w-full ">
+        <div className=" w-1/2">
+          {alert && (
+            <p className="text-red-600 font-semibold">{message}</p>
+          )}
+        </div>
+
+        <div className="flex gap-2 w-1/2 justify-end">
+          <Button
+            type="button"
+            variant={'destructive'}
+            onClick={onCancel}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" variant={'animated'}>
+            {donation ? "Actualizar" : "Registrar"} Donación
+          </Button>
+        </div>
       </StyledDialogFooter>
     </form>
   )
@@ -507,18 +505,12 @@ const DonationDetailFormExit = ({
 }: DonationDetailFormExitProps) => {
 
   const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
-
   const changeMedicine = (value: string) => {
-
 
     const setInventory = inventory.find(item => item.medicine.id == Number(value));
     if (setInventory) {
       setMedicineSelected(setInventory);
     }
-
-    console.log(value);
-    console.log(inventory.map(item => item.medicine));
-    console.log(setInventory);
 
     handleMedicineDetailChange(index, "medicineId", Number(value))
   }

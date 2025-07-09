@@ -33,6 +33,13 @@ export const usersColumns: Column[] = [
         visible: true
     },
     {
+        label: 'Rol',
+        column: 'rol.rol',
+        element: (data: IUsers) => data.rol.rol,
+        isIcon: false,
+        visible: true
+    },
+    {
         label: 'Editar',
         column: 'edit',
         element: () => '',

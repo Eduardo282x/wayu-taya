@@ -92,11 +92,11 @@ export const Profile = () => {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 text-2xl gap-4 text-white manrope">
-        <FaRegUser size={60} />
+      <div className="bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2  gap-4 text-white manrope">
+        <FaRegUser size={50} />
         <div className="">
           <h1 className="text-3xl font-bold mb-2">Mi Perfil</h1>
-          <p className="text-blue-100">Fundación Wayu Tayaa - Gestión de Cuenta</p>
+          <p className="text-blue-100 text-sm">Fundación Wayu Tayaa - Gestión de Cuenta</p>
         </div>
       </div>
 

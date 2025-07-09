@@ -6,6 +6,9 @@ const usersUrl = "/users";
 export const getUsers = async () => {
     return await getDataApi(usersUrl);
 }
+export const getRoles = async () => {
+    return await getDataApi(`${usersUrl}/roles`)
+}
 export const postUsers = async (data: UsersBody) => {
     return await postDataApi(usersUrl, data)
 }

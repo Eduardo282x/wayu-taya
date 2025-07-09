@@ -2,7 +2,7 @@ import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/pages/layout/Header"
 import { DonationBody, GroupDonations, IDonations } from "@/services/donations/donations.interface"
-import { getDonations, getDonationsReport, postDonation } from "@/services/donations/donations.service"
+import { getDonations, getDonationsReport, getLotes, postDonation } from "@/services/donations/donations.service"
 import { useEffect, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
 import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data.tsx"
@@ -31,6 +31,7 @@ export const Donations = () => {
   const [stores, setStores] = useState<IStore[]>([])
   const [medicines, setMedicines] = useState<IMedicine[]>([])
   const [inventory, setInventory] = useState<IInventory[]>([])
+  const [lotes, setLotes] = useState<string[]>([])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
   const [loading, setLoading] = useState<boolean>(false)
@@ -48,8 +49,17 @@ export const Donations = () => {
     getMedicinesApi();
     getInventoryApi();
     getInstitutionsApi();
+    getLotesApi();
   }, [])
 
+  const getLotesApi = async () => {
+    try {
+      const response: string[] = await getLotes()
+      setLotes(response);
+    } catch (err) {
+      console.log(err)
+    }
+  }
   const getProvidersApi = async () => {
     try {
       const response: IProviders[] = await getProviders()
@@ -137,11 +147,12 @@ export const Donations = () => {
   }
 
   const handleCloseDialog = () => {
-    setOpenDialog(false)
-    setDonationSelected(null)
+    setOpenDialog(false);
+    setDonationSelected(null);
   }
 
   const handleSaveDonation = async (donationData: DonationBody) => {
+    setLoading(true);
     await postDonation(donationData);
     handleCloseDialog();
     getDonationsApi();
@@ -194,6 +205,7 @@ export const Donations = () => {
           institutions={institutions}
           handleDonationFilterChange={handleDonationFilterChange}
           cleanFilters={cleanFilters}
+          lotes={lotes}
         />
         <div className="flex items-center ">
           <FilterComponent

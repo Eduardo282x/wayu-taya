@@ -13,24 +13,18 @@ import { FaRegSave } from "react-icons/fa"
 import { TiUserAddOutline } from "react-icons/ti"
 // import { FormInputCustoms } from "@/components/formInput/FormInputCustom"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
-import { IUsers, UsersBody } from "@/services/users/user.interface"
-
-export interface User {
-  id: number
-  nombre: string
-  apellido: string
-  usuario: string
-  correo: string
-}
+import { IUsers, Role, UsersBody } from "@/services/users/user.interface"
+import FormSelectCustom from "@/components/formInput/FormSelectCustom"
 
 interface UsersFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (user: UsersBody) => void
   user?: IUsers | null
+  roles: Role[]
 }
 
-const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, user }) => {
+const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, user, roles }) => {
   const isEdit = !!user
 
   const {
@@ -44,6 +38,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
       lastName: '',
       correo: '',
       username: '',
+      rolId: 0,
     }
   })
 
@@ -54,6 +49,16 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
         lastName: user.lastName,
         correo: user.correo,
         username: user.username,
+        rolId: user.rolId
+      }
+      reset(userData)
+    } else {
+      const userData = {
+        name: '',
+        lastName: '',
+        correo: '',
+        username: '',
+        rolId: 0,
       }
       reset(userData)
     }
@@ -128,6 +133,16 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
                 },
               })}
               error={errors.correo?.message}
+            />
+          </div>
+
+          <div>
+            <FormSelectCustom
+              label="Rol"
+              id="rol"
+              options={roles.map(item => ({ label: item.rol, value: item.id.toString() }))}
+              {...register("rolId")}
+              error={errors.rolId?.message}
             />
           </div>
 
