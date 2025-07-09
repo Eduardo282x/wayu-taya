@@ -118,6 +118,7 @@ export const Medicine = () => {
     }
   }
   const downloadTemplate = async () => {
+    setLoading(true)
     const response = await getMedicineTemplate()
     const url = URL.createObjectURL(response)
     const link = window.document.createElement("a")
@@ -127,6 +128,7 @@ export const Medicine = () => {
     link.click()
     window.document.body.removeChild(link)
     URL.revokeObjectURL(url)
+    setLoading(false)
   }
 
   const handleDrag = (e: React.DragEvent) => {

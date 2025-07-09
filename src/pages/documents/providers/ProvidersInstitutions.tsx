@@ -8,8 +8,8 @@ import { HeaderPages } from "@/pages/layout/Header";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { Button } from "@/components/ui/button";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
-import { GroupInstitution, IInstitution, InstitutionsBody } from "@/services/institution/institution.interface";
-import { deleteInstitutions, getInstitutions, postInstitutions, putInstitutions } from "@/services/institution/institution.service";
+import { GroupInstitution, IInstitution, InstitutionsBody, IParish } from "@/services/institution/institution.interface";
+import { deleteInstitutions, getInstitutions, getParish, postInstitutions, putInstitutions } from "@/services/institution/institution.service";
 import { TableComponents } from "@/components/table/TableComponents";
 import { ProviderForm } from "./ProviderForm";
 import { InstitutionForm } from "./InstitutionForm";
@@ -21,6 +21,7 @@ type view = 'provider' | 'institution';
 export const ProvidersInstitutions = () => {
 	const [columns, setColumns] = useState<Column[]>(providerColumns);
 	const [providers, setProviders] = useState<GroupProviders>({ allProviders: [], providers: [] });
+	const [parish, setParish] = useState<IParish[]>([]);
 	const [institution, setInstitution] = useState<GroupInstitution>({ allInstitution: [], institution: [] });
 	const [loading, setLoading] = useState(true);
 	const [currentView, setCurrentView] = useState<view>('provider');
@@ -33,7 +34,17 @@ export const ProvidersInstitutions = () => {
 	useEffect(() => {
 		getProvidersApi();
 		getInstitutionsApi();
+		getParishApi();
 	}, []);
+
+	const getParishApi = async () => {
+		try {
+			const response: IParish[] = await getParish();
+			setParish(response)
+		} catch (err) {
+			console.log(err);
+		}
+	}
 
 	const getProvidersApi = async () => {
 		setLoading(true)
@@ -180,6 +191,7 @@ export const ProvidersInstitutions = () => {
 					onOpenChange={setOpenInstitution}
 					institution={institutionSelected}
 					onSubmit={getActionForm}
+					parish={parish}
 				/>
 
 				<ConfirmDeleteDialog

@@ -66,7 +66,7 @@ export const Inventory = () => {
   const onSubmitMovedInventory = async (data: MoveMedicineFormData) => {
     const parseData = data.movements.map(item => {
       return {
-        medicineId: Number(item.medicineId),
+      medicineId: Number(item.medicineId),
         sourceStoreId: Number(item.sourceStoreId),
         quantity: Number(item.quantity),
         targetStoreId: Number(item.targetStoreId),

@@ -1,8 +1,9 @@
+import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { StyledDialog, StyledDialogContent, StyledDialogDescription, StyledDialogHeader, StyledDialogTitle } from "@/components/StyledDialog/StyledDialog"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { IInstitution, InstitutionsBody } from "@/services/institution/institution.interface"
+import { IInstitution, InstitutionsBody, IParish } from "@/services/institution/institution.interface"
 import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { FaRegSave } from "react-icons/fa"
@@ -12,12 +13,13 @@ interface InstitutionFormProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onSubmit: (institution: InstitutionsBody) => void
-    institution: IInstitution | null
+    institution: IInstitution | null;
+    parish: IParish[]
 }
-export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution }: InstitutionFormProps) => {
+export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, parish }: InstitutionFormProps) => {
     const isEdit = !!institution;
 
-    const { register, handleSubmit, reset, formState: { errors }, control } = useForm<InstitutionsBody>({
+    const { register, handleSubmit, reset, watch, setValue,  formState: { errors }, control } = useForm<InstitutionsBody>({
         defaultValues: {
             name: '',
             rif: '',
@@ -25,6 +27,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution }: I
             country: '',
             email: '',
             type: '',
+            parishId: 0,
         }
     })
 
@@ -37,6 +40,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution }: I
                 country: institution.country,
                 email: institution.email,
                 type: institution.type,
+                parishId: institution.parishId,
             }
             reset(institutionData)
         } else {
@@ -47,6 +51,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution }: I
                 country: '',
                 email: '',
                 type: '',
+                parishId: 0,
             }
             reset(baseData)
         }
@@ -148,6 +153,14 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution }: I
                                 )}
                             </div>
                         )}
+                    />
+
+                    <FormAutocompleteV2
+                        data={parish.map(ca => ({ label: `${ca.name} - ${ca.town.name} - Edo. ${ca.town.city.state.name}`, value: ca.id.toString() }))}
+                        label={"Parroquia"}
+                        valueDefault={watch('parishId')}
+                        placeholder={"Seleccionar una parroquia"}
+                        onChange={(value) => setValue('parishId', Number(value))}
                     />
 
 

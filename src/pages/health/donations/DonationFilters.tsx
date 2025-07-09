@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { FaFilter } from 'react-icons/fa';
 
 interface IDonationFiltersProps {
+    lotes: string[]
     providers: IProviders[]
     institutions: IInstitution[];
     handleDonationFilterChange: (filter: string, value: string | number) => void;
@@ -15,7 +16,7 @@ interface IDonationFiltersProps {
 }
 
 
-export const DonationFilterDropDown = ({ providers, institutions, handleDonationFilterChange, cleanFilters }: IDonationFiltersProps) => {
+export const DonationFilterDropDown = ({ providers, institutions, handleDonationFilterChange, cleanFilters, lotes }: IDonationFiltersProps) => {
     return (
         <div>
             <DropdownMenu>
@@ -27,8 +28,9 @@ export const DonationFilterDropDown = ({ providers, institutions, handleDonation
                         <FaFilter />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
+                <DropdownMenuContent align="start" className='h-80'>
                     <DonationFilters
+                        lotes={lotes}
                         providers={providers}
                         institutions={institutions}
                         handleDonationFilterChange={handleDonationFilterChange}
@@ -39,7 +41,7 @@ export const DonationFilterDropDown = ({ providers, institutions, handleDonation
     )
 }
 
-export const DonationFilters = ({ providers, institutions, handleDonationFilterChange, cleanFilters }: IDonationFiltersProps) => {
+export const DonationFilters = ({ providers, institutions, handleDonationFilterChange, cleanFilters, lotes }: IDonationFiltersProps) => {
     const [typeDonation, setTypeDonation] = useState<'Entrada' | 'Salida'>('Entrada');
     return (
         <div className='flex items-end gap-4 p-4'>
@@ -59,11 +61,7 @@ export const DonationFilters = ({ providers, institutions, handleDonationFilterC
             <FormSelectCustom
                 label='Lote'
                 id='2'
-                options={[
-                    { value: 'all', label: 'Todos' },
-                    { value: 'Lote 1', label: 'Lote 1' },
-                    { value: 'Lote 2', label: 'Lote 2' },
-                ]}
+                options={lotes.map(lo => ({ label: lo, value: lo }))}
                 onChange={(e) => handleDonationFilterChange('lote', e.target.value)}
             />
             <div className='w-60'>

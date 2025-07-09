@@ -7,6 +7,10 @@ export const getDonations = async () => {
     return await getDataApi(donationsUrl);
 }
 
+export const getLotes = async () => {
+    return await getDataApi(`${donationsUrl}/lotes`);
+}
+
 export const getDonationsReport = async (id: number) => {
     return await getDataFileApi(`${donationsUrl}/download/${id}`);
 }

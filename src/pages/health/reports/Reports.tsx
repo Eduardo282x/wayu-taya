@@ -20,6 +20,7 @@ const reportTypes = [
         description: "Resumen completo de todas las donaciones recibidas",
         icon: Heart,
         color: "bg-blue-500",
+        done: true
     },
     {
         id: "inventory",
@@ -27,6 +28,7 @@ const reportTypes = [
         description: "Estado actual del inventario y productos disponibles",
         icon: Package,
         color: "bg-green-500",
+        done: false
     },
     {
         id: "warehouses",
@@ -34,6 +36,7 @@ const reportTypes = [
         description: "Utilización y capacidad de almacenes",
         icon: Warehouse,
         color: "bg-orange-500",
+        done: false
     },
 ]
 
@@ -92,6 +95,7 @@ export const Reports = () => {
     const getReportApi = async () => {
         setLoading(true)
         const response = await getReport(filtersDate) as IReports;
+        console.log(response)
         if (response) {
             setReport(response);
 
@@ -136,7 +140,7 @@ export const Reports = () => {
         <div className="h-full overflow-x-hidden">
             {loading && <ScreenLoader/>}
             {/* Header */}
-            <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 text-2xl gap-4 text-white manrope">
+            <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 gap-4 text-white manrope">
                 <LuChartNoAxesCombined size={60} />
                 <div className="">
                     <h1 className="text-2xl font-bold">Centro de Reportes</h1>
@@ -176,7 +180,12 @@ export const Reports = () => {
                         {reportTypes.map((report) => {
                             const IconComponent = report.icon
                             return (
-                                <Card key={report.id} className="hover:shadow-lg transition-shadow duration-200">
+                                <Card key={report.id} className="hover:shadow-lg transition-shadow duration-200 relative overflow-hidden">
+                                    {!report.done && (
+                                        <div className="absolute top-0 left-0 bg-black opacity-40 flex items-center justify-center w-full h-full">
+                                            <p className="text-white">Próximamente...</p>
+                                        </div>
+                                    )}
                                     <CardHeader className="pb-3">
                                         <div className="flex items-center space-x-3">
                                             <div className={`p-2 rounded-lg ${report.color}`}>

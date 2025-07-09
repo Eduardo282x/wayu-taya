@@ -29,6 +29,13 @@ export const institutionColumns: Column[] = [
         element: (data: IInstitution) => data.name,
     },
     {
+        label: "Rif",
+        column: "rif",
+        visible: true,
+        isIcon: false,
+        element: (data: IInstitution) => data.rif,
+    },
+    {
         label: "Tipo",
         column: "type",
         visible: true,
@@ -48,6 +55,13 @@ export const institutionColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: IInstitution) => data.email,
+    },
+    {
+        label: "Parroquia",
+        column: "parish.name",
+        visible: true,
+        isIcon: false,
+        element: (data: IInstitution) => data.parish.name,
     },
     {
         label: "Editar",

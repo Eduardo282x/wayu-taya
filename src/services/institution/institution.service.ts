@@ -2,9 +2,13 @@ import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/a
 import { InstitutionsBody } from "./institution.interface";
 
 const institutionsUrl = "/institutions";
+const parishUrl = "/parroquias";
 
 export const getInstitutions = async () => {
     return await getDataApi(institutionsUrl);
+}
+export const getParish = async () => {
+    return await getDataApi(parishUrl);
 }
 export const postInstitutions = async (data: InstitutionsBody) => {
     return await postDataApi(institutionsUrl, data)
