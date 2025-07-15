@@ -1,8 +1,8 @@
 import { FileText } from "lucide-react"
-import { FaMusic } from "react-icons/fa"
+// import { FaMusic } from "react-icons/fa"
 import { GiHealthNormal } from "react-icons/gi"
-import { IoIosWater } from "react-icons/io"
-import { TbAppleFilled } from "react-icons/tb"
+// import { IoIosWater } from "react-icons/io"
+// import { TbAppleFilled } from "react-icons/tb"
 import { Sections } from "../layout/sidebar.data"
 
 export interface CategoryCardProps {

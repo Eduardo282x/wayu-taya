@@ -28,4 +28,4 @@ export interface Rol {
 
 export type Role = 'Super Admin' |
     'Administrador' |
-    'Usuarios'
+    'Usuarios' | ''
