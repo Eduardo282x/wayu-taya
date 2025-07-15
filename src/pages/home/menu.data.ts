@@ -16,15 +16,15 @@ export interface CategoryCardProps {
 }
 
 export const optionsMenu: CategoryCardProps[] = [
-    {
-        title: "Agua",
-        description: "Control y administración del agua",
-        icon: IoIosWater,
-        buttonText: "Acceder",
-        url: '/agua',
-        section: 'agua',
-        working: true,
-    },
+    // {
+    //     title: "Agua",
+    //     description: "Control y administración del agua",
+    //     icon: IoIosWater,
+    //     buttonText: "Acceder",
+    //     url: '/agua',
+    //     section: 'agua',
+    //     working: true,
+    // },
     {
         title: "Salud",
         description: "Actividades y recursos destinados al campo de salud",
@@ -43,22 +43,22 @@ export const optionsMenu: CategoryCardProps[] = [
         section: 'documentos',
         working: false,
     },
-    {
-        title: "Musica",
-        description: "Actividades y eventos relacionados a la música",
-        icon: FaMusic,
-        buttonText: "Musica",
-        url: '/musica',
-        section: 'musica',
-        working: true,
-    },
-    {
-        title: "Comida",
-        description: "Administración de insumos y comida en las diferentes regiones",
-        icon: TbAppleFilled,
-        buttonText: "Comida",
-        url: '/alimentos',
-        section: 'alimentos',
-        working: true,
-    },
+    // {
+    //     title: "Musica",
+    //     description: "Actividades y eventos relacionados a la música",
+    //     icon: FaMusic,
+    //     buttonText: "Musica",
+    //     url: '/musica',
+    //     section: 'musica',
+    //     working: true,
+    // },
+    // {
+    //     title: "Comida",
+    //     description: "Administración de insumos y comida en las diferentes regiones",
+    //     icon: TbAppleFilled,
+    //     buttonText: "Comida",
+    //     url: '/alimentos',
+    //     section: 'alimentos',
+    //     working: true,
+    // },
 ]

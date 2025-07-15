@@ -10,17 +10,22 @@ export interface BodyRecoverPassword {
 }
 
 export interface UserToken {
-    id:       number;
-    name:     string;
+    id: number;
+    name: string;
     lastName: string;
-    correo:   string;
+    correo: string;
     username: string;
     password: string;
-    rolId:    number;
-    rol:      Rol;
+    rolId: number;
+    rol: Rol;
 }
 
 export interface Rol {
-    id:  number;
-    rol: string;
+    id: number;
+    rol: Role;
 }
+
+
+export type Role = 'Super Admin' |
+    'Administrador' |
+    'Usuarios'
