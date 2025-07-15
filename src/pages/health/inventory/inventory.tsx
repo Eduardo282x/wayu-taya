@@ -13,6 +13,9 @@ import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { FaHistory, FaExchangeAlt } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { MoveMedicineDialog, MoveMedicineFormData } from "./move-medicine-dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getStore } from "@/services/store/store.service"
+import { IStore } from "@/services/store/store.interface"
 // import { SuccessDialog } from "./success-dialog"
 
 export const Inventory = () => {
@@ -25,11 +28,24 @@ export const Inventory = () => {
   const [historyData, setHistoryData] = useState<IInventoryHistory[]>([])
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   // const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
+  const [stores, setStores] = useState<IStore[]>([])
 
   useEffect(() => {
-    getInventoryApi()
-    getInventoryHistorialApi()
+    getInventoryApi();
+    getInventoryHistorialApi();
+    getStoreApi();
   }, [])
+
+  const getStoreApi = async () => {
+    setLoading(true);
+    try {
+      const response: IStore[] = await getStore();
+      setStores(response);
+    } catch (err) {
+      console.error("Error al obtener almacenes:", err);
+    }
+    setLoading(false);
+  };
 
   const getInventoryApi = async () => {
     setLoading(true)
@@ -63,10 +79,24 @@ export const Inventory = () => {
     setIsDeleteDialogOpen(false)
   }
 
+  const filterInventoryByStore = (storeId: string) => {
+    const filtered = inventory.allInventory
+      .filter(item => item.stores.some(store => store.id === Number(storeId)))
+      .map(item => ({
+        ...item,
+        stores: item.stores.filter(store => store.id === Number(storeId)), // solo ese almacén
+      }));
+
+    setInventory(prev => ({
+      ...prev,
+      inventory: storeId == 'all' ? prev.allInventory : filtered
+    }))
+  }
+
   const onSubmitMovedInventory = async (data: MoveMedicineFormData) => {
     const parseData = data.movements.map(item => {
       return {
-      medicineId: Number(item.medicineId),
+        medicineId: Number(item.medicineId),
         sourceStoreId: Number(item.sourceStoreId),
         quantity: Number(item.quantity),
         targetStoreId: Number(item.targetStoreId),
@@ -98,6 +128,22 @@ export const Inventory = () => {
         </Button>
 
         <div className="flex items-center gap-2">
+          <Select onValueChange={filterInventoryByStore}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Filtrar por almacén..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>
+                Todos
+              </SelectItem>
+              {stores.map(item => (
+                <SelectItem key={item.id} value={item.id.toString()}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <FilterComponent
             data={inventory.allInventory}
             setDataFilter={(data) =>

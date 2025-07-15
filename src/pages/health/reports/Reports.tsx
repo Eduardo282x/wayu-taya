@@ -8,10 +8,12 @@ import { XAxis, YAxis, PieChart, Pie, Cell, LineChart, Line } from "recharts"
 import { Download, TrendingUp, Package, Heart, Warehouse } from "lucide-react"
 import { LuChartNoAxesCombined } from "react-icons/lu"
 import { BiDonateHeart } from "react-icons/bi"
-import { generateReportDonations, getReport } from "@/services/reports/report.service"
+import { generateReportDonations, generateReportInventory, generateReportStore, getReport } from "@/services/reports/report.service"
 import { BodyReport, GraphicStorage, IReports, ProductByStorage, ReportDonations } from "@/services/reports/report.interface"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
-import { ReportDialogs } from "./ReportDialogs"
+import { ReportDialogs, WareHouseDialog } from "./ReportDialogs"
+import { IStore } from "@/services/store/store.interface"
+import { getStore } from "@/services/store/store.service"
 
 // Datos de ejemplo
 const reportTypes = [
@@ -29,7 +31,7 @@ const reportTypes = [
         description: "Estado actual del inventario y productos disponibles",
         icon: Package,
         color: "bg-green-500",
-        done: false
+        done: true
     },
     {
         id: "warehouses",
@@ -37,7 +39,7 @@ const reportTypes = [
         description: "Utilización y capacidad de almacenes",
         icon: Warehouse,
         color: "bg-orange-500",
-        done: false
+        done: true
     },
 ]
 
@@ -54,6 +56,8 @@ export const Reports = () => {
     const now = new Date();
     const [loading, setLoading] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
+    const [openWarehouse, setOpenWareHouse] = useState<boolean>(false);
+    const [stores, setStores] = useState<IStore[]>([])
     const [report, setReport] = useState<IReports>();
     const [warehouseData, setWarehouseData] = useState<GraphicStorage[]>([])
     const [filtersDate, setFiltersDate] = useState<BodyReport>({
@@ -94,6 +98,10 @@ export const Reports = () => {
         getReportApi()
     }, [filtersDate])
 
+    useEffect(() => {
+        getStoreApi()
+    }, [])
+
     const getReportApi = async () => {
         setLoading(true)
         const response = await getReport(filtersDate) as IReports;
@@ -120,11 +128,29 @@ export const Reports = () => {
         return colorCodes[randomIndex];
     }
 
-    const handleDownloadReport = (reportId: string) => {
+    const getStoreApi = async () => {
+        setLoading(true);
+        try {
+            const response: IStore[] = await getStore();
+            setStores(response);
+        } catch (err) {
+            console.error("Error al obtener almacenes:", err);
+        }
+        setLoading(false);
+    };
+
+    const handleDownloadReport = (report: string) => {
         // Aquí iría la lógica para descargar el reporte
-        console.log(`Descargando reporte: ${reportId}`)
         // generateReportApi();
-        setOpen(true)
+        if (report == 'donations') {
+            setOpen(true)
+        }
+        if (report == 'inventory') {
+            generateReportInventoryApi()
+        }
+        if (report == 'warehouses') {
+            setOpenWareHouse(true)
+        }
     }
 
     const generateReportApi = async (data: ReportDonations) => {
@@ -139,10 +165,34 @@ export const Reports = () => {
         URL.revokeObjectURL(url);
         setOpen(false);
     }
+    const generateReportInventoryApi = async () => {
+        const response = await generateReportInventory();
+        const url = URL.createObjectURL(response)
+        const link = window.document.createElement("a")
+        link.href = url
+        link.download = `Reporte de inventario`
+        window.document.body.appendChild(link)
+        link.click()
+        window.document.body.removeChild(link)
+        URL.revokeObjectURL(url);
+        setOpen(false);
+    }
+    const generateReportStoreApi = async (storeId: number) => {
+        const response = await generateReportStore(storeId);
+        const url = URL.createObjectURL(response)
+        const link = window.document.createElement("a")
+        link.href = url
+        link.download = `Reporte de almacenes`
+        window.document.body.appendChild(link)
+        link.click()
+        window.document.body.removeChild(link)
+        URL.revokeObjectURL(url);
+        setOpenWareHouse(false);
+    }
 
     return (
         <div className="h-full overflow-x-hidden">
-            {loading && <ScreenLoader/>}
+            {loading && <ScreenLoader />}
             {/* Header */}
             <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 gap-4 text-white manrope">
                 <LuChartNoAxesCombined size={60} />
@@ -185,11 +235,11 @@ export const Reports = () => {
                             const IconComponent = report.icon
                             return (
                                 <Card key={report.id} className="hover:shadow-lg transition-shadow duration-200 relative overflow-hidden">
-                                    {!report.done && (
+                                    {/* {!report.done && (
                                         <div className="absolute top-0 left-0 bg-black opacity-40 flex items-center justify-center w-full h-full">
                                             <p className="text-white">Próximamente...</p>
                                         </div>
-                                    )}
+                                    )} */}
                                     <CardHeader className="pb-3">
                                         <div className="flex items-center space-x-3">
                                             <div className={`p-2 rounded-lg ${report.color}`}>
@@ -201,8 +251,8 @@ export const Reports = () => {
                                         </div>
                                         <CardDescription className="text-sm">{report.description}</CardDescription>
                                     </CardHeader>
-                                    <CardContent className="pt-0">
-                                        <div className="flex space-x-2">
+                                    <CardContent className="pt-0 h-full flex items-end w-full">
+                                        <div className="flex items-end w-full">
                                             <Button
                                                 size="sm"
                                                 variant="animated"
@@ -367,11 +417,18 @@ export const Reports = () => {
 
 
             <ReportDialogs
-            open={open}
-            setOpen={setOpen}
-            lotes={report ? report.lotes : []}
-            provider={report ? report.providers : []}
-            onSubmitData={generateReportApi}
+                open={open}
+                setOpen={setOpen}
+                lotes={report ? report.lotes : []}
+                provider={report ? report.providers : []}
+                onSubmitData={generateReportApi}
+            />
+
+            <WareHouseDialog
+                open={openWarehouse}
+                setOpen={setOpenWareHouse}
+                stores={stores}
+                onSubmitData={generateReportStoreApi}
             />
         </div>
     )

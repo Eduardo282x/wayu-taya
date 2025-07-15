@@ -1,4 +1,5 @@
 import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
+import FormSelectCustom from "@/components/formInput/FormSelectCustom";
 import {
     StyledDialog,
     StyledDialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/StyledDialog/StyledDialog"
 import { Button } from "@/components/ui/button";
 import { ReportDonations } from "@/services/reports/report.interface";
+import { IStore } from "@/services/store/store.interface";
 import { useState } from "react";
 
 interface ReportDialogsProps {
@@ -71,6 +73,56 @@ export const ReportDialogs = ({ open, setOpen, provider, lotes, onSubmitData }: 
                             onChange={(value) => setLotes(value)}
                             multiple={true}
                             dataSelected={lotesSelected.map(item => item.toString())}
+                        />
+                    </div>
+
+                    <div className="flex justify-end space-x-2 pt-4">
+                        <Button
+                            variant="animated"
+                            className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
+                            type="submit"
+                            onClick={onSubmit}
+                        >
+                            Generar
+                        </Button>
+                    </div>
+                </div>
+            </StyledDialogContent>
+        </StyledDialog>
+    )
+}
+
+interface WareHouseDialogProps {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    stores: IStore[]
+    onSubmitData: (storeId: number) => void
+}
+
+export const WareHouseDialog = ({ open, setOpen, stores, onSubmitData }: WareHouseDialogProps) => {
+    const [storeSelected, setStoreSelected] = useState<string>('');
+
+    const onSubmit = () => {
+        onSubmitData(Number(storeSelected));
+    }
+
+    return (
+        <StyledDialog open={open} onOpenChange={setOpen}>
+            <StyledDialogContent className="w-[30rem] ">
+                <StyledDialogHeader>
+                    <StyledDialogTitle>Generar Reporte</StyledDialogTitle>
+                    <StyledDialogDescription>
+                        Seleccionar el almacén
+                    </StyledDialogDescription>
+                </StyledDialogHeader>
+                <div className="grid gap-4 py-4">
+
+                    <div>
+                        <FormSelectCustom
+                            label="Almacén"
+                            id="store"
+                            options={stores.map(item => ({ label: item.name, value: item.id.toString() }))}
+                            onChange={(e) => setStoreSelected(e.target.value)}
                         />
                     </div>
 

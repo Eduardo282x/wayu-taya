@@ -10,6 +10,7 @@ import { PagesInterface } from "./table.data";
 
 import { Button } from "../ui/button";
 import "./table.css";
+import { UserToken } from "@/services/auth/auth.interfaces";
 
 interface TableProps {
   column: Column[];
@@ -35,10 +36,27 @@ export const TableComponents: FC<TableProps> = ({
     setPage(0);
   }, [data, rowsPerPage]);
 
+  const [columns, setColumns] = useState<Column[]>(column);
   const indexOfLastItem = (page + 1) * Number(rowsPerPage);
   const indexOfFirstItem = indexOfLastItem - Number(rowsPerPage);
   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
   const totalItems = data.length;
+
+  useEffect(() => {
+    filterColumnsByUser()
+  }, [column])
+
+  const filterColumnsByUser = () => {
+    const localUser: UserToken = JSON.parse(localStorage.getItem('token') as string) as UserToken;
+console.log(localUser);
+
+    if(localUser.rol.rol == 'Administrador'){
+      setColumns(column.filter(item => item.column != 'delete'))
+    }
+    if(localUser.rol.rol == 'Usuarios'){
+      setColumns(column.filter(item => item.column != 'delete' && item.column != 'edit'))
+    }
+  }
 
   return (
     <div className="w-full ">
@@ -46,7 +64,7 @@ export const TableComponents: FC<TableProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              {column.map((col: Column, index: number) => (
+              {columns.map((col: Column, index: number) => (
                 <TableHead className={`${col.className && col.className(col)}`} key={index}>{col.label}</TableHead>
               ))}
               {isExpansible && (
@@ -60,9 +78,9 @@ export const TableComponents: FC<TableProps> = ({
             {currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => (
               <>
                 {isExpansible ?
-                  <TableRowExpansible index={index} data={item} columns={column} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={column} />
+                  <TableRowExpansible index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
                   :
-                  <TableRowNormal index={index} data={item} columns={column} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={column} />
+                  <TableRowNormal index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
                 }
               </>
             ))
