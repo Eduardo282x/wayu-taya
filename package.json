@@ -64,6 +64,8 @@
   "overrides": {
     "vite": {
       "rollup": "npm:@rollup/wasm-node"
-    }
+    },
+    "@swc/core": "1.5.7",
+    "@swc/core": "npm:@swc/wasm"
   }
 }
