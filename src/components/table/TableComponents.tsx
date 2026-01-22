@@ -9,8 +9,8 @@ import { FC, useEffect, useRef, useState } from "react";
 import { PagesInterface } from "./table.data";
 
 import { Button } from "../ui/button";
-import "./table.css";
 import { UserToken } from "@/services/auth/auth.interfaces";
+import "./table.css";
 
 interface TableProps {
   column: Column[];
@@ -47,15 +47,16 @@ export const TableComponents: FC<TableProps> = ({
   }, [column])
 
   const filterColumnsByUser = () => {
-    const localUser: UserToken = JSON.parse(localStorage.getItem('token') as string) as UserToken;
-console.log(localUser);
 
-    if(localUser.rol.rol == 'Administrador'){
-      setColumns(column.filter(item => item.column != 'delete'))
-    }
-    if(localUser.rol.rol == 'Usuarios'){
-      setColumns(column.filter(item => item.column != 'delete' && item.column != 'edit'))
-    }
+    setColumns(column.filter(col => col.visible == true));
+    // const localUser: UserToken = JSON.parse(localStorage.getItem('token') as string) as UserToken;
+
+    // if(localUser.rol.rol == 'Administrador'){
+    //   setColumns(column.filter(item => item.column != 'delete'))
+    // }
+    // if(localUser.rol.rol == 'Usuarios'){
+    //   setColumns(column.filter(item => item.column != 'delete' && item.column != 'edit'))
+    // }
   }
 
   return (
