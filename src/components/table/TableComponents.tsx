@@ -9,7 +9,6 @@ import { FC, useEffect, useRef, useState } from "react";
 import { PagesInterface } from "./table.data";
 
 import { Button } from "../ui/button";
-import { UserToken } from "@/services/auth/auth.interfaces";
 import "./table.css";
 
 interface TableProps {
