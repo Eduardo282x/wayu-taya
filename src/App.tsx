@@ -29,6 +29,7 @@ import { ProvidersInstitutions } from './pages/documents/providers/ProvidersInst
 import { useAxiosInterceptor } from './services/Interceptor';
 import { Reports } from './pages/health/reports/Reports';
 import { Documents } from './pages/documents/documents/Documents';
+import { ProtectedRouter } from './pages/layout/ProtectedRouter';
 
 function App() {
   useAxiosInterceptor();
@@ -38,34 +39,35 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/login' element={<Login />}></Route>
+          <Route element={<ProtectedRouter />}>
+            <Route path='/' element={<Home />}></Route>
 
-          <Route path='/' element={<Home />}></Route>
+            <Route element={<Layout />}>
+              <Route path='/documentos' element={<Documents />}></Route>
+              <Route path='/documentos/personas' element={<People />}></Route>
+              <Route path='/documentos/actividades' element={<Activities />}></Route>
+              <Route path='/documentos/documentos' element={<Documents />}></Route>
+              <Route path='/documentos/eventos' element={<Events />}></Route>
+              <Route path='/documentos/proveedores' element={<ProvidersInstitutions />}></Route>
 
-          <Route element={<Layout />}>
-            <Route path='/documentos' element={<Documents />}></Route>
-            <Route path='/documentos/personas' element={<People />}></Route>
-            <Route path='/documentos/actividades' element={<Activities />}></Route>
-            <Route path='/documentos/documentos' element={<Documents />}></Route>
-            <Route path='/documentos/eventos' element={<Events />}></Route>
-            <Route path='/documentos/proveedores' element={<ProvidersInstitutions />}></Route>
+              <Route path='/salud' element={<Health />}></Route>
+              <Route path='/salud/donaciones' element={<Donations />}></Route>
+              <Route path='/salud/reportes' element={<Reports />}></Route>
+              <Route path='/salud/eventos' element={<Events />}></Route>
+              <Route path='/salud/inventario' element={<Inventory />}></Route>
+              <Route path='/salud/medicamentos' element={<Medicine />}></Route>
+              <Route path='/salud/almacenes' element={<Store />}></Route>
+              <Route path='/salud/categorías' element={<Category />}></Route>
+              <Route path='/salud/proveedores' element={<ProvidersInstitutions />}></Route>
+              <Route path='/salud/instituciones' element={<ProvidersInstitutions />} />
 
-            <Route path='/salud' element={<Health />}></Route>
-            <Route path='/salud/donaciones' element={<Donations />}></Route>
-            <Route path='/salud/reportes' element={<Reports/>}></Route>
-            <Route path='/salud/eventos' element={<Events />}></Route>
-            <Route path='/salud/inventario' element={<Inventory />}></Route>
-            <Route path='/salud/medicamentos' element={<Medicine />}></Route>
-            <Route path='/salud/almacenes' element={<Store />}></Route>
-            <Route path='/salud/categorías' element={<Category />}></Route>
-            <Route path='/salud/proveedores' element={<ProvidersInstitutions />}></Route>
-            <Route path='/salud/instituciones' element={<ProvidersInstitutions />} />
+              <Route path='/musica' element={<Music />}></Route>
+              <Route path='/alimentos' element={<Food />}></Route>
+              <Route path='/agua' element={<Water />}></Route>
 
-            <Route path='/musica' element={<Music />}></Route>
-            <Route path='/alimentos' element={<Food />}></Route>
-            <Route path='/agua' element={<Water />}></Route>
-
-            <Route path='/usuarios' element={<Users />}></Route>
-            <Route path='/perfil' element={<Profile />}></Route>
+              <Route path='/usuarios' element={<Users />}></Route>
+              <Route path='/perfil' element={<Profile />}></Route>
+            </Route>
           </Route>
 
         </Routes>
