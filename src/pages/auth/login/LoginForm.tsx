@@ -36,7 +36,7 @@ export const LoginForm = ({ onForgotPassword, setLoading }: LoginFormProps) => {
         localStorage.setItem('token', String(res.token))
         setTimeout(() => {
           navigate('/')
-        }, 1500);
+        }, 1000);
       }
     })
     setLoading(false)

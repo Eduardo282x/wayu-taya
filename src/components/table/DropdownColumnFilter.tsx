@@ -28,7 +28,7 @@ export const DropdownColumnFilter = ({ columns, setColumns }: DropdownColumnFilt
     return (
         <div>
             <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                     <Button
                         variant="outline"
                         className="bg-white text-[#0350af] border border-[#0350af] hover:bg-[#e6fafd] hover:text-[#0350af]"

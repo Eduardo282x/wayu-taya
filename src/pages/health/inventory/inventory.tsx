@@ -178,6 +178,7 @@ export const Inventory = () => {
       <div className="mt-3">
         {currentView === "inventory" ? (
           <TableComponents
+            key="inventory"
             data={inventory.inventory}
             column={inventoryColumns}
             actionTable={getActionTable}
@@ -189,6 +190,7 @@ export const Inventory = () => {
           />
         ) : (
           <TableComponents
+            key="history"
             data={historyData}
             column={historyColumns}
             actionTable={() => { }}
@@ -210,6 +212,7 @@ export const Inventory = () => {
           open={isMoveDialogOpen}
           onOpenChange={setIsMoveDialogOpen}
           inventory={inventory.inventory}
+          stores={stores}
           onSubmit={onSubmitMovedInventory}
         />
 

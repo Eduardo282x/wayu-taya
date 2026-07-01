@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead, } from "
 import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip";
 import { IoIosArrowBack, IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import { Column } from "@/components/table/table.interface";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, Fragment, useEffect, useRef, useState } from "react";
 import { PagesInterface } from "./table.data";
 
 import { Button } from "../ui/button";
@@ -76,13 +76,13 @@ export const TableComponents: FC<TableProps> = ({
           </TableHeader>
           <TableBody>
             {currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => (
-              <>
+              <Fragment key={index}>
                 {isExpansible ?
                   <TableRowExpansible index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
                   :
                   <TableRowNormal index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
                 }
-              </>
+              </Fragment>
             ))
             ) : (
               <TableRow>
@@ -180,7 +180,7 @@ const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: Tab
           <div
             className={`transition-all duration-300 ease-in-out w-full ${open ? 'h-auto px-4 py-2' : '!h-0'} interpolate overflow-hidden`}
           >
-            <p>{renderRow && renderRow(data, index)}</p>
+            <div>{renderRow && renderRow(data, index)}</div>
           </div>
         </TableCell>
       </TableRow>
@@ -207,7 +207,7 @@ const ColumnIcon = ({ col, item, actionTable }: ColumnCellProps) => {
     <TableCell className={col.className ? col.className(item) : ""}>
       {!(col.hiddenIcon && col.hiddenIcon(item)) && (
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               size={"icon"}
               className="py-[0.4rem] pl-[0.2rem] "

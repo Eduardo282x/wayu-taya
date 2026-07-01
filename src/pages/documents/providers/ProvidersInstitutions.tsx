@@ -19,7 +19,8 @@ import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 type view = 'provider' | 'institution';
 
 export const ProvidersInstitutions = () => {
-	const [columns, setColumns] = useState<Column[]>(providerColumns);
+	const [columnsProviders, setColumnsProviders] = useState<Column[]>(providerColumns);
+	const [columnsInstitutions, setColumnsInstitutions] = useState<Column[]>(institutionColumns);
 	const [providers, setProviders] = useState<GroupProviders>({ allProviders: [], providers: [] });
 	const [parish, setParish] = useState<IParish[]>([]);
 	const [institution, setInstitution] = useState<GroupInstitution>({ allInstitution: [], institution: [] });
@@ -76,7 +77,6 @@ export const ProvidersInstitutions = () => {
 	}
 	const changeTab = (tab: view) => {
 		setCurrentView(tab)
-		setColumns(tab == 'provider' ? providerColumns : institutionColumns);
 	}
 
 	const setFilter = (data: IProviders[] | IInstitution[]) => {
@@ -154,7 +154,13 @@ export const ProvidersInstitutions = () => {
 				</div>
 
 				<div className="flex items-center ">
-					<DropdownColumnFilter columns={columns} setColumns={setColumns} />
+					{currentView == 'provider' && (
+						<DropdownColumnFilter columns={columnsProviders} setColumns={setColumnsProviders} />
+					)}
+					{currentView == 'institution' && (
+						<DropdownColumnFilter columns={columnsInstitutions} setColumns={setColumnsInstitutions} />
+					)}
+					
 					<FilterComponent
 						data={currentView == 'provider' ? providers.allProviders : institution.allInstitution}
 						columns={currentView == 'provider' ? providerColumns : institutionColumns}
@@ -173,11 +179,21 @@ export const ProvidersInstitutions = () => {
 			</div>
 
 			<div className="mt-1 lg:mt-4 ">
-				<TableComponents
-					data={currentView == 'provider' ? providers.providers : institution.institution}
-					column={columns.filter(col => col.visible == true)}
-					actionTable={getActionTable}
-				/>
+				{currentView == 'provider' && (
+					<TableComponents
+						data={providers.providers}
+						column={columnsProviders.filter(col => col.visible == true)}
+						actionTable={getActionTable}
+					/>
+				)}
+
+				{currentView == 'institution' && (
+					<TableComponents
+						data={institution.institution}
+						column={columnsInstitutions.filter(col => col.visible == true)}
+						actionTable={getActionTable}
+					/>
+				)}
 
 				<ProviderForm
 					open={openProvider}

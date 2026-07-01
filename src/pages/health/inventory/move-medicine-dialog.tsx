@@ -13,6 +13,7 @@ import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { FaExchangeAlt, FaWarehouse, FaPills, FaPlus } from "react-icons/fa"
 import type { IInventory } from "@/services/inventory/inventory.interface"
 import { Trash2 } from "lucide-react"
+import { IStore } from "@/services/store/store.interface"
 
 interface MovementItem {
   medicineId: string | number;
@@ -29,10 +30,11 @@ interface MoveMedicineDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   inventory: IInventory[]
+  stores: IStore[]
   onSubmit?: (data: MoveMedicineFormData) => void
 }
 
-export const MoveMedicineDialog = ({ open, onOpenChange, inventory, onSubmit }: MoveMedicineDialogProps) => {
+export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSubmit }: MoveMedicineDialogProps) => {
   const {
     control,
     handleSubmit,
@@ -65,7 +67,7 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, onSubmit }: 
     if (!medicineId || !sourceStoreId) return []
 
     // Obtener todos los almacenes disponibles excepto el almacén origen
-    const allStores = inventory.flatMap((inv) => inv.stores)
+    const allStores = stores;
     const uniqueStores = allStores.filter(
       (store, index, self) =>
         index === self.findIndex((s) => s.id === store.id) && store.id.toString() !== sourceStoreId,
