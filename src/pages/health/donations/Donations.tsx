@@ -245,7 +245,7 @@ export const Donations = () => {
 
 
       <StyledDialog open={openDialog} onOpenChange={setOpenDialog}>
-        <StyledDialogContent className="w-[60rem] max-h-[90vh] overflow-y-auto overflow-x-hidden">
+        <StyledDialogContent className="w-[70rem] max-h-[90vh] overflow-y-auto overflow-x-hidden">
           <StyledDialogHeader>
             <StyledDialogTitle>{donationSelected ? "Editar Donación" : "Registrar Nueva Donación"}</StyledDialogTitle>
           </StyledDialogHeader>

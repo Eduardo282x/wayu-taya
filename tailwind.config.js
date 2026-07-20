@@ -11,25 +11,19 @@ module.exports = {
   ],
   theme: {
     extend: {
-      animation: {
-        theme: {
-          extend: {
-            keyframes: {
-              slideLeft: {
-                from: { transform: "translateX(100%)" },
-                to: { transform: "translateX(0)" },
-              },
-              slideRight: {
-                from: { transform: "translateX(0)" },
-                to: { transform: "translateX(100%)" },
-              },
-            },
-            animation: {
-              "slide-left": "slideLeft 0.6s forwards",
-              "slide-right": "slideRight 0.6s forwards",
-            },
-          },
+      keyframes: {
+        slideLeft: {
+          from: { transform: "translateX(100%)" },
+          to: { transform: "translateX(0)" },
         },
+        slideRight: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(100%)" },
+        },
+      },
+      animation: {
+        "slide-left": "slideLeft 0.6s forwards",
+        "slide-right": "slideRight 0.6s forwards",
       },
       transitionDuration: {
         600: "600ms",
@@ -77,13 +71,6 @@ module.exports = {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-      animation: {
-        "slide-left": "slideLeft 0.6s forwards",
-        "slide-right": "slideRight 0.6s forwards",
-      },
-      transitionDuration: {
-        600: "600ms",
       },
     },
   },

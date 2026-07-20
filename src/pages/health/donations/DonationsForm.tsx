@@ -457,7 +457,7 @@ const DonationDetailFormEntry = ({
         )}
       </div>
 
-      <div className="flex items-start justify-around gap-4">
+      <div className="grid grid-cols-4">
         <div className="w-60">
           <FormAutocompleteV2
             label="Medicina"
@@ -509,6 +509,7 @@ const DonationDetailFormEntry = ({
           label="Fecha de Ingreso"
           id={`admissionDate-${index}`}
           type="date"
+          className="w-60"
           value={formatDateForInput(detail.admissionDate)}
           onChange={(e) => handleMedicineDetailChange(index, "admissionDate", e.target.value)}
         />
@@ -516,6 +517,7 @@ const DonationDetailFormEntry = ({
           label="Fecha de Expiración"
           id={`expirationDate-${index}`}
           type="date"
+          className="w-60"
           value={formatDateForInput(detail.expirationDate)}
           onChange={(e) => handleMedicineDetailChange(index, "expirationDate", e.target.value)}
         />

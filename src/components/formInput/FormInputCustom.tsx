@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { formatDateForInput } from "@/utils/formatters";
+// import { formatDateForInput } from "@/utils/formatters";
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -49,7 +49,7 @@ const FormInputCustom: React.FC<FormInputProps> = ({
   };
 
   const handleDateSelect = (date?: Date) => {
-    const formattedValue = date ? formatDateForInput(date) : "";
+    const formattedValue = date ? new Date(date) : "";
 
     const syntheticEvent = {
       target: {
@@ -95,10 +95,11 @@ const FormInputCustom: React.FC<FormInputProps> = ({
           <PopoverContent className="w-auto p-0 overflow-hidden rounded-md" align="start">
             <Calendar
               mode="single"
+              locale={es}
               selected={selectedDate}
               onSelect={handleDateSelect}
               initialFocus
-              locale={es}
+              captionLayout="dropdown"
             />
           </PopoverContent>
         </Popover>

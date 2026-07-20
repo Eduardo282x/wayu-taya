@@ -33,7 +33,6 @@ const FormSelectCustom: React.FC<FormSelectProps> = ({
   error,
   options,
   placeholder = "Selecciona una opción",
-  appendTo,
   className,
   triggerClassName,
   contentClassName,
@@ -90,7 +89,6 @@ const FormSelectCustom: React.FC<FormSelectProps> = ({
         </SelectTrigger>
 
         <SelectContent
-          container={appendTo === "body" ? document.body : appendTo ?? undefined}
           position="popper"
           sideOffset={4}
           className={cn("max-h-60 overflow-y-auto", contentClassName)}
