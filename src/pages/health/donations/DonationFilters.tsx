@@ -20,7 +20,7 @@ export const DonationFilterDropDown = ({ providers, institutions, handleDonation
     return (
         <div>
             <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                     <Button
                         variant="outline"
                         className="bg-white text-[#0350af] border border-[#0350af] hover:bg-[#e6fafd] hover:text-[#0350af]"
@@ -28,7 +28,7 @@ export const DonationFilterDropDown = ({ providers, institutions, handleDonation
                         <FaFilter />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className='h-80'>
+                <DropdownMenuContent align="start" className=''>
                     <DonationFilters
                         lotes={lotes}
                         providers={providers}
@@ -48,6 +48,8 @@ export const DonationFilters = ({ providers, institutions, handleDonationFilterC
             <FormSelectCustom
                 label='Tipo'
                 id='1'
+                className='w-40'
+                defaultValue='all'
                 options={[
                     { value: 'all', label: 'Todos' },
                     { value: 'Entrada', label: 'Entrada' },
@@ -61,13 +63,19 @@ export const DonationFilters = ({ providers, institutions, handleDonationFilterC
             <FormSelectCustom
                 label='Lote'
                 id='2'
-                options={lotes.map(lo => ({ label: lo, value: lo }))}
+                defaultValue='all'
+                className='w-40'
+                options={[
+                    { value: 'all', label: 'Todos' },
+                    ...lotes.map(lo => ({ label: lo, value: lo }))
+                ]}
                 onChange={(e) => handleDonationFilterChange('lote', e.target.value)}
             />
             <div className='w-60'>
                 {typeDonation == 'Entrada' ?
                     <FormAutocompleteV2
                         label="Proveedor"
+                        appendTo='body'
                         placeholder="Selecciona un proveedor"
                         data={providers.map(provider => ({
                             value: provider.id.toString(),

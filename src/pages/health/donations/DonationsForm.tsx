@@ -13,7 +13,7 @@ import { IMedicine } from "@/services/medicine/medicine.interface"
 import { IInstitution } from "@/services/institution/institution.interface"
 import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
-import { formatDate } from "@/utils/formatters"
+import { formatDate, formatDateForInput } from "@/utils/formatters"
 
 interface DonationsFormProps {
   donation: IDonations | null;
@@ -86,7 +86,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         )
       }
     }
-  }, [donation])
+  }, [donation, reset])
 
   const handleMedicineDetailChange = (index: number, field: DonationTypeForm, value: string | number, indexDet?: number) => {
     setMedicineDetails((prev) => prev.map((detail, i) => {
@@ -163,6 +163,40 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     );
   }
 
+  const hasDonationDetailsChanged = () => {
+    if (!donation) return false;
+
+    const normalizeDate = (value: Date | string) => {
+      if (value instanceof Date) {
+        return value.toISOString().split('T')[0];
+      }
+
+      return value;
+    };
+
+    const currentDetails = medicineDetails.map((item) => ({
+      medicineId: item.medicineId,
+      detailCount: item.details.length,
+      admissionDate: normalizeDate(item.admissionDate),
+      expirationDate: normalizeDate(item.expirationDate),
+      details: item.details.map((det) => ({
+        amount: det.amount,
+        storageId: det.storageId,
+        lote: det.lote ?? '',
+      })),
+    }));
+
+    const originalDetails = donation.detDonation?.map((det) => ({
+      medicineId: det.medicine?.id ?? det.medicineId,
+      detailCount: 1,
+      admissionDate: normalizeDate(det.admissionDate),
+      expirationDate: normalizeDate(det.expirationDate),
+      details: [{ amount: det.amount, storageId: 0, lote: '' }],
+    })) ?? [];
+
+    return JSON.stringify(currentDetails) !== JSON.stringify(originalDetails);
+  };
+
   const onSubmit = (data: DonationBody) => {
     if (data.lote == '' || data.date == '') {
       setAlert(true)
@@ -192,7 +226,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           admissionDate: new Date(det.admissionDate),
           expirationDate: new Date(det.expirationDate),
         }
-      })
+      }),
+      changeDonDetails: donation ? hasDonationDetailsChanged() : false,
     };
     onSave(parseData);
   }
@@ -288,7 +323,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           <FormInputCustom
             label="Lote"
             id="lote"
-            {...register("lote")}
+            value={watch("lote")}
+            onChange={(e) => setValue("lote", e.target.value)}
             placeholder="Lote"
           />
 
@@ -296,7 +332,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             label="Fecha"
             id="date"
             type="date"
-            {...register("date")}
+            value={formatDateForInput(watch("date"))}
+            onChange={(e) => setValue("date", e.target.value)}
           />
         </div>
       </div>
@@ -472,14 +509,14 @@ const DonationDetailFormEntry = ({
           label="Fecha de Ingreso"
           id={`admissionDate-${index}`}
           type="date"
-          value={detail.admissionDate.toLocaleString()}
+          value={formatDateForInput(detail.admissionDate)}
           onChange={(e) => handleMedicineDetailChange(index, "admissionDate", e.target.value)}
         />
         <FormInputCustom
           label="Fecha de Expiración"
           id={`expirationDate-${index}`}
           type="date"
-          value={detail.expirationDate.toLocaleString()}
+          value={formatDateForInput(detail.expirationDate)}
           onChange={(e) => handleMedicineDetailChange(index, "expirationDate", e.target.value)}
         />
       </div>

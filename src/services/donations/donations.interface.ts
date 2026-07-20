@@ -7,9 +7,10 @@ export interface DonationBody {
     providerId: number | null;
     institutionId: number | null;
     type: TypeDonation;
-    date: Date | string,
-    lote: string,
-    medicines: DonationMedicine[]
+    date: Date | string;
+    lote: string;
+    medicines: DonationMedicine[];
+    changeDonDetails?: boolean;
 }
 
 export interface DonationMedicine {

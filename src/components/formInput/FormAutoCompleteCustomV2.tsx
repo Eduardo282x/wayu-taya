@@ -1,5 +1,6 @@
 import { Check, ChevronsUpDown, SearchIcon } from "lucide-react"
 import { FC, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "../ui/button";
 
 interface AutoCompleteProps {
@@ -12,14 +13,18 @@ interface AutoCompleteProps {
   holdOpen?: boolean
   multiple?: boolean
   dataSelected?: string[]
+  appendTo?: "body" | HTMLElement | null
 }
 
-export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected }) => {
+export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string | number>(valueDefault ? valueDefault : "");
   const [inputValue, setInputValue] = useState<string>("");
   const [dataFiltered, setDataFiltered] = useState<{ label: string, value: string }[]>(data);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setValue(valueDefault ? valueDefault.toString() : "");
@@ -38,7 +43,14 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (ref.current && !ref.current.contains(event.target as Node)) {
+    const target = event.target as Node;
+    const path = event.composedPath?.() ?? [];
+    const clickedInsideComponent = path.includes(ref.current as EventTarget)
+      || path.includes(menuRef.current as EventTarget)
+      || ref.current?.contains(target)
+      || menuRef.current?.contains(target);
+
+    if (!clickedInsideComponent) {
       setOpen(false);
     }
   };
@@ -46,7 +58,7 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
   useEffect(() => {
     setInputValue('')
     setDataFiltered(data);
-  }, [open])
+  }, [open, data])
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -54,6 +66,17 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [])
+
+  useEffect(() => {
+    if (!open || !triggerRef.current) return;
+
+    const rect = triggerRef.current.getBoundingClientRect();
+    setMenuPosition({
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+    });
+  }, [open, inputValue, dataFiltered]);
 
   const normalize = (str: string) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
@@ -74,9 +97,58 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
     }
   }
 
+  const dropdownContent = (
+    <div
+      ref={menuRef}
+      className="border rounded-lg overflow-hidden animationOpacity !z-[100000000] bg-white"
+      style={appendTo ? {
+        position: "fixed",
+        top: menuPosition.top,
+        left: menuPosition.left,
+        width: menuPosition.width,
+        zIndex: 100000000,
+      } : undefined}
+    >
+      <div className="flex items-center justify-start px-2 border-b-2">
+        <SearchIcon className="size-4 shrink-0 opacity-50" />
+        <input
+          autoFocus
+          placeholder={placeholder}
+          className="px-2 py-1 rounded-none outline-none w-full"
+          value={inputValue}
+          onChange={onChangeInput}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
+      <div className="max-h-60 overflow-y-auto px-2 w-full">
+        {dataFiltered && dataFiltered.map((option: { label: string, value: string }, index: number) => {
+          const isSelected = multiple
+            ? dataSelected?.includes(option.value)
+            : option.value.toString() === value;
+          return (
+            <p
+              key={index}
+              onClick={() => handleSelect(option.value.toString())}
+              className="text-sm flex items-center justify-between py-1 px-2 hover:bg-gray-100 rounded-md transition-all cursor-pointer"
+            >
+              {option.label}
+              {isSelected && (
+                <Check className="ml-auto h-4 w-4 text-blue-600" />
+              )}
+            </p>
+          );
+        })}
+
+        {dataFiltered.length == 0 && (
+          <p className="text-[.85rem] py-2 text-center text-gray-600">No se encontraron datos.</p>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="relative w-full" ref={ref}>
-      <div>
+      <div ref={triggerRef}>
         <label
           className="pl-1 block text-sm font-medium mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent"
         >
@@ -100,42 +172,9 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
       </div>
 
       {open && (
-        <div className="border rounded-lg overflow-hidden absolute animationOpacity !z-[100000000] mt-1 w-full bg-white">
-          <div className="flex items-center justify-start px-2 border-b-2">
-            <SearchIcon className="size-4 shrink-0 opacity-50" />
-            <input
-              autoFocus
-              placeholder={placeholder}
-              className="px-2 py-1 rounded-none outline-none w-full"
-              value={inputValue}
-              onChange={onChangeInput}
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-          <div className="max-h-60 overflow-y-auto px-2 w-full">
-            {dataFiltered && dataFiltered.map((option: { label: string, value: string }, index: number) => {
-              const isSelected = multiple
-                ? dataSelected?.includes(option.value)
-                : option.value.toString() === value;
-              return (
-                <p
-                  key={index}
-                  onClick={() => handleSelect(option.value.toString())}
-                  className="text-sm flex items-center justify-between py-1 px-2 hover:bg-gray-100 rounded-md transition-all cursor-pointer"
-                >
-                  {option.label}
-                  {isSelected && (
-                    <Check className="ml-auto h-4 w-4 text-blue-600" />
-                  )}
-                </p>
-              );
-            })}
-
-            {dataFiltered.length == 0 && (
-              <p className="text-[.85rem] py-2 text-center text-gray-600">No se encontraron datos.</p>
-            )}
-          </div>
-        </div>
+        appendTo
+          ? createPortal(dropdownContent, appendTo === "body" ? document.body : appendTo)
+          : dropdownContent
       )}
     </div>
   )

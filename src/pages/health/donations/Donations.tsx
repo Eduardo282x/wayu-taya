@@ -2,7 +2,7 @@ import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/pages/layout/Header"
 import { DonationBody, GroupDonations, IDonations } from "@/services/donations/donations.interface"
-import { getDonations, getDonationsReport, getLotes, postDonation } from "@/services/donations/donations.service"
+import { getDonations, getDonationsReport, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
 import { useEffect, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
 import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data.tsx"
@@ -153,7 +153,13 @@ export const Donations = () => {
 
   const handleSaveDonation = async (donationData: DonationBody) => {
     setLoading(true);
-    await postDonation(donationData);
+
+    if (donationSelected?.id) {
+      await putDonation(donationSelected.id, donationData);
+    } else {
+      await postDonation(donationData);
+    }
+
     handleCloseDialog();
     getDonationsApi();
   }
@@ -171,7 +177,7 @@ export const Donations = () => {
 
       setDonations((prev) => ({ ...prev, donations: filteredDonations }));
     }
-  }, [donationsFilter])
+  }, [donations.allDonations, donationsFilter])
 
   const handleDonationFilterChange = (filter: string, value: string | number) => {
     if (filter === 'type') {
@@ -199,7 +205,7 @@ export const Donations = () => {
       {loading && <ScreenLoader />}
       <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
 
-      <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+      <div className="flex justify-between items-center px-2 pb-2 pt-1 border-b-2 border-gray-300">
         <DonationFilterDropDown
           providers={providers}
           institutions={institutions}

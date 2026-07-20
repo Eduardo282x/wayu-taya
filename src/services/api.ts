@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export const api = axios.create({
     baseURL: `${import.meta.env.VITE_BASE_URL_API || 'https://wayu-taya-api.onrender.com'}/api`
+    // baseURL: `https://wayu-taya-api.onrender.com/api`
 })
 
 export const getDataApi = async (url: string) => {
