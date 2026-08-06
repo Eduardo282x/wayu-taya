@@ -112,14 +112,14 @@ export const Category = () => {
                         className={tabSelected('form')}
                         onClick={() => setCurrentView("form")}
                     >
-                        Formas
+                        Presentaciones
                     </Button>
                 </div>
                 <div className="flex items-center gap-2">
                     <FilterComponent
                         data={currentView === "category" ? categories.allCategories : forms.allForms}
                         columns={currentView === "category" ? categoryColumns : formColumns}
-                        placeholder={currentView === "category" ? "Buscar categoría..." : "Buscar forma..."}
+                        placeholder={currentView === "category" ? "Buscar categoría..." : "Buscar presentación..."}
                         setDataFilter={setFilters}
                     />
 
@@ -130,7 +130,7 @@ export const Category = () => {
                         className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-[#58c0e9] text-white"
                     >
                         <FaPlus className="w-4 h-4" />
-                        {currentView === "category" ? "Agregar Categoría" : "Agregar Forma"}
+                        {currentView === "category" ? "Agregar Categoría" : "Agregar Presentación"}
                     </Button>
                 </div>
             </div>
@@ -146,7 +146,7 @@ export const Category = () => {
                     onOpenChange={setIsDeleteDialogOpen}
                     onConfirm={handleConfirmDelete}
                     itemName={categoryFormSelected ? "" : ""}
-                    itemType={currentView === "category" ? "esta categoría" : "esta forma farmacéutica"}
+                    itemType={currentView === "category" ? "esta categoría" : "esta presentación farmacéutica"}
                 />
 
                 <CategoryAndFormDialog

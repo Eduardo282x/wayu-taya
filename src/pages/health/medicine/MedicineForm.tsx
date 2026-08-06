@@ -206,15 +206,15 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
                   rules={{
                     required:
                       currentTab === "medicamento"
-                        ? "La forma es obligatoria"
+                        ? "La presentación es obligatoria"
                         : false,
                   }}
                   render={({ field }) => (
                     <FormAutocompleteV2
                       data={forms.map(ca => ({ label: ca.forms, value: ca.id.toString() }))}
-                      label={"Forma"}
+                      label={"Presentación"}
                       valueDefault={field.value}
-                      placeholder={"Seleccionar una Forma"}
+                      placeholder={"Seleccionar una Presentación"}
                       onChange={(value) => setValue('formId', Number(value))}
                     />
                   )}

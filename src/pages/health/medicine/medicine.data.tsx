@@ -68,7 +68,7 @@ export const medicineColumns: Column[] = [
     isIcon: false,
   },
   {
-    label: "Forma",
+    label: "Presentación",
     column: "form.forms",
     element: (data: IMedicine) => data.form ? data.form.forms : '-',
     visible: false,

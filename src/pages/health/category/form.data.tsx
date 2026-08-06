@@ -4,7 +4,7 @@ import { FaRegTrashAlt, FaEdit } from "react-icons/fa";
 
 export const formColumns: Column[] = [
   {
-    label: "Forma",
+    label: "Presentación",
     column: "forms",
     visible: true,
     isIcon: false,
@@ -17,7 +17,7 @@ export const formColumns: Column[] = [
     isIcon: true,
     element: () => "",
     icon: {
-      label: "Editar forma",
+      label: "Editar Presentación",
       icon: FaEdit,
       className: "text-blue-600 cursor-pointer hover:text-blue-800",
       variant: "ghost",
@@ -30,7 +30,7 @@ export const formColumns: Column[] = [
     isIcon: true,
     element: () => "",
     icon: {
-      label: "Eliminar forma",
+      label: "Eliminar presentación",
       icon: FaRegTrashAlt,
       className: "text-red-600 cursor-pointer hover:text-red-800",
       variant: "ghost",

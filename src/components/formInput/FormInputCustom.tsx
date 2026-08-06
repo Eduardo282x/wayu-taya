@@ -98,7 +98,7 @@ const FormInputCustom: React.FC<FormInputProps> = ({
               locale={es}
               selected={selectedDate}
               onSelect={handleDateSelect}
-              initialFocus
+              className="rounded-lg border"
               captionLayout="dropdown"
             />
           </PopoverContent>

@@ -65,17 +65,17 @@ export const CategoryAndFormDialog: React.FC<CategoryAndFormDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
             {isEdit
-              ? `Editar ${currentTab === "category" ? "Categoría" : "Forma"}`
-              : `Agregar ${currentTab === "category" ? "Nueva Categoría" : "Nueva Forma"
+              ? `Editar ${currentTab === "category" ? "Categoría" : "Presentación"}`
+              : `Agregar ${currentTab === "category" ? "Nueva Categoría" : "Nueva Presentación"
               }`}
           </DialogTitle>
           <DialogDescription className="manrope">
             {isEdit
-              ? `Modifica los datos de ${currentTab === "category" ? "la categoría" : "la forma"
+              ? `Modifica los datos de ${currentTab === "category" ? "la categoría" : "la presentación"
               } y guarda los cambios.`
               : `Ingresa los datos para agregar ${currentTab === "category"
                 ? "una nueva categoría"
-                : "una nueva forma"
+                : "una nueva presentación"
               }.`}
           </DialogDescription>
         </DialogHeader>
@@ -97,19 +97,19 @@ export const CategoryAndFormDialog: React.FC<CategoryAndFormDialogProps> = ({
               value="form"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
             >
-              Forma
+              Presentación
             </TabsTrigger>
           </TabsList>
 
           <form onSubmit={handleSubmit(handleSubmitCategoryForm)} className="pt-2">
             <TabsContent value="category" className="mt-0 flex flex-col gap-2">
               <FormInputCustom
-                label={`Nombre de la ${currentTab === "category" ? "Categoría" : "Forma"}`}
+                label={`Nombre de la ${currentTab === "category" ? "Categoría" : "Presentación"}`}
                 id="name"
                 autoFocus
                 placeholder={`E.g., ${currentTab === "category" ? "Analgésicos" : "Tableta"}`}
                 {...register("category", {
-                  required: `El nombre de la ${currentTab === "category" ? "categoría" : "forma"} es obligatorio`,
+                  required: `El nombre de la ${currentTab === "category" ? "categoría" : "presentación"} es obligatorio`,
                   minLength: { value: 2, message: "Mínimo 2 caracteres" },
                 })}
               />
@@ -117,12 +117,12 @@ export const CategoryAndFormDialog: React.FC<CategoryAndFormDialogProps> = ({
 
             <TabsContent value="form" className="mt-0 flex flex-col gap-2">
               <FormInputCustom
-                label={`Nombre de la ${currentTab === "category" ? "Categoría" : "Forma"}`}
+                label={`Nombre de la ${currentTab === "category" ? "Categoría" : "Presentación"}`}
                 id="name-form"
                 autoFocus
                 placeholder={`E.g., ${currentTab === "category" ? "Analgésicos" : "Jarabe"}`}
                 {...register("forms", {
-                  required: `El nombre de la ${currentTab === "category" ? "categoría" : "forma"} es obligatorio`,
+                  required: `El nombre de la ${currentTab === "category" ? "categoría" : "presentación"} es obligatorio`,
                   minLength: { value: 2, message: "Mínimo 2 caracteres" },
                 })}
               />

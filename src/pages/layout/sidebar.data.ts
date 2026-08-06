@@ -61,7 +61,7 @@ export const menu: IMenu[] = [
         icon: MdOutlineInventory2,
     },
     {
-        label: 'Medicamentos',
+        label: 'Medicamentos e Insumos',
         active: false,
         url: '/salud/medicamentos',
         icon: AiOutlineProduct,
