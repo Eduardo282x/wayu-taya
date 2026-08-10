@@ -32,7 +32,7 @@ export default function PageTransitionComponent({ children, toggle }: PageTransi
         <div className="relative w-full h-full overflow-hidden">
 
             <div
-                className={`flex h-full transition-transform duration-500 ease-in-out ${forceRerender ? 'w-[100%]' : 'w-[200%]'} ${toggle ? '-translate-x-1/2' : 'translate-x-0'}`}
+                className={`flex h-full transition-transform duration-500 ease-in-out ${forceRerender ? 'w-full' : 'w-[200%]'} ${toggle ? '-translate-x-1/2' : 'translate-x-0'}`}
             >
 
                 <div className="w-1/2 shrink-0 h-full overflow-auto">{primaryView}</div>

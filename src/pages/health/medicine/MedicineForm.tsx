@@ -3,11 +3,11 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { BiCartAdd } from "react-icons/bi";
 import { FaArrowLeft } from "react-icons/fa";
-import FormInput from "@/components/formInput/FormInputCustom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface";
 import { baseMedicine } from "./medicine.data";
 import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2";
+import { FormInput } from "@/components/formInput/FormInput";
 
 
 interface MedicineFormProps {
@@ -113,52 +113,41 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
           onSubmit={handleSubmit(handleFormSubmit)}
           className="grid grid-cols-3 gap-2 p-4 overflow-y-auto"
         >
-          <FormInput
-            label="Nombre"
-            id="nombre"
-            autoFocus
-            placeholder="Ibuprofeno"
-            {...register("name", {
-              required: "El nombre es obligatorio",
-              minLength: { value: 2, message: "Mínimo 2 caracteres" },
-            })}
-            error={errors.name?.message}
-          />
-          <FormInput
-            label="Descripción"
-            id="descripcion"
-            placeholder="Analgésico para el dolor"
-            {...register("description", {
-              required: "La descripción es obligatoria",
-            })}
-            error={errors.description?.message}
-          />
-
-          <FormAutocompleteV2
-            data={categories.map(ca => ({ label: ca.category, value: ca.category }))}
-            label="Categoría"
-            freeText
-            appendTo='body'
-            valueDefault={watch('category')}
-            placeholder="Seleccionar o escribir una categoría"
-            onChange={(value) => setValue('category', value)}
-          />
-
           <input type="hidden" {...register("medicine")} />
 
           {currentTab === "medicamento" && (
             <TabsContent value="medicamento" className="col-span-3 grid grid-cols-3 mt-0 gap-2 ">
               <FormInput
-                label="Temperatura de Almacenamiento"
-                id="temperatura"
-                placeholder="Ambiente"
-                {...register("temperate", {
+                label="Nombre"
+                id="nombre"
+                autoFocus
+                placeholder="Acetaminofén"
+                {...register("name", {
+                  required: "El nombre es obligatorio",
+                  minLength: { value: 2, message: "Mínimo 2 caracteres" },
+                })}
+                error={errors.name?.message}
+              />
+              <FormInput
+                label="Presentación"
+                id="presentacion"
+                placeholder="500mg x 24 cápsulas"
+                {...register("presentation", {
                   required:
                     currentTab === "medicamento"
-                      ? "La temperatura es obligatoria"
+                      ? "La presentación es obligatoria"
                       : false,
                 })}
-                error={errors.temperate?.message}
+                error={errors.presentation?.message}
+              />
+              <FormAutocompleteV2
+                data={categories.map(ca => ({ label: ca.category, value: ca.category }))}
+                label="Categoría"
+                freeText
+                appendTo='body'
+                valueDefault={watch('category')}
+                placeholder="Seleccionar o escribir una categoría"
+                onChange={(value) => setValue('category', value)}
               />
               <FormInput
                 label="Manufactura"
@@ -184,7 +173,12 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
                 })}
                 error={errors.activeIngredient?.message}
               />
-
+              <FormInput
+                label="País de Origen"
+                id="pais_origen"
+                placeholder="Venezuela"
+                {...register("countryOfOrigin")}
+              />
               <FormAutocompleteV2
                 data={forms.map(f => ({ label: f.forms, value: f.forms }))}
                 label="Forma"
@@ -194,32 +188,61 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
                 placeholder="Seleccionar o escribir una forma"
                 onChange={(value) => setValue('form', value)}
               />
-
               <FormInput
-                label="Presentación"
-                id="presentacion"
-                placeholder="500 mg"
-                {...register("presentation", {
+                label="Temperatura de Almacenamiento"
+                id="temperatura"
+                placeholder="15°C a 30°C"
+                {...register("temperate", {
                   required:
                     currentTab === "medicamento"
-                      ? "La presentación es obligatoria"
+                      ? "La temperatura es obligatoria"
                       : false,
                 })}
-                error={errors.presentation?.message}
+                error={errors.temperate?.message}
               />
-
               <FormInput
-                label="País de Origen"
-                id="pais_origen"
-                placeholder="Venezuela"
-                {...register("countryOfOrigin")}
+                label="Descripción"
+                id="descripcion"
+                placeholder="Analgésico para el dolor de cabeza"
+                {...register("description", {
+                  required: "La descripción es obligatoria",
+                })}
+                error={errors.description?.message}
               />
             </TabsContent>
           )}
 
           {currentTab === "producto" && (
-            <TabsContent value="producto" className="mt-0">
-              <input type="hidden" {...register("medicine")} />
+            <TabsContent value="producto" className="col-span-3 grid grid-cols-3 mt-0 gap-2">
+              <FormInput
+                label="Nombre"
+                id="nombre_producto"
+                autoFocus
+                placeholder="Crema hidratante"
+                {...register("name", {
+                  required: "El nombre es obligatorio",
+                  minLength: { value: 2, message: "Mínimo 2 caracteres" },
+                })}
+                error={errors.name?.message}
+              />
+              <FormInput
+                label="Descripción"
+                id="descripcion_producto"
+                placeholder="Cuidado diario de la piel"
+                {...register("description", {
+                  required: "La descripción es obligatoria",
+                })}
+                error={errors.description?.message}
+              />
+              <FormAutocompleteV2
+                data={categories.map(ca => ({ label: ca.category, value: ca.category }))}
+                label="Categoría"
+                freeText
+                appendTo='body'
+                valueDefault={watch('category')}
+                placeholder="Seleccionar o escribir una categoría"
+                onChange={(value) => setValue('category', value)}
+              />
             </TabsContent>
           )}
 

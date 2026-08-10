@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MdDomainAdd } from "react-icons/md";
-import FormInput from "@/components/formInput/FormInputCustom";
 import { IStore, StoreBody } from "@/services/store/store.interface";
+import { FormInput } from "@/components/formInput/FormInput";
 
 
 interface StoreFormProps {
