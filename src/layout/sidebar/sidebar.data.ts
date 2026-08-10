@@ -147,28 +147,28 @@ export const menuHealth: IMenuSection[] = [
         title: 'Operaciones',
         items: [
             {
-                label: 'Almacenes',
-                active: false,
-                url: '/salud/almacenes',
-                icon: MdOutlineWarehouse,
-            },
-            {
-                label: 'Medicamentos',
-                active: false,
-                url: '/salud/medicamentos',
-                icon: AiOutlineProduct,
-            },
-            {
                 label: 'Proveedores e Instituciones',
                 active: false,
                 url: '/salud/proveedores',
                 icon: FaUserTie,
             },
             {
+                label: 'Almacenes',
+                active: false,
+                url: '/salud/almacenes',
+                icon: MdOutlineWarehouse,
+            },
+            {
                 label: 'Eventos',
                 active: false,
                 url: '/documentos/eventos',
                 icon: FaRegCalendarAlt,
+            },
+            {
+                label: 'Medicamentos',
+                active: false,
+                url: '/salud/medicamentos',
+                icon: AiOutlineProduct,
             },
         ],
     },

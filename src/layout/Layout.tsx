@@ -8,11 +8,11 @@ export const Layout = () => {
     return (
         <div className=' w-screen h-screen overflow-hidden bg-linear-to-r from-[#024dae] to-[#5cdee5] flex items-center justify-around'>
             <TooltipProvider>
-                <div className='hidden lg:block w-[15%] h-screen'>
+                <div className='hidden lg:block w-[15%] mr-2 h-screen'>
                     <Sidebar />
                 </div>
 
-                <div className='w-full md:w-[90%] px-4 h-full lg:w-[82%] lg:h-[95%] lg:bg-gray-100 rounded-2xl'>
+                <div className='w-full md:w-[82.5%] px-4 my-auto h-full lg:h-[95%] lg:bg-gray-100 rounded-2xl'>
                     {/* <Header /> */}
                     <div className='block lg:hidden'>
                         <HeaderMobile />
