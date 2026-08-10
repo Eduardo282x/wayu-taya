@@ -13,6 +13,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   id: string;
   error?: string;
+  required?: boolean;
 }
 
 const FormInputCustom: React.FC<FormInputProps> = ({
@@ -24,6 +25,7 @@ const FormInputCustom: React.FC<FormInputProps> = ({
   placeholder = "Selecciona una fecha",
   type,
   className,
+  required = true,
   ...inputProps
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -72,6 +74,11 @@ const FormInputCustom: React.FC<FormInputProps> = ({
         className="block text-sm font-medium mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent"
       >
         {label}
+        {required ? (
+          <span className="text-red-500 ml-1">*</span>
+        ) : (
+          <span className="text-gray-500 font-normal"> (Opcional)</span>
+        )}
       </label>
 
       {isDateInput ? (

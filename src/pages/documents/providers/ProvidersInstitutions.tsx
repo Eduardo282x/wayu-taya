@@ -15,6 +15,7 @@ import { ProviderForm } from "./ProviderForm";
 import { InstitutionForm } from "./InstitutionForm";
 import { institutionColumns, providerColumns } from "./providerInstitution.data";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
+import PageTransitionComponent from "@/components/PageTransition";
 
 type view = 'provider' | 'institution';
 
@@ -71,9 +72,9 @@ export const ProvidersInstitutions = () => {
 
 	const tabSelected = (tab: view): string => {
 		if (tab == currentView) {
-			return 'bg-gradient-to-r from-blue-800 to-[#58c0e9] text-white'
+			return 'w-40 bg-gradient-to-r from-blue-800 to-[#58c0e9] text-white'
 		}
-		return 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+		return 'w-40 bg-white text-gray-700'
 	}
 	const changeTab = (tab: view) => {
 		setCurrentView(tab)
@@ -128,95 +129,103 @@ export const ProvidersInstitutions = () => {
 	};
 
 	return (
-		<div className='px-3 lg:p-0 '>
+		<div className='px-3 lg:p-0 h-full flex flex-col'>
 			{loading && (
 				<ScreenLoader />
 			)}
+			<PageTransitionComponent toggle={openProvider || openInstitution}>
+				<div className="h-full overflow-auto">
+					<HeaderPages title={currentView === "provider" ? "Proveedores" : "Instituciones"} Icon={FaUserTie} />
 
-			<HeaderPages title={currentView === "provider" ? "Proveedores" : "Instituciones"} Icon={FaUserTie} />
+					<div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+						<div className="flex items-center gap-2">
+							<Button
+								variant={currentView === "provider" ? "animated" : "outline"}
+								className={tabSelected('provider')}
+								onClick={() => changeTab("provider")}
+							>
+								Proveedores
+							</Button>
+							<Button
+								variant={currentView === "institution" ? "animated" : "outline"}
+								className={tabSelected('institution')}
+								onClick={() => changeTab("institution")}
+							>
+								Instituciones
+							</Button>
+						</div>
 
-			<div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-				<div className="flex items-center gap-2">
-					<Button
-						variant={currentView === "provider" ? "animated" : "outline"}
-						className={tabSelected('provider')}
-						onClick={() => changeTab("provider")}
-					>
-						Proveedores
-					</Button>
-					<Button
-						variant={currentView === "institution" ? "animated" : "outline"}
-						className={tabSelected('institution')}
-						onClick={() => changeTab("institution")}
-					>
-						Instituciones
-					</Button>
+						<div className="flex items-center ">
+							{currentView == 'provider' && (
+								<DropdownColumnFilter columns={columnsProviders} setColumns={setColumnsProviders} />
+							)}
+							{currentView == 'institution' && (
+								<DropdownColumnFilter columns={columnsInstitutions} setColumns={setColumnsInstitutions} />
+							)}
+
+							<FilterComponent
+								data={currentView == 'provider' ? providers.providers : institution.institutions}
+								columns={currentView == 'provider' ? providerColumns : institutionColumns}
+								setDataFilter={setFilter}
+								placeholder={currentView == 'provider' ? "Buscar proveedor..." : "Buscar Institución..."}
+							/>
+							<Button
+								variant={"animated"}
+								className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
+								onClick={newElement}
+							>
+								<FaPlus className="w-4 h-4" />
+								Crear {currentView == 'provider' ? 'Proveedor' : 'Institución'}
+							</Button>
+						</div>
+					</div>
+
+					<div className="mt-1 lg:mt-4 ">
+						{currentView == 'provider' && (
+							<TableComponents
+								data={providers.providers}
+								column={columnsProviders.filter(col => col.visible == true)}
+								actionTable={getActionTable}
+							/>
+						)}
+
+						{currentView == 'institution' && (
+							<TableComponents
+							data={institution.institutions}
+								column={columnsInstitutions.filter(col => col.visible == true)}
+								actionTable={getActionTable}
+							/>
+						)}
+					</div>
+
+					<ConfirmDeleteDialog
+						open={openDialogDelete}
+						onOpenChange={setOpenDialogDelete}
+						onConfirm={confirmDelete}
+						name={currentView == 'provider' ? providerSelected?.name : institutionSelected?.name}
+					/>
 				</div>
 
-				<div className="flex items-center ">
-					{currentView == 'provider' && (
-						<DropdownColumnFilter columns={columnsProviders} setColumns={setColumnsProviders} />
-					)}
-					{currentView == 'institution' && (
-						<DropdownColumnFilter columns={columnsInstitutions} setColumns={setColumnsInstitutions} />
-					)}
-					
-					<FilterComponent
-						data={currentView == 'provider' ? providers.providers : institution.institutions}
-						columns={currentView == 'provider' ? providerColumns : institutionColumns}
-						setDataFilter={setFilter}
-						placeholder={currentView == 'provider' ? "Buscar proveedor..." : "Buscar Institución..."}
-					/>
-					<Button
-						variant={"animated"}
-						className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
-						onClick={newElement}
-					>
-						<FaPlus className="w-4 h-4" />
-						Crear {currentView == 'provider' ? 'Proveedor' : 'Institución'}
-					</Button>
+				<div className="h-full px-2">
+					<div className={openInstitution ? "hidden" : "h-full"}>
+						<ProviderForm
+							open={openProvider}
+							onOpenChange={setOpenProvider}
+							provider={providerSelected}
+							onSubmit={getActionForm}
+						/>
+					</div>
+					<div className={openProvider ? "hidden" : "h-full"}>
+						<InstitutionForm
+							open={openInstitution}
+							onOpenChange={setOpenInstitution}
+							institution={institutionSelected}
+							onSubmit={getActionForm}
+							parish={parish}
+						/>
+					</div>
 				</div>
-			</div>
-
-			<div className="mt-1 lg:mt-4 ">
-				{currentView == 'provider' && (
-					<TableComponents
-						data={providers.providers}
-						column={columnsProviders.filter(col => col.visible == true)}
-						actionTable={getActionTable}
-					/>
-				)}
-
-				{currentView == 'institution' && (
-					<TableComponents
-					data={institution.institutions}
-						column={columnsInstitutions.filter(col => col.visible == true)}
-						actionTable={getActionTable}
-					/>
-				)}
-
-				<ProviderForm
-					open={openProvider}
-					onOpenChange={setOpenProvider}
-					provider={providerSelected}
-					onSubmit={getActionForm}
-				/>
-
-				<InstitutionForm
-					open={openInstitution}
-					onOpenChange={setOpenInstitution}
-					institution={institutionSelected}
-					onSubmit={getActionForm}
-					parish={parish}
-				/>
-
-				<ConfirmDeleteDialog
-					open={openDialogDelete}
-					onOpenChange={setOpenDialogDelete}
-					onConfirm={confirmDelete}
-					name={currentView == 'provider' ? providerSelected?.name : institutionSelected?.name}
-				/>
-			</div>
+			</PageTransitionComponent>
 		</div>
 	);
 };

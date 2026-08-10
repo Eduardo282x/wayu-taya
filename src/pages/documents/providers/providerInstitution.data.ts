@@ -35,7 +35,7 @@ export const institutionColumns: Column[] = [
     {
         label: "Correo",
         column: "email",
-        visible: true,
+        visible: false,
         isIcon: false,
         element: (data: IInstitution) => data.email,
     },

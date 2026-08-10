@@ -75,7 +75,7 @@ export const ProviderForm = ({ open, onOpenChange, onSubmit, provider }: Provide
                 </Button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4 overflow-y-auto">
+            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-3 gap-4 p-4 overflow-y-auto">
                 <div>
                     <FormInputCustom
                         label="Nombre"
@@ -151,7 +151,7 @@ export const ProviderForm = ({ open, onOpenChange, onSubmit, provider }: Provide
                     />
                 </div>
 
-                <div className="flex justify-end space-x-2 pt-4">
+                <div className="col-span-3 flex items-center justify-center pt-4">
                     <Button
                         variant="animated"
                         className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"

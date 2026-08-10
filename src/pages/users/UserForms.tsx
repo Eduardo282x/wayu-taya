@@ -83,7 +83,6 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
           <FormInputCustom
             label="Nombre"
             id="nombre"
-            autoFocus
             {...register("name", {
               required: "El nombre es obligatorio",
               pattern: {

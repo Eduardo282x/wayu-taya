@@ -144,7 +144,7 @@ export const menuHealth: IMenuSection[] = [
         ],
     },
     {
-        title: 'Operaciones',
+        title: 'Logística',
         items: [
             {
                 label: 'Proveedores e Instituciones',
@@ -165,7 +165,7 @@ export const menuHealth: IMenuSection[] = [
                 icon: FaRegCalendarAlt,
             },
             {
-                label: 'Medicamentos',
+                label: 'Medicamentos e Insumos',
                 active: false,
                 url: '/salud/medicamentos',
                 icon: AiOutlineProduct,
