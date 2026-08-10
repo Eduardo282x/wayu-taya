@@ -7,7 +7,7 @@ import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/layout/header/Header"
 import { getInventory, getInventoryHistorial, moveInventoryStorage } from "@/services/inventory/inventory.service"
-import type { IInventory, IInventoryHistory, InventoryContent } from "@/services/inventory/inventory.interface"
+import type { IInventory, InventoryContent, InventoryHistoryContent } from "@/services/inventory/inventory.interface"
 import { TableComponents } from "@/components/table/TableComponents"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { FaHistory, FaExchangeAlt } from "react-icons/fa"
@@ -25,7 +25,7 @@ export const Inventory = () => {
   const [inventorySelected, setInventorySelected] = useState<IInventory | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [currentView, setCurrentView] = useState<"inventory" | "history">("inventory")
-  const [historyData, setHistoryData] = useState<IInventoryHistory[]>([])
+  const [historyData, setHistoryData] = useState<InventoryHistoryContent>({ history: [] })
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   // const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
   const [stores, setStores] = useState<IStore[]>([])
@@ -60,7 +60,7 @@ export const Inventory = () => {
 
   const getInventoryHistorialApi = async () => {
     try {
-      const response: IInventoryHistory[] = await getInventoryHistorial()
+      const response = await getInventoryHistorial()
       setHistoryData(response)
     } catch (err) {
       console.log(err)
@@ -192,7 +192,7 @@ export const Inventory = () => {
         ) : (
           <TableComponents
             key="history"
-            data={historyData}
+            data={historyData.history}
             column={historyColumns}
             actionTable={() => { }}
             colSpanColumns={false}

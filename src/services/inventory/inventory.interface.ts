@@ -21,6 +21,10 @@ export interface ILotes {
     expirationDate: Date;
     admissionDate: Date;
 }
+
+export interface InventoryHistoryContent {
+    history: IInventoryHistory[]
+}
 export interface IInventoryHistory {
     id: number;
     medicineId: number;

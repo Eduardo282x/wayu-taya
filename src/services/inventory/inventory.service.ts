@@ -1,6 +1,6 @@
 import { MoveMedicineFormData } from "@/pages/health/inventory/move-medicine-dialog";
 import { deleteDataApi, getDataApi, putDataApi } from "@/services/api.service"
-import { InventoryContent, IInventoryHistory } from "./inventory.interface";
+import { InventoryContent, InventoryHistoryContent } from "./inventory.interface";
 
 const inventoryUrl = "/inventory";
 
@@ -12,10 +12,10 @@ export const getInventory = async (): Promise<InventoryContent> => {
     return response.data;
 }
 
-export const getInventoryHistorial = async (): Promise<IInventoryHistory[]> => {
-    const response = await getDataApi<IInventoryHistory[]>(`${inventoryUrl}/historial`);
+export const getInventoryHistorial = async (): Promise<InventoryHistoryContent> => {
+    const response = await getDataApi<InventoryHistoryContent>(`${inventoryUrl}/historial`);
     if (response.data == null) {
-        return []
+        return { history: [] }
     }
     return response.data;
 }
