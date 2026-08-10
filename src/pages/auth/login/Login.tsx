@@ -85,7 +85,7 @@ export const Login = () => {
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
                 <div className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope lg:text-xl mb-1">¡Bienvenido!</div>
-                <div className="text-gray-500 manrope lg:text-xl opacity-70 ml-1">Ingresa tus datos....</div>
+                <div className="text-gray-500 manrope lg:text-lg opacity-70 ml-1">Sistema de Gestión de Procesos Wayu Taya</div>
               </div>
 
               <LoginForm onForgotPassword={handleForgotPassword} setLoading={setLoading} loading={loading} />

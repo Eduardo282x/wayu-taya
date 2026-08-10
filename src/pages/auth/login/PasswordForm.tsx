@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { passwordSchema } from "./passwordForm.data"
 import { BodyRecoverPassword } from '@/services/auth/auth.interfaces'
 import { recoverPasswordLogin } from '@/services/auth/auth.service'
@@ -44,12 +47,12 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
 
   return (
     <form className="lg:space-y-6 lg:px-6 h-full w-full flex flex-col lg:items-center" onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col relative justify-center lg:w-[70%]">
-        <label className="text-[0.8rem] ml-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent lg:text-[1rem] manrope selection:bg-transparent">Correo Electrónico</label>
-        <input
+      <div className="flex flex-col relative justify-center w-full">
+        <Label className="ml-1 mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent">Correo Electrónico</Label>
+        <Input
           type="email"
           placeholder="Correo Electrónico"
-          className="lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 placeholder:text-[0.7rem] text-[0.7rem] w-full p-[0.5rem] pb-1 lg:px-4 border border-gray-300 rounded-md focus:outline-1 focus:outline-blue-800 placeholder:opacity-80 shadow-xl lg:mb-0 "
+          className="bg-white h-11 rounded-lg pr-10"
           {...register("email")} />
 
         <div className='h-[0.6rem] text-nowrap mb-2 lg:mb-0 lg:h-[0.5rem]'>
@@ -63,22 +66,26 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       </div>
 
 
-      <div className='lg:self-center lg:w-[70%]'>
-        <label className='text-[0.8rem] ml-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent lg:text-[1rem] manrope selection:bg-transparent'>Contraseña</label>
-        <div className='flex  border border-gray-300 rounded-md shadow-xl focus-within:outline-1 focus-within:outline-blue-800'>
-          <input
+      <div className='lg:self-center w-full'>
+        <Label className='ml-1 mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent'>Contraseña</Label>
+        <div className='relative w-full'>
+          <Input
             type={showPassword ? 'text' : 'password'}
             placeholder="Contraseña"
-            className="lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 text-[0.7rem] placeholder:text-[0.7rem] w-full p-[0.5rem] pb-1 pl-2 lg:px-4 rounded-md focus:outline-none placeholder:opacity-80 lg:pr-0 lg:mb-0"
+            className="bg-white h-11 rounded-lg pr-10 pr-10"
             {...register('password')}
           />
 
-          <div className='text-2xl flex items-center p-1' onClick={() => setShowPassword(!showPassword)}>
+          <button
+            type='button'
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-800 cursor-pointer"
+          >
             {showPassword
-              ? <FaRegEye className="text-blue-800 cursor-pointer" />
-              : <FaRegEyeSlash className="text-blue-800 cursor-pointer" />
+              ? <FaRegEye />
+              : <FaRegEyeSlash />
             }
-          </div>
+          </button>
         </div>
         <div className='h-[1rem] text-center  w-55 '>
           {errors.password && (
@@ -89,22 +96,26 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
         </div>
       </div>
 
-      <div className='lg:self-center lg:w-[70%]'>
-        <label className='text-[0.8rem] ml-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent lg:text-[1rem] manrope selection:bg-transparent'>Confirmar Contraseña</label>
-        <div className='flex w-full border border-gray-300 rounded-md shadow-xl focus-within:outline-1 focus-within:outline-blue-800'>
-          <input
+      <div className='lg:self-center w-full'>
+        <Label className='ml-1 mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent'>Confirmar Contraseña</Label>
+        <div className='relative w-full'>
+          <Input
             type={showPasswordConfirm ? 'text' : 'password'}
             placeholder="Contraseña"
-            className="lg:placeholder:text-[1rem] lg:text-[1rem] lg:py-2 text-[0.7rem] placeholder:text-[0.7rem] w-full p-[0.5rem] pb-1 pl-2 lg:px-4 rounded-md focus:outline-none  placeholder:opacity-80 lg:pr-0 lg:mb-0"
+            className="bg-white h-11 rounded-lg pr-10 pr-10"
             {...register('confirmPassword')}
           />
 
-          <div className='text-2xl flex items-center p-1' onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}>
+          <button
+            type='button'
+            onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-800 cursor-pointer"
+          >
             {showPasswordConfirm
-              ? <FaRegEye className="text-blue-800 cursor-pointer" />
-              : <FaRegEyeSlash className="text-blue-800 cursor-pointer" />
+              ? <FaRegEye />
+              : <FaRegEyeSlash />
             }
-          </div>
+          </button>
         </div>
 
         <div className='h-[1rem] text-center text-nowrap mb-2 lg:mb-[0] lg:h-[0.5rem] w-[55]'>
@@ -120,20 +131,29 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       </div>
 
 
-      <div className='flex  lg:w-[70%]'>
-        <button
+      <div className='flex items-center justify-between w-full gap-4'>
+        <Button
           type="submit"
+          variant="animated"
           disabled={loading}
-          className="lg:text-[1rem] p-3 text-[0.77rem] lg:py-[4%] manrope text-white font-medium rounded-md bg-linear-to-r from-blue-800 to-[#5cdee5] transition-all duration-200 hover:-translate-y-[0.2rem] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer shadow-xl w-[50%] lg:w-[70%] lg:h-[10%] h-[50%]">
+          className="w-[50%] shadow-xl">
           Confirmar
-        </button>
+        </Button>
 
+        <Button
+          type="button"
+          onClick={onBackToLogin}
+          variant="outline"
+          disabled={loading}
+          className="text-blue-800">
+          Volver al inicio de sesión
+        </Button>
 
-        <div
+        {/* <div
           className="text-blue-800 lg:text-[0.75rem] cursor-pointer hover:underline text-[0.54rem] self-center ml-1 lg:text-nowrap manrope selection:bg-transparent"
           onClick={onBackToLogin}>
           Volver al inicio de sesión
-        </div>
+        </div> */}
       </div>
 
     </form>
