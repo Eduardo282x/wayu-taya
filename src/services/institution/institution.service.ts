@@ -1,4 +1,4 @@
-import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api"
+import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
 import { InstitutionsBody } from "./institution.interface";
 
 const institutionsUrl = "/institutions";

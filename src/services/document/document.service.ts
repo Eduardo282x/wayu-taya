@@ -1,4 +1,4 @@
-import { deleteDataApi, getDataApi, getDataFileApi, postDataFileApi } from "../api";
+import { deleteDataApi, getDataApi, getDataFileApi, postDataFileApi } from "../api.service";
 // import { DocumentUploadFileBody } from "./document.interface";
 
 const documentUrl = "/documents";

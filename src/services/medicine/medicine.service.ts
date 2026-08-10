@@ -1,4 +1,4 @@
-import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, postFilesDataApi, putDataApi } from "@/services/api"
+import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, postFilesDataApi, putDataApi } from "@/services/api.service"
 import { ICategory, IForm, MedicineBody } from "./medicine.interface";
 
 const medicineUrl = "/medicine";

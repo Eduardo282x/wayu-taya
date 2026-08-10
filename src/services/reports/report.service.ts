@@ -1,4 +1,4 @@
-import { getDataFileApi, postDataApi, postDataFileApi } from "@/services/api"
+import { getDataFileApi, postDataApi, postDataFileApi } from "@/services/api.service"
 import { BodyReport, ReportDonations } from "./report.interface";
 
 const reportUrl = "/reports";

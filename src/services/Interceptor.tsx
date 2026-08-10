@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Snackbar } from '@/components/snackbar/Snackbar';
+// import { Snackbar } from '@/components/snackbar/Snackbar';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { api } from './api.service';
+import { BaseResponse } from './base.interface';
 // import { useNavigate } from 'react-router';
-import { api } from './api';
 
 export const useAxiosInterceptor = () => {
     // const navigate = useNavigate();
@@ -14,12 +15,18 @@ export const useAxiosInterceptor = () => {
     useEffect(() => {
         const interceptor = api.interceptors.response.use(
             (response) => {
+                // console.log(response);
+
+                // if (response.status === 401) {
+                //     navigate('/login')
+                // }
+
                 if (['post', 'put', 'delete'].includes(response.config.method || '')) {
-                    const message = response.data;
-                    if (isValidMessage(message.message)) {
-                        toast.custom(<Snackbar success={message.success} message={message.message} />, {
-                            duration: 1500,
-                            position: 'bottom-center'
+                    const message: BaseResponse<any> = response.data;
+                    if (isValidMessage(message?.message)) {
+                        toast.success(message.message, {
+                            duration: 3000,
+                            position: 'top-right'
                         });
                     }
                 }
@@ -28,13 +35,12 @@ export const useAxiosInterceptor = () => {
             (error) => {
                 if (['post', 'put', 'delete'].includes(error.config?.method || '')) {
                     const message = error.response?.data;
-                    const parseMessage = message.message.length > 0 ? message.message[0] : message.message
-                    console.log(parseMessage);
+                    // console.log(error.response);
 
                     if (isValidMessage(message?.message)) {
-                        toast.custom(<Snackbar success={message.success} message={parseMessage} />, {
+                        toast.error(message.message, {
                             duration: 1500,
-                            position: 'bottom-center'
+                            position: 'top-right'
                         });
                     }
                 }

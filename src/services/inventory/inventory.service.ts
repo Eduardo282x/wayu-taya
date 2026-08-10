@@ -1,5 +1,5 @@
 import { MoveMedicineFormData } from "@/pages/health/inventory/move-medicine-dialog";
-import { deleteDataApi, getDataApi, putDataApi } from "@/services/api"
+import { deleteDataApi, getDataApi, putDataApi } from "@/services/api.service"
 // import { InventoryBody } from "./user.interface";
 
 const inventoryUrl = "/inventory";

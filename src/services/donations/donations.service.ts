@@ -1,4 +1,4 @@
-import { getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api";
+import { getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
 import { DonationBody } from "./donations.interface";
 
 const donationsUrl = "/donations";

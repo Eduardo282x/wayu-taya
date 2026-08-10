@@ -2,8 +2,9 @@
 import axios from 'axios';
 
 export const api = axios.create({
-    baseURL: `${import.meta.env.VITE_BASE_URL_API || 'https://wayu-taya-api.onrender.com'}/api`
-    // baseURL: `https://wayu-taya-api.onrender.com/api`
+    baseURL: `${import.meta.env.VITE_BASE_URL_API || 'https://wayu-taya-api.onrender.com'}/api`,
+    // baseURL: `https://wayu-taya-api.onrender.com/api`,
+    timeout: 10000
 })
 
 export const getDataApi = async (url: string) => {
@@ -52,7 +53,7 @@ export const postFilesDataApi = async (endpoint: string, formData: FormData) => 
     })
 }
 
-export const postDataFileApi = async (endpoint: string, data: any)=> {
+export const postDataFileApi = async (endpoint: string, data: any) => {
     return await api.post(endpoint, data, { responseType: 'blob' }).then((response) => {
         return response.data;
     }).catch((err) => {
@@ -79,3 +80,18 @@ export const deleteDataApi = async (url: string) => {
         console.log(err);
     }
 }
+
+// Interceptors
+api.interceptors.request.use(
+    (config) => {
+        // const token = useAuthStore.getState().token || localStorage.getItem("token");
+        const token = localStorage.getItem("token");
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    (error) => Promise.reject(error),
+);
