@@ -1,12 +1,12 @@
 import { deleteDataApi, getDataApi, getDataFileApi, postDataFileApi } from "../api.service";
-import { IDocument } from "./document.interface";
+import { DocumentContent, IDocument } from "./document.interface";
 
 const documentUrl = "/documents";
 
-export const getDocument = async (): Promise<IDocument[]> => {
-    const response = await getDataApi<IDocument[]>(documentUrl);
+export const getDocument = async (): Promise<DocumentContent> => {
+    const response = await getDataApi<DocumentContent>(documentUrl);
     if (response.data == null) {
-        return []
+        return { documents: [] }
     }
     return response.data;
 }

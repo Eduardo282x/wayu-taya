@@ -1,12 +1,12 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { GroupPeople, IPeople, PeopleBody } from "./people.interface";
+import { IPeople, PeopleBody, PeopleContent } from "./people.interface";
 
 const peopleUrl = "/people";
 
-export const getPeople = async (): Promise<GroupPeople> => {
-    const response = await getDataApi<GroupPeople>(peopleUrl);
+export const getPeople = async (): Promise<PeopleContent> => {
+    const response = await getDataApi<PeopleContent>(peopleUrl);
     if (response.data == null) {
-        return { allPeople: [], people: [] }
+        return { people: [] }
     }
     return response.data;
 }

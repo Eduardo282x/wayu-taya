@@ -7,6 +7,10 @@ export interface DocumentUploadFileBody {
     content: string;
 }
 
+export interface DocumentContent {
+    documents: IDocument[]
+}
+
 export interface IDocument {
     id:            number;
     name:          string;

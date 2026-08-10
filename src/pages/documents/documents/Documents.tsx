@@ -9,7 +9,7 @@ import { BsFiletypePdf } from "react-icons/bs"
 import { BsFiletypePng } from "react-icons/bs"
 import { BsFiletypeDocx } from "react-icons/bs"
 import { deleteDocument, downloadFile, getDocument, getDocumentAdult, getDocumentLegalRepresentative, uploadFileDocument } from "@/services/document/document.service"
-import { DocumentUploadFileBody, IDocument } from "@/services/document/document.interface"
+import { DocumentContent, DocumentUploadFileBody, IDocument } from "@/services/document/document.interface"
 import { formatDate } from "@/utils/formatters"
 import { TableComponents } from "@/components/table/TableComponents"
 import { Column } from "@/components/table/table.interface"
@@ -23,7 +23,7 @@ type SortField = "nombre" | "fecha" | "tamano" | null
 type SortOrder = "asc" | "desc"
 
 export const Documents = () => {
-  const [data, setData] = useState<IDocument[]>([])
+  const [data, setData] = useState<DocumentContent>({ documents: [] })
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [tipoFilter, setTipoFilter] = useState<FilterType>(null)
   const [contenidoFilter, setContenidoFilter] = useState<ContentType | null>(null)
@@ -59,7 +59,7 @@ export const Documents = () => {
   }
 
   const processedData = useMemo(() => {
-    let result = [...data]
+    let result = [...data.documents]
 
     if (tipoFilter) {
       result = result.filter((item) => item.type === tipoFilter)
@@ -143,7 +143,7 @@ export const Documents = () => {
       column: "type",
       label: "Tipo",
       visible: true,
-      className: () => 'text-white uppercase',
+      className: () => 'text-white',
       element: (item: IDocument) => <span>{item.type ? item.type : '-'}</span>,
     },
     {

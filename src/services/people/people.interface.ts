@@ -14,8 +14,7 @@ export interface PeopleBody {
     // cambioPersona?: boolean;
 }
 
-export interface GroupPeople {
-    allPeople: IPeople[]
+export interface PeopleContent {
     people: IPeople[]
 }
 

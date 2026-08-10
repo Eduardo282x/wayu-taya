@@ -8,14 +8,14 @@ import { IoPersonAddOutline } from "react-icons/io5";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { PeopleForm } from "./PeopleForm";
-import { GroupPeople, IPeople, PeopleBody } from "@/services/people/people.interface";
+import { IPeople, PeopleBody, PeopleContent } from "@/services/people/people.interface";
 import { getPeople, postPeopleNormal, putPeopleNormal } from "@/services/people/people.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { Column } from "@/components/table/table.interface";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
 
 export const People = () => {
-  const [people, setPeople] = useState<GroupPeople>({ allPeople: [], people: [] });
+  const [people, setPeople] = useState<PeopleContent>({ people: [] });
   const [peopleSelected, setPeopleSelected] = useState<IPeople | null>(null);
   const [columns, setColumns] = useState<Column[]>(columnPeople);
   const [open, setOpen] = useState<boolean>(false);
@@ -28,7 +28,7 @@ export const People = () => {
   const getPeopleApi = async () => {
     setLoading(true)
     try {
-      const response: GroupPeople = await getPeople();
+      const response = await getPeople();
       setPeople(response)
     } catch (err) {
       console.log(err);
@@ -74,7 +74,7 @@ export const People = () => {
 
         <div className="flex items-center ">
           <FilterComponent
-            data={people.allPeople}
+            data={people.people}
             columns={columnPeople}
             setDataFilter={setPeopleFilter}
             placeholder="Buscar personas..."
