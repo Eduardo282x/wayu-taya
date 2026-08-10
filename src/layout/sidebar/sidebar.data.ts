@@ -3,16 +3,22 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 // import { MdAccessTime } from "react-icons/md";
 // import { FaBuilding } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
-import { MdOutlineCategory, MdOutlineInventory2, MdOutlineWarehouse } from "react-icons/md";
+import { MdOutlineInventory2, MdOutlineWarehouse } from "react-icons/md";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BiDonateHeart } from "react-icons/bi";
 import { FaUserTie } from "react-icons/fa6";
 import { LuChartNoAxesCombined } from "react-icons/lu";
+import { FiUser } from "react-icons/fi";
 export interface IMenu {
     label: string;
     url: string;
     active: boolean;
     icon: React.ComponentType<{ className?: string }>;
+}
+
+export interface IMenuSection {
+    title?: string;
+    items: IMenu[];
 }
 
 export type Sections = 'documentos' | 'salud' | 'agua' | 'musica' | 'alimentos';
@@ -113,60 +119,75 @@ export const menuDocuments: IMenu[] = [
         icon: PiUsersThree,
     },
 ];
-export const menuHealth: IMenu[] = [
+export const menuHealth: IMenuSection[] = [
     {
-        label: 'Eventos',
-        active: false,
-        url: '/documentos/eventos',
-        icon: FaRegCalendarAlt,
+        title: 'Resumen',
+        items: [
+            {
+                label: 'Reportes',
+                active: false,
+                url: '/salud/reportes',
+                icon: LuChartNoAxesCombined,
+            },
+            {
+                label: 'Donaciones',
+                active: false,
+                url: '/salud/donaciones',
+                icon: BiDonateHeart,
+            },
+            {
+                label: 'Inventario',
+                active: false,
+                url: '/salud/inventario',
+                icon: MdOutlineInventory2,
+            },
+        ],
     },
     {
-        label: 'Donaciones',
-        active: false,
-        url: '/salud/donaciones',
-        icon: BiDonateHeart,
+        title: 'Operaciones',
+        items: [
+            {
+                label: 'Almacenes',
+                active: false,
+                url: '/salud/almacenes',
+                icon: MdOutlineWarehouse,
+            },
+            {
+                label: 'Medicamentos',
+                active: false,
+                url: '/salud/medicamentos',
+                icon: AiOutlineProduct,
+            },
+            {
+                label: 'Proveedores e Instituciones',
+                active: false,
+                url: '/salud/proveedores',
+                icon: FaUserTie,
+            },
+            {
+                label: 'Eventos',
+                active: false,
+                url: '/documentos/eventos',
+                icon: FaRegCalendarAlt,
+            },
+        ],
     },
     {
-        label: 'Reportes',
-        active: false,
-        url: '/salud/reportes',
-        icon: LuChartNoAxesCombined ,
-    },
-    {
-        label: 'Proveedores y Instituciones',
-        active: false,
-        url: '/salud/proveedores',
-        icon: FaUserTie,
-    },
-    {
-        label: 'Inventario',
-        active: false,
-        url: '/salud/inventario',
-        icon: MdOutlineInventory2,
-    },
-    {
-        label: 'Medicamentos',
-        active: false,
-        url: '/salud/medicamentos',
-        icon: AiOutlineProduct,
-    },
-    {
-        label: 'Categorías',
-        active: false,
-        url: '/salud/categorías',
-        icon: MdOutlineCategory,
-    },
-    {
-        label: 'Almacenes',
-        active: false,
-        url: '/salud/almacenes',
-        icon: MdOutlineWarehouse,
-    },
-    {
-        label: 'Usuarios',
-        active: false,
-        url: '/usuarios',
-        icon: PiUsersThree,
+        title: 'Configuración',
+        items: [
+            {
+                label: 'Usuarios',
+                active: false,
+                url: '/usuarios',
+                icon: PiUsersThree,
+            },
+            {
+                label: 'Mi perfil',
+                active: false,
+                url: '/perfil',
+                icon: FiUser,
+            },
+        ],
     },
 ];
 export const menuMusic: IMenu[] = [

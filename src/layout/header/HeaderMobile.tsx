@@ -6,7 +6,7 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { IoMdMenu } from 'react-icons/io';
-import { Sidebar } from './Sidebar';
+import { Sidebar } from '../sidebar/Sidebar';
 import { useState } from 'react';
 
 export const HeaderMobile = () => {

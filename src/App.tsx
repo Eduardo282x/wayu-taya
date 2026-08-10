@@ -5,7 +5,7 @@ import { Food } from './pages/food/Food';
 import { Water } from './pages/water/Water';
 
 import { Login } from './pages/auth/login/Login';
-import { Layout } from './pages/layout/Layout';
+import { Layout } from './layout/Layout';
 import Home from './pages/home/Home';
 
 import { People } from './pages/documents/people/People';
@@ -29,7 +29,7 @@ import { ProvidersInstitutions } from './pages/documents/providers/ProvidersInst
 import { useAxiosInterceptor } from './services/Interceptor';
 import { Reports } from './pages/health/reports/Reports';
 import { Documents } from './pages/documents/documents/Documents';
-import { ProtectedRouter } from './pages/layout/ProtectedRouter';
+import { ProtectedRouter } from './layout/ProtectedRouter';
 
 function App() {
   useAxiosInterceptor();

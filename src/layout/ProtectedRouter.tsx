@@ -1,12 +1,14 @@
+import { validateToken } from '@/hooks/authtenticate';
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router';
 
 export const ProtectedRouter = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    
+
     useEffect(() => {
-        if (!localStorage.getItem('token')) {
+        const getTokenDecode = validateToken();
+        if (!getTokenDecode || getTokenDecode.expired) {
             navigate('/login')
         }
     }, [location])

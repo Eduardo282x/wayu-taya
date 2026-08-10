@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router';
-import { Sidebar } from './Sidebar';
-import { HeaderMobile } from './HeaderMobile';
+import { Sidebar } from './sidebar/Sidebar';
+import { HeaderMobile } from './header/HeaderMobile';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 export const Layout = () => {

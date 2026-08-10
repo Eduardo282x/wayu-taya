@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { menuDocuments, menuHealth, menuMusic, menuWater, menuFeed, IMenu, Sections, menu } from './sidebar.data';
+import { menuDocuments, menuHealth, menuMusic, menuWater, menuFeed, IMenu, IMenuSection, Sections, menu } from './sidebar.data';
 import { TbLogout2 } from "react-icons/tb";
 import logo from '@/assets/images/logo1.png';
 
@@ -17,39 +17,44 @@ import { IoIosArrowDown } from 'react-icons/io';
 export const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [menuData, setMenuData] = useState<IMenu[]>(menu);
+    const [menuData, setMenuData] = useState<IMenuSection[]>([{ items: menu }]);
 
     useEffect(() => {
         const getMenuLocalStorage: Sections = localStorage.getItem('menu') as Sections;
         if (getMenuLocalStorage) {
             switch (getMenuLocalStorage) {
                 case 'documentos':
-                    setMenuData(menuDocuments);
+                    setMenuData([{ items: menuDocuments }]);
                     break;
                 case 'salud':
                     setMenuData(menuHealth);
                     break;
                 case 'musica':
-                    setMenuData(menuMusic);
+                    setMenuData([{ items: menuMusic }]);
                     break;
                 case 'agua':
-                    setMenuData(menuWater);
+                    setMenuData([{ items: menuWater }]);
                     break;
                 case 'alimentos':
-                    setMenuData(menuFeed);
+                    setMenuData([{ items: menuFeed }]);
                     break;
                 default:
-                    setMenuData(menu);
+                    setMenuData([{ items: menu }]);
                     break;
             }
         }
     }, [])
 
     useEffect(() => {
-        setMenuData((prev) => prev.map(me => {
+        setMenuData((prev) => prev.map(section => {
             return {
-                ...me,
-                active: location.pathname === me.url
+                ...section,
+                items: section.items.map(me => {
+                    return {
+                        ...me,
+                        active: location.pathname === me.url
+                    }
+                })
             }
         }))
     }, [location.pathname])
@@ -76,13 +81,22 @@ export const Sidebar = () => {
 
             <div className='flex flex-col items-start justify-between h-[90%] w-full'>
                 <div className='flex flex-col items-start justify-start gap-1 w-full'>
-                    {menuData && menuData.map((me: IMenu, index: number) => (
-                        <div
-                            key={index}
-                            onClick={() => navigate(me.url)}
-                            className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent  hover:border-white ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
-                        >
-                            <me.icon className='text-3xl' /> {me.label}
+                    {menuData && menuData.map((section: IMenuSection, index: number) => (
+                        <div key={index} className='flex flex-col items-start justify-start gap-1 w-full'>
+                            {section.title && (
+                                <p className='mt-2 px-2 text-[11px] font-semibold uppercase tracking-widest text-white/50 manrope'>
+                                    {section.title}
+                                </p>
+                            )}
+                            {section.items.map((me: IMenu, i: number) => (
+                                <div
+                                    key={i}
+                                    onClick={() => navigate(me.url)}
+                                    className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent  hover:border-white ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
+                                >
+                                    <me.icon className='text-3xl' /> {me.label}
+                                </div>
+                            ))}
                         </div>
                     ))}
                 </div>

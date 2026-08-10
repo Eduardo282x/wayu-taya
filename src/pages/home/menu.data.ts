@@ -3,7 +3,7 @@ import { FileText } from "lucide-react"
 import { GiHealthNormal } from "react-icons/gi"
 // import { IoIosWater } from "react-icons/io"
 // import { TbAppleFilled } from "react-icons/tb"
-import { Sections } from "../layout/sidebar.data"
+import { Sections } from "../../layout/sidebar/sidebar.data"
 
 export interface CategoryCardProps {
     title: string;
