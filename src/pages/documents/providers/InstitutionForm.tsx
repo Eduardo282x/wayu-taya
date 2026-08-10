@@ -156,7 +156,8 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                     />
 
                     <FormAutocompleteV2
-                        data={parish.map(ca => ({ label: `${ca.name} - ${ca.town.name} - Edo. ${ca.town.city.state.name}`, value: ca.id.toString() }))}
+                        // data={parish.map(ca => ({ label: `${ca.name} - ${ca.town.name} - Edo. ${ca.town.city.state.name}`, value: ca.id.toString() }))}
+                        data={parish.map(ca => ({ label: `${ca.name}`, value: ca.id.toString() }))}
                         label={"Parroquia"}
                         valueDefault={watch('parishId')}
                         placeholder={"Seleccionar una parroquia"}

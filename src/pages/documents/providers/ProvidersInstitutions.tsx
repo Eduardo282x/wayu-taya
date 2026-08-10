@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { Column } from "@/components/table/table.interface";
 import { FaPlus, FaUserTie } from "react-icons/fa";
 import { deleteProviders, getProviders, postProviders, putProviders } from "@/services/provider/provider.service"; // Importa el servicio
-import { GroupProviders, IProviders, ProviderBody } from "@/services/provider/provider.interface";
+import { ProvidersContent, IProviders, ProviderBody } from "@/services/provider/provider.interface";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { HeaderPages } from "@/layout/header/Header";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { Button } from "@/components/ui/button";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
-import { GroupInstitution, IInstitution, InstitutionsBody, IParish } from "@/services/institution/institution.interface";
+import { InstitutionContent, IInstitution, InstitutionsBody, IParish } from "@/services/institution/institution.interface";
 import { deleteInstitutions, getInstitutions, getParish, postInstitutions, putInstitutions } from "@/services/institution/institution.service";
 import { TableComponents } from "@/components/table/TableComponents";
 import { ProviderForm } from "./ProviderForm";
@@ -21,9 +21,9 @@ type view = 'provider' | 'institution';
 export const ProvidersInstitutions = () => {
 	const [columnsProviders, setColumnsProviders] = useState<Column[]>(providerColumns);
 	const [columnsInstitutions, setColumnsInstitutions] = useState<Column[]>(institutionColumns);
-	const [providers, setProviders] = useState<GroupProviders>({ allProviders: [], providers: [] });
+	const [providers, setProviders] = useState<ProvidersContent>({ providers: [] });
 	const [parish, setParish] = useState<IParish[]>([]);
-	const [institution, setInstitution] = useState<GroupInstitution>({ allInstitution: [], institution: [] });
+	const [institution, setInstitution] = useState<InstitutionContent>({ institutions: [] });
 	const [loading, setLoading] = useState(true);
 	const [currentView, setCurrentView] = useState<view>('provider');
 	const [openDialogDelete, setOpenDialogDelete] = useState(false);
@@ -40,8 +40,8 @@ export const ProvidersInstitutions = () => {
 
 	const getParishApi = async () => {
 		try {
-			const response: IParish[] = await getParish();
-			setParish(response)
+			const response = await getParish();
+			setParish(response.parishes)
 		} catch (err) {
 			console.log(err);
 		}
@@ -50,7 +50,7 @@ export const ProvidersInstitutions = () => {
 	const getProvidersApi = async () => {
 		setLoading(true)
 		try {
-			const response: GroupProviders = await getProviders();
+			const response = await getProviders();
 			setProviders(response)
 		} catch (err) {
 			console.log(err);
@@ -61,7 +61,7 @@ export const ProvidersInstitutions = () => {
 	const getInstitutionsApi = async () => {
 		setLoading(true)
 		try {
-			const response: GroupInstitution = await getInstitutions();
+			const response: InstitutionContent = await getInstitutions();
 			setInstitution(response)
 		} catch (err) {
 			console.log(err);
@@ -162,7 +162,7 @@ export const ProvidersInstitutions = () => {
 					)}
 					
 					<FilterComponent
-						data={currentView == 'provider' ? providers.allProviders : institution.allInstitution}
+						data={currentView == 'provider' ? providers.providers : institution.institutions}
 						columns={currentView == 'provider' ? providerColumns : institutionColumns}
 						setDataFilter={setFilter}
 						placeholder={currentView == 'provider' ? "Buscar proveedor..." : "Buscar Institución..."}
@@ -189,7 +189,7 @@ export const ProvidersInstitutions = () => {
 
 				{currentView == 'institution' && (
 					<TableComponents
-						data={institution.institution}
+					data={institution.institutions}
 						column={columnsInstitutions.filter(col => col.visible == true)}
 						actionTable={getActionTable}
 					/>

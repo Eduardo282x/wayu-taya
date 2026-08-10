@@ -1,5 +1,4 @@
-export interface GroupProviders {
-    allProviders: IProviders[];
+export interface ProvidersContent {
     providers: IProviders[];
 }
 
@@ -20,4 +19,6 @@ export interface ProviderBody {
     address: string;
     country: string;
     email: string;
+    responsible: string;
+    phone: string;
 }

@@ -24,7 +24,6 @@ import { Profile } from './pages/users/profile/Profile';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
 import { Store } from './pages/health/store/Store';
-import { Category } from './pages/health/category/Category';
 import { ProvidersInstitutions } from './pages/documents/providers/ProvidersInstitutions';
 import { useAxiosInterceptor } from './services/Interceptor';
 import { Reports } from './pages/health/reports/Reports';
@@ -60,7 +59,6 @@ function App() {
                 <Route path='inventario' element={<Inventory />} />
                 <Route path='medicamentos' element={<Medicine />} />
                 <Route path='almacenes' element={<Store />} />
-                <Route path='categorías' element={<Category />} />
                 <Route path='proveedores' element={<ProvidersInstitutions />} />
                 <Route path='instituciones' element={<ProvidersInstitutions />} />
               </Route>

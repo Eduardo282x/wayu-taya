@@ -1,49 +1,29 @@
 import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, postFilesDataApi, putDataApi } from "@/services/api.service"
-import { GroupCategory, GroupForm, GroupMedicine, ICategory, IForm, IMedicine, MedicineBody } from "./medicine.interface";
+import { MedicineContent, IMedicine, MedicineBody, FormContent, CategoryContent } from "./medicine.interface";
 
 const medicineUrl = "/medicine";
 
-export const getMedicine = async (): Promise<GroupMedicine> => {
-    const response = await getDataApi<GroupMedicine>(medicineUrl);
+export const getMedicine = async (): Promise<MedicineContent> => {
+    const response = await getDataApi<MedicineContent>(medicineUrl);
     if (response.data == null) {
-        return { allMedicine: [], medicine: [] }
+        return { medicines: [] }
     }
     return response.data;
 }
 
-export const getCategories = async (): Promise<GroupCategory> => {
-    const response = await getDataApi<GroupCategory>(`${medicineUrl}/category`);
+export const getCategories = async (): Promise<CategoryContent> => {
+    const response = await getDataApi<CategoryContent>(`${medicineUrl}/category`);
     if (response.data == null) {
-        return { allCategories: [], categories: [] }
+        return { categories: [] }
     }
     return response.data;
 }
 
-export const postCategories = async (data: ICategory): Promise<ICategory | null> => {
-    const response = await postDataApi<ICategory, ICategory>(`${medicineUrl}/category`, data);
-    return response.data;
-}
-
-export const putCategories = async (id: number, data: ICategory): Promise<ICategory | null> => {
-    const response = await putDataApi<ICategory, ICategory>(`${medicineUrl}/category/${id}`, data);
-    return response.data;
-}
-
-export const getForms = async (): Promise<GroupForm> => {
-    const response = await getDataApi<GroupForm>(`${medicineUrl}/forms`);
+export const getForms = async (): Promise<FormContent> => {
+    const response = await getDataApi<FormContent>(`${medicineUrl}/forms`);
     if (response.data == null) {
-        return { allForms: [], forms: [] }
+        return { forms: [] }
     }
-    return response.data;
-}
-
-export const postForms = async (data: IForm): Promise<IForm | null> => {
-    const response = await postDataApi<IForm, IForm>(`${medicineUrl}/forms`, data);
-    return response.data;
-}
-
-export const putForms = async (id: number, data: IForm): Promise<IForm | null> => {
-    const response = await putDataApi<IForm, IForm>(`${medicineUrl}/forms/${id}`, data);
     return response.data;
 }
 

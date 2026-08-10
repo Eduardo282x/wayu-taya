@@ -1,6 +1,5 @@
-export interface GroupInstitution {
-    allInstitution: IInstitution[];
-    institution: IInstitution[];
+export interface InstitutionContent {
+    institutions: IInstitution[];
 }
 
 export interface IInstitution {
@@ -24,6 +23,10 @@ export interface Parish {
 
 export interface ParishRef {
     name: string;
+}
+
+export interface ParishContent {
+    parishes: IParish[]
 }
 
 export interface IParish {

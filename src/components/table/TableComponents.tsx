@@ -266,11 +266,11 @@ const PaginationTable = ({
         {totalElements}
       </p>
 
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-end gap-2">
         <div className="flex justify-start items-center gap-2">
-          <span className="font-semibold text-gray-700">
+          <p className=" whitespace-nowrap">
             Elementos por página:
-          </span>
+          </p>
           <Select value={rowsPerPage.toString()} onValueChange={setRowsPerPage}>
             <SelectTrigger>
               <SelectValue />

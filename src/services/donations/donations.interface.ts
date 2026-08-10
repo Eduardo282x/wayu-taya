@@ -32,8 +32,7 @@ export interface DetailDonationMedicine {
 //------------------------
 
 
-export interface GroupDonations {
-    allDonations: IDonations[];
+export interface DonationsContent {
     donations: IDonations[];
 }
 

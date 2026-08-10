@@ -1,24 +1,7 @@
 import { Column } from "@/components/table/table.interface";
-import { GroupInstitution, IInstitution } from "@/services/institution/institution.interface";
-import { GroupProviders, IProviders, ProviderBody } from "@/services/provider/provider.interface";
+import { IInstitution } from "@/services/institution/institution.interface";
+import { IProviders } from "@/services/provider/provider.interface";
 import { FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
-
-
-export interface ProviderInstitutionProps {
-    setLoading: (loader: boolean) => void;
-    columns: Column[];
-    getActionForm: (action: ProviderBody | IInstitution) => void
-}
-
-export interface ProvidersProps extends ProviderInstitutionProps {
-    providers: GroupProviders
-    setProviders: (data: GroupProviders) => void
-}
-
-export interface InstitutionProps extends ProviderInstitutionProps {
-    institution: GroupInstitution
-    setInstitution: (data: GroupInstitution) => void
-}
 
 export const institutionColumns: Column[] = [
     {

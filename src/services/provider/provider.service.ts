@@ -1,12 +1,12 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { GroupProviders, IProviders, ProviderBody } from "./provider.interface";
+import { ProvidersContent, IProviders, ProviderBody } from "./provider.interface";
 
-const providersUrl = "/proveedores";
+const providersUrl = "/providers";
 
-export const getProviders = async (): Promise<GroupProviders> => {
-    const response = await getDataApi<GroupProviders>(providersUrl);
+export const getProviders = async (): Promise<ProvidersContent> => {
+    const response = await getDataApi<ProvidersContent>(providersUrl);
     if (response.data == null) {
-        return { allProviders: [], providers: [] }
+        return { providers: [] }
     }
     return response.data;
 }

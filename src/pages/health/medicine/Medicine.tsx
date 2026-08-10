@@ -1,4 +1,4 @@
-import type { GroupMedicine, GroupCategory, GroupForm, IMedicine, MedicineBody, ICategory, IForm } from "@/services/medicine/medicine.interface"
+import type { MedicineContent, IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface"
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter"
 import { TableComponents } from "@/components/table/TableComponents"
 import { FilterComponent } from "@/components/table/FilterComponent"
@@ -26,14 +26,14 @@ import { FaDownload, FaUpload } from "react-icons/fa6"
 import { UploadMedicineDialog } from "./UploadMedicineDialog"
 
 export const Medicine = () => {
-  const [medicines, setMedicines] = useState<GroupMedicine>({ allMedicine: [], medicine: [] })
+  const [medicines, setMedicines] = useState<MedicineContent>({ medicines: [] })
   const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(null)
   const [columns, setColumns] = useState<Column[]>(medicineColumns)
   const [isAddFormOpen, setIsAddFormOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [categories, setCategories] = useState<ICategory[]>([])
-  const [forms, setForms] = useState<IForm[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [forms, setForms] = useState<Form[]>([])
 
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [dragActive, setDragActive] = useState<boolean>(false)
@@ -47,7 +47,7 @@ export const Medicine = () => {
   const getMedicineApi = async () => {
     setLoading(true)
     try {
-      const response: GroupMedicine = await getMedicine()
+      const response = await getMedicine()
       setMedicines(response)
     } catch (err) {
       console.error("Error al obtener medicamentos:", err)
@@ -57,9 +57,9 @@ export const Medicine = () => {
 
   const getCategoriesAndForms = async () => {
     try {
-      const responseCategory: GroupCategory = await getCategories()
+      const responseCategory = await getCategories()
       setCategories(responseCategory.categories)
-      const responseForms: GroupForm = await getForms()
+      const responseForms = await getForms()
       setForms(responseForms.forms)
     } catch (error) {
       console.error("Error al cargar categorías o formas:", error)
@@ -170,10 +170,10 @@ export const Medicine = () => {
   const handleSaveMedicineFile = async () => {
     if (!uploadedFile) return
     setLoading(true);
-    
+
     const formData = new FormData();
     formData.append('file', uploadedFile);
-    
+
     await uploadMedicineFile(formData);
     setUploadedFile(null)
     setIsUploadOpen(false);
@@ -207,7 +207,7 @@ export const Medicine = () => {
 
         <div className="flex items-center ">
           <FilterComponent
-            data={medicines.allMedicine}
+            data={medicines.medicines}
             columns={medicineColumns}
             placeholder="Buscar medicamentos..."
             setDataFilter={setMedicineFilter}
@@ -222,7 +222,7 @@ export const Medicine = () => {
       <div className="mt-4">
         <TableComponents
           column={columns.filter((item) => item.visible === true)}
-          data={medicines.medicine}
+          data={medicines.medicines}
           actionTable={getActionTable}
         />
       </div>

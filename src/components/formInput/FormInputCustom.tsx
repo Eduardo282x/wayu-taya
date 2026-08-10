@@ -112,7 +112,7 @@ const FormInputCustom: React.FC<FormInputProps> = ({
           )}
           {...inputProps}
           type={type}
-          value={typeof value === "string" || typeof value === "number" ? value : (inputProps as { value?: string }).value ?? ""}
+          value={typeof value === "string" || typeof value === "number" ? value : (inputProps as { value?: string }).value}
           onChange={handleInputChange}
         />
       )}

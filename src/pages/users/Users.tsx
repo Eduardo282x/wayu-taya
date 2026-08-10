@@ -11,6 +11,7 @@ import { FilterComponent } from "@/components/table/FilterComponent";
 import { usersColumns } from "./user.data";
 import { deleteUsers, getRoles, getUsers, postUsers, putUsers } from "@/services/users/user.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
+import PageTransitionComponent from "@/components/PageTransition";
 
 export const Users = () => {
   const [users, setUsers] = useState<UsersContent>({ users: [] });
@@ -87,52 +88,60 @@ export const Users = () => {
   }
 
   return (
-    <div className='px-3 lg:p-0 '>
+    <div className='px-3 lg:p-0 h-full flex flex-col'>
       {loading && (
         <ScreenLoader />
       )}
-      <HeaderPages title="Usuarios" Icon={PiUsersThree} />
+      <div className="w-full">
+        <PageTransitionComponent toggle={open}>
+          <div className="h-full overflow-auto">
+            <HeaderPages title="Usuarios" Icon={PiUsersThree} />
 
-      <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-        <div className="flex items-center ">
-          <FilterComponent
-            data={users.users}
-            columns={usersColumns}
-            setDataFilter={setUserFilter}
-            placeholder="Buscar usuarios..."
-          />
-          <Button
-            variant={"animated"}
-            className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
-            onClick={newUser}
-          >
-            <TiUserAddOutline className='size-4 lg:size-6 ' />
-            Crear Usuario
-          </Button>
-        </div>
-      </div>
+            <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+              <div className="flex items-center ">
+                <FilterComponent
+                  data={users.users}
+                  columns={usersColumns}
+                  setDataFilter={setUserFilter}
+                  placeholder="Buscar usuarios..."
+                />
+                <Button
+                  variant={"animated"}
+                  className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
+                  onClick={newUser}
+                >
+                  <TiUserAddOutline className='size-4 lg:size-6 ' />
+                  Crear Usuario
+                </Button>
+              </div>
+            </div>
 
-      <div className="mt-1 lg:mt-4 ">
-        <TableComponents
-          data={users.users}
-          column={usersColumns}
-          actionTable={getActionTable}
-        />
+            <div className="mt-1 lg:mt-4 ">
+              <TableComponents
+                data={users.users}
+                column={usersColumns}
+                actionTable={getActionTable}
+              />
+            </div>
 
-        <UsersForm
-          open={open}
-          onOpenChange={setOpen}
-          user={userSelected}
-          roles={roles.roles}
-          onSubmit={getActionForm}
-        />
+            <ConfirmDeleteDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+              onConfirm={handleConfirmDelete}
+              userName={userSelected?.name}
+            />
+          </div>
 
-        <ConfirmDeleteDialog
-          open={isDeleteDialogOpen}
-          onOpenChange={setIsDeleteDialogOpen}
-          onConfirm={handleConfirmDelete}
-          userName={userSelected?.name}
-        />
+          <div className="h-full px-2">
+            <UsersForm
+              open={open}
+              onOpenChange={setOpen}
+              user={userSelected}
+              roles={roles.roles}
+              onSubmit={getActionForm}
+            />
+          </div>
+        </PageTransitionComponent>
       </div>
     </div>
   );

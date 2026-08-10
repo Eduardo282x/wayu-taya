@@ -1,21 +1,21 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { GroupInstitution, IInstitution, InstitutionsBody, IParish } from "./institution.interface";
+import { InstitutionContent, IInstitution, InstitutionsBody, ParishContent } from "./institution.interface";
 
 const institutionsUrl = "/institutions";
 const parishUrl = "/parroquias";
 
-export const getInstitutions = async (): Promise<GroupInstitution> => {
-    const response = await getDataApi<GroupInstitution>(institutionsUrl);
+export const getInstitutions = async (): Promise<InstitutionContent> => {
+    const response = await getDataApi<InstitutionContent>(institutionsUrl);
     if (response.data == null) {
-        return { allInstitution: [], institution: [] }
+        return { institutions: [] }
     }
     return response.data;
 }
 
-export const getParish = async (): Promise<IParish[]> => {
-    const response = await getDataApi<IParish[]>(parishUrl);
+export const getParish = async (): Promise<ParishContent> => {
+    const response = await getDataApi<ParishContent>(parishUrl);
     if (response.data == null) {
-        return []
+        return { parishes: [] }
     }
     return response.data;
 }

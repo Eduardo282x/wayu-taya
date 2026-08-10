@@ -1,7 +1,7 @@
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/layout/header/Header.tsx"
-import { DonationBody, GroupDonations, IDonations } from "@/services/donations/donations.interface"
+import { DonationBody, DonationsContent, IDonations } from "@/services/donations/donations.interface"
 import { getDonations, getDonationsReport, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
 import { useEffect, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
@@ -24,7 +24,7 @@ import { IInventory } from "@/services/inventory/inventory.interface.ts"
 import { getInventory } from "@/services/inventory/inventory.service.ts"
 
 export const Donations = () => {
-  const [donations, setDonations] = useState<GroupDonations>({ allDonations: [], donations: [] })
+  const [donations, setDonations] = useState<DonationsContent>({ donations: [] })
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
   const [providers, setProviders] = useState<IProviders[]>([])
   const [institutions, setInstitutions] = useState<IInstitution[]>([])
@@ -71,7 +71,7 @@ export const Donations = () => {
   const getInstitutionsApi = async () => {
     try {
       const response = await getInstitutions()
-      setInstitutions(response.institution)
+      setInstitutions(response.institutions)
     } catch (err) {
       console.log(err)
     }
@@ -89,7 +89,7 @@ export const Donations = () => {
   const getMedicinesApi = async () => {
     try {
       const response = await getMedicine()
-      setMedicines(response.medicine)
+      setMedicines(response.medicines)
     } catch (err) {
       console.log(err)
     }
@@ -107,7 +107,7 @@ export const Donations = () => {
   const getDonationsApi = async () => {
     setLoading(true)
     try {
-      const response: GroupDonations = await getDonations()
+      const response: DonationsContent = await getDonations()
       setDonations(response)
     } catch (err) {
       console.log(err)
@@ -166,7 +166,7 @@ export const Donations = () => {
 
   useEffect(() => {
     if (donationsFilter) {
-      const filteredDonations = donations.allDonations.filter((donation) => {
+      const filteredDonations = donations.donations.filter((donation) => {
         const matchesType = donationsFilter.type === 'all' || donation.type === donationsFilter.type;
         const matchesLote = donationsFilter.lote === 'all' || donation.lote.toLowerCase().includes(donationsFilter.lote.toLowerCase());
         const matchesProvider = donationsFilter.providerId ? donation.providerId === donationsFilter.providerId : true;
@@ -177,7 +177,7 @@ export const Donations = () => {
 
       setDonations((prev) => ({ ...prev, donations: filteredDonations }));
     }
-  }, [donations.allDonations, donationsFilter])
+  }, [donations.donations, donationsFilter])
 
   const handleDonationFilterChange = (filter: string, value: string | number) => {
     if (filter === 'type') {
@@ -215,7 +215,7 @@ export const Donations = () => {
         />
         <div className="flex items-center ">
           <FilterComponent
-            data={donations.allDonations}
+            data={donations.donations}
             columns={donationsColumns}
             placeholder="Buscar donación..."
             setDataFilter={setDonationFilter}

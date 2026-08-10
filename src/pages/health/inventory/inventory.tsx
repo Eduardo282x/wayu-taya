@@ -204,7 +204,7 @@ export const Inventory = () => {
           open={isDeleteDialogOpen}
           onOpenChange={setIsDeleteDialogOpen}
           onConfirm={handleConfirmDelete}
-          medicineName={`${inventorySelected?.medicine.name} ${inventorySelected?.medicine.amount}${inventorySelected?.medicine.unit}`}
+          medicineName={`${inventorySelected?.medicine.name} ${inventorySelected?.medicine.presentation}`}
         />
 
         <AlertDialog open={alertOpen} onOpenChange={setAlertOpen} title="Error" description={"Mensaje"} />

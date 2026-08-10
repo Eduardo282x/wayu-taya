@@ -1,12 +1,12 @@
 import { getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
-import { DonationBody, GroupDonations, IDonations } from "./donations.interface";
+import { DonationBody, DonationsContent, IDonations } from "./donations.interface";
 
 const donationsUrl = "/donations";
 
-export const getDonations = async (): Promise<GroupDonations> => {
-    const response = await getDataApi<GroupDonations>(donationsUrl);
+export const getDonations = async (): Promise<DonationsContent> => {
+    const response = await getDataApi<DonationsContent>(donationsUrl);
     if (response.data == null) {
-        return { allDonations: [], donations: [] }
+        return { donations: [] }
     }
     return response.data;
 }
