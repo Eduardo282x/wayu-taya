@@ -10,7 +10,7 @@ export const inventoryColumns: Column[] = [
     visible: true,
     isIcon: false,
     element: (data: IInventory) =>
-      `${data.medicine.name} ${data.medicine.amount}${data.medicine.unit}`,
+      `${data.medicine.name} ${data.medicine.presentation}`,
   },
   {
     label: "Cantidad",
@@ -66,7 +66,7 @@ export const historyColumns: Column[] = [
     column: "medicine.name",
     visible: true,
     isIcon: false,
-    element: (data: IInventoryHistory) => `${data.medicine.name} ${data.medicine.amount}${data.medicine.unit}`,
+    element: (data: IInventoryHistory) => `${data.medicine.name} ${data.medicine.presentation}`,
   },
   {
     label: "Tipo",

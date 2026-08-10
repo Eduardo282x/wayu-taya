@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, SearchIcon } from "lucide-react"
+import { Check, ChevronsUpDown, Plus, SearchIcon } from "lucide-react"
 import { FC, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "../ui/button";
@@ -14,9 +14,10 @@ interface AutoCompleteProps {
   multiple?: boolean
   dataSelected?: string[]
   appendTo?: "body" | HTMLElement | null
+  freeText?: boolean
 }
 
-export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo }) => {
+export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo, freeText }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string | number>(valueDefault ? valueDefault : "");
   const [inputValue, setInputValue] = useState<string>("");
@@ -56,9 +57,12 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
   };
 
   useEffect(() => {
-    setInputValue('')
-    setDataFiltered(data);
-  }, [open, data])
+    if (open) {
+      setInputValue('')
+      setDataFiltered(data);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -90,9 +94,12 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       const selectedOption = dataFiltered[0];
       if (selectedOption) {
         handleSelect(selectedOption.value.toString());
+      } else if (freeText && inputValue.trim()) {
+        handleSelect(inputValue.trim());
       }
     }
   }
@@ -139,7 +146,16 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
           );
         })}
 
-        {dataFiltered.length == 0 && (
+        {freeText && inputValue.trim() && !dataFiltered.some(opt => normalize(opt.label) === normalize(inputValue.trim())) && (
+          <p
+            onClick={() => handleSelect(inputValue.trim())}
+            className="text-sm flex items-center gap-1 py-1 px-2 hover:bg-blue-50 rounded-md transition-all cursor-pointer text-blue-700 border-t"
+          >
+            <Plus className="size-4 shrink-0" /> Usar "{inputValue.trim()}"
+          </p>
+        )}
+
+        {dataFiltered.length == 0 && !(freeText && inputValue.trim()) && (
           <p className="text-[.85rem] py-2 text-center text-gray-600">No se encontraron datos.</p>
         )}
       </div>
@@ -162,7 +178,7 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
         >
           <span className="-ml-2">
             {value
-              ? data.find((option) => option.value.toString() === value)?.label
+              ? data.find((option) => option.value.toString() === value)?.label ?? value.toString()
               : placeholder}
           </span>
           <div className="absolute top-[2.15rem] right-1 bg-white">

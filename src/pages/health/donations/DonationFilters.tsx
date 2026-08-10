@@ -1,11 +1,9 @@
 import { FormAutocompleteV2 } from '@/components/formInput/FormAutoCompleteCustomV2';
 import FormSelectCustom from '@/components/formInput/FormSelectCustom'
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { IInstitution } from '@/services/institution/institution.interface';
 import { IProviders } from '@/services/provider/provider.interface';
 import { useState } from 'react';
-import { FaFilter } from 'react-icons/fa';
 
 interface IDonationFiltersProps {
     lotes: string[]
@@ -19,24 +17,12 @@ interface IDonationFiltersProps {
 export const DonationFilterDropDown = ({ providers, institutions, handleDonationFilterChange, cleanFilters, lotes }: IDonationFiltersProps) => {
     return (
         <div>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="outline"
-                        className="bg-white text-[#0350af] border border-[#0350af] hover:bg-[#e6fafd] hover:text-[#0350af]"
-                    >
-                        <FaFilter />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className=''>
-                    <DonationFilters
-                        lotes={lotes}
-                        providers={providers}
-                        institutions={institutions}
-                        handleDonationFilterChange={handleDonationFilterChange}
-                        cleanFilters={cleanFilters} />
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <DonationFilters
+                lotes={lotes}
+                providers={providers}
+                institutions={institutions}
+                handleDonationFilterChange={handleDonationFilterChange}
+                cleanFilters={cleanFilters} />
         </div>
     )
 }
@@ -48,7 +34,7 @@ export const DonationFilters = ({ providers, institutions, handleDonationFilterC
             <FormSelectCustom
                 label='Tipo'
                 id='1'
-                className='w-40'
+                className='w-32'
                 defaultValue='all'
                 options={[
                     { value: 'all', label: 'Todos' },
@@ -64,7 +50,7 @@ export const DonationFilters = ({ providers, institutions, handleDonationFilterC
                 label='Lote'
                 id='2'
                 defaultValue='all'
-                className='w-40'
+                className='w-32'
                 options={[
                     { value: 'all', label: 'Todos' },
                     ...lotes.map(lo => ({ label: lo, value: lo }))

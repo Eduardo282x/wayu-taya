@@ -3,13 +3,13 @@ import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/layout/header/Header.tsx"
 import { DonationBody, DonationsContent, IDonations } from "@/services/donations/donations.interface"
 import { getDonations, getDonationsReport, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
 import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data.tsx"
 import { FilterComponent } from "@/components/table/FilterComponent"
 import { Button } from "@/components/ui/button"
 import { DonationsForm } from "./DonationsForm"
-import { StyledDialog, StyledDialogContent, StyledDialogHeader, StyledDialogTitle } from "@/components/StyledDialog/StyledDialog"
+import PageTransitionComponent from "@/components/PageTransition"
 import { Plus } from "lucide-react"
 import { IProviders } from "@/services/provider/provider.interface"
 import { getProviders } from "@/services/provider/provider.service"
@@ -41,21 +41,24 @@ export const Donations = () => {
     providerId: null,
     institutionId: null,
   })
+  const filterAppliedRef = useRef<string>('');
 
   useEffect(() => {
-    getStoresApi();
-    getDonationsApi();
-    getProvidersApi();
-    getMedicinesApi();
-    getInventoryApi();
-    getInstitutionsApi();
-    getLotesApi();
+    Promise.all([
+      getStoresApi(),
+      getDonationsApi(),
+      getProvidersApi(),
+      getMedicinesApi(),
+      getInventoryApi(),
+      getInstitutionsApi(),
+      getLotesApi(),
+    ]);
   }, [])
 
   const getLotesApi = async () => {
     try {
-      const response: string[] = await getLotes()
-      setLotes(response);
+      const response = await getLotes()
+      setLotes(response.lotes);
     } catch (err) {
       console.log(err)
     }
@@ -151,32 +154,38 @@ export const Donations = () => {
     setDonationSelected(null);
   }
 
-  const handleSaveDonation = async (donationData: DonationBody) => {
+  const handleSaveDonation = async (donationData: DonationBody): Promise<{ success: boolean; message?: string }> => {
     setLoading(true);
 
-    if (donationSelected?.id) {
-      await putDonation(donationSelected.id, donationData);
-    } else {
-      await postDonation(donationData);
+    const response = donationSelected?.id
+      ? await putDonation(donationSelected.id, donationData)
+      : await postDonation(donationData);
+
+    if (!response.success) {
+      setLoading(false);
+      return { success: false, message: response.message };
     }
 
     handleCloseDialog();
     getDonationsApi();
+    return { success: true };
   }
 
   useEffect(() => {
-    if (donationsFilter) {
-      const filteredDonations = donations.donations.filter((donation) => {
-        const matchesType = donationsFilter.type === 'all' || donation.type === donationsFilter.type;
-        const matchesLote = donationsFilter.lote === 'all' || donation.lote.toLowerCase().includes(donationsFilter.lote.toLowerCase());
-        const matchesProvider = donationsFilter.providerId ? donation.providerId === donationsFilter.providerId : true;
-        const matchesInstitution = donationsFilter.institutionId ? donation.institutionId === donationsFilter.institutionId : true;
+    const filterKey = JSON.stringify(donationsFilter);
+    if (filterAppliedRef.current === filterKey) return;
+    filterAppliedRef.current = filterKey;
 
-        return matchesType && matchesLote && matchesProvider && matchesInstitution;
-      });
+    const filteredDonations = donations.donations.filter((donation) => {
+      const matchesType = donationsFilter.type === 'all' || donation.type === donationsFilter.type;
+      const matchesLote = donationsFilter.lote === 'all' || donation.lote.toLowerCase().includes(donationsFilter.lote.toLowerCase());
+      const matchesProvider = donationsFilter.providerId ? donation.providerId === donationsFilter.providerId : true;
+      const matchesInstitution = donationsFilter.institutionId ? donation.institutionId === donationsFilter.institutionId : true;
 
-      setDonations((prev) => ({ ...prev, donations: filteredDonations }));
-    }
+      return matchesType && matchesLote && matchesProvider && matchesInstitution;
+    });
+
+    setDonations((prev) => ({ ...prev, donations: filteredDonations }));
   }, [donations.donations, donationsFilter])
 
   const handleDonationFilterChange = (filter: string, value: string | number) => {
@@ -201,54 +210,54 @@ export const Donations = () => {
   }
 
   return (
-    <div className="min-h-[90vh] w-[79.5vw] pr-7 overflow-auto">
-      {loading && <ScreenLoader />}
-      <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
+    <div className='px-3 lg:p-0 h-full flex flex-col'>
+      {loading && (
+        <ScreenLoader />
+      )}
+      <PageTransitionComponent toggle={openDialog}>
+        <div className="h-full overflow-auto">
+          <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
 
-      <div className="flex justify-between items-center px-2 pb-2 pt-1 border-b-2 border-gray-300">
-        <DonationFilterDropDown
-          providers={providers}
-          institutions={institutions}
-          handleDonationFilterChange={handleDonationFilterChange}
-          cleanFilters={cleanFilters}
-          lotes={lotes}
-        />
-        <div className="flex items-center ">
-          <FilterComponent
-            data={donations.donations}
-            columns={donationsColumns}
-            placeholder="Buscar donación..."
-            setDataFilter={setDonationFilter}
-          />
-          <Button variant={"animated"} className="h-full" onClick={newDonations}>
-            <Plus className="w-4 h-4 mr-1" />
-            Agregar Donación
-          </Button>
+          <div className="flex justify-between items-center px-2 pb-2 pt-1 border-b-2 border-gray-300">
+            <DonationFilterDropDown
+              providers={providers}
+              institutions={institutions}
+              handleDonationFilterChange={handleDonationFilterChange}
+              cleanFilters={cleanFilters}
+              lotes={lotes}
+            />
+            <div className="flex items-center ">
+              <FilterComponent
+                data={donations.donations}
+                columns={donationsColumns}
+                placeholder="Buscar donación..."
+                setDataFilter={setDonationFilter}
+              />
+              <Button variant={"animated"} className="h-full" onClick={newDonations}>
+                <Plus className="w-4 h-4 mr-1" />
+                Agregar Donación
+              </Button>
 
-        </div>
-      </div>
-
-      <div className="mt-3">
-        <TableComponents
-          data={donations.donations}
-          column={donationsColumns}
-          actionTable={getActionTable}
-          colSpanColumns={true}
-          isExpansible={true}
-          renderRow={(donations: IDonations, index: number) => (
-            <div key={index} className="max-h-32">
-              <TableComponents data={donations.detDonation} column={detDonationsColumns} actionTable={getActionTable} />
             </div>
-          )}
-        />
-      </div>
+          </div>
 
+          <div className="mt-3">
+            <TableComponents
+              data={donations.donations}
+              column={donationsColumns}
+              actionTable={getActionTable}
+              colSpanColumns={true}
+              isExpansible={true}
+              renderRow={(donations: IDonations, index: number) => (
+                <div key={index} className="max-h-32">
+                  <TableComponents data={donations.detDonation} column={detDonationsColumns} actionTable={getActionTable} />
+                </div>
+              )}
+            />
+          </div>
+        </div>
 
-      <StyledDialog open={openDialog} onOpenChange={setOpenDialog}>
-        <StyledDialogContent className="w-[70rem] max-h-[90vh] overflow-y-auto overflow-x-hidden">
-          <StyledDialogHeader>
-            <StyledDialogTitle>{donationSelected ? "Editar Donación" : "Registrar Nueva Donación"}</StyledDialogTitle>
-          </StyledDialogHeader>
+        <div className="h-full px-2">
           <DonationsForm
             donation={donationSelected}
             providers={providers}
@@ -258,8 +267,8 @@ export const Donations = () => {
             institutions={institutions}
             onSave={handleSaveDonation}
             onCancel={handleCloseDialog} />
-        </StyledDialogContent>
-      </StyledDialog>
+        </div>
+      </PageTransitionComponent>
     </div>
   )
 }

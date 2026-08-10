@@ -15,6 +15,7 @@ import {
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import type { Column } from "@/components/table/table.interface"
 import { MedicineForm } from "./MedicineForm"
+import PageTransitionComponent from "@/components/PageTransition"
 import { HeaderPages } from "@/layout/header/Header"
 import { medicineColumns } from "./medicine.data"
 import { Button } from "@/components/ui/button"
@@ -186,77 +187,83 @@ export const Medicine = () => {
   }
 
   return (
-    <>
-      {loading && <ScreenLoader />}
-      <div>
-        <HeaderPages title="Medicamentos" Icon={FaPills} />
-      </div>
-
-      <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-        <div className="flex items-center gap-2">
-          <DropdownColumnFilter columns={columns} setColumns={setColumns} />
-
-          <Button onClick={downloadTemplate} variant={"animatedNormal"} className="bg-green-700">
-            <FaDownload /> Descargar plantilla
-          </Button>
-          <Button onClick={() => setIsUploadOpen(true)} variant={"animatedNormal"} className="bg-green-700">
-            <FaUpload />
-            Cargar datos
-          </Button>
-        </div>
-
-        <div className="flex items-center ">
-          <FilterComponent
-            data={medicines.medicines}
-            columns={medicineColumns}
-            placeholder="Buscar medicamentos..."
-            setDataFilter={setMedicineFilter}
-          />
-          <Button variant={"animated"} className="h-full" onClick={openAddForm}>
-            <GiMedicines className="size-6" />
-            Registrar Medicamentos
-          </Button>
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <TableComponents
-          column={columns.filter((item) => item.visible === true)}
-          data={medicines.medicines}
-          actionTable={getActionTable}
-        />
-      </div>
-
-      <MedicineForm
-        open={isAddFormOpen}
-        onOpenChange={setIsAddFormOpen}
-        onSubmit={handleMedicineSubmit}
-        medicineData={medicineSelected}
-        categories={categories}
-        forms={forms}
-      />
-
-      <ConfirmDeleteMedicineDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={handleConfirmDeleteMedicine}
-        medicineName={medicineSelected?.name}
-      />
-
-      {isUploadOpen && (
-        <UploadMedicineDialog
-          isUploadOpen={isUploadOpen}
-          setIsUploadOpen={setIsUploadOpen}
-          dragActive={dragActive}
-          handleDrag={handleDrag}
-          handleDrop={handleDrop}
-          handleFileInput={handleFileInput}
-          formatFileSize={formatFileSize}
-          uploadedFile={uploadedFile}
-          handleSaveMedicineFile={handleSaveMedicineFile}
-          removeUploadedFile={removeUploadedFile}
-        />
+    <div className='px-3 lg:p-0 h-full flex flex-col'>
+      {loading && (
+        <ScreenLoader />
       )}
-    </>
+      <PageTransitionComponent toggle={isAddFormOpen}>
+          <div className="h-full overflow-auto">
+            <HeaderPages title="Medicamentos" Icon={FaPills} />
+
+            <div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+              <div className="flex items-center gap-2">
+                <DropdownColumnFilter columns={columns} setColumns={setColumns} />
+
+                <Button onClick={downloadTemplate} variant={"animatedNormal"} className="bg-green-700">
+                  <FaDownload /> Descargar plantilla
+                </Button>
+                <Button onClick={() => setIsUploadOpen(true)} variant={"animatedNormal"} className="bg-green-700">
+                  <FaUpload />
+                  Cargar datos
+                </Button>
+              </div>
+
+              <div className="flex items-center ">
+                <FilterComponent
+                  data={medicines.medicines}
+                  columns={medicineColumns}
+                  placeholder="Buscar medicamentos..."
+                  setDataFilter={setMedicineFilter}
+                />
+                <Button variant={"animated"} className="h-full" onClick={openAddForm}>
+                  <GiMedicines className="size-6" />
+                  Registrar Medicamentos
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <TableComponents
+                column={columns.filter((item) => item.visible === true)}
+                data={medicines.medicines}
+                actionTable={getActionTable}
+              />
+            </div>
+
+            <ConfirmDeleteMedicineDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+              onConfirm={handleConfirmDeleteMedicine}
+              medicineName={medicineSelected?.name}
+            />
+
+            {isUploadOpen && (
+              <UploadMedicineDialog
+                isUploadOpen={isUploadOpen}
+                setIsUploadOpen={setIsUploadOpen}
+                dragActive={dragActive}
+                handleDrag={handleDrag}
+                handleDrop={handleDrop}
+                handleFileInput={handleFileInput}
+                formatFileSize={formatFileSize}
+                uploadedFile={uploadedFile}
+                handleSaveMedicineFile={handleSaveMedicineFile}
+                removeUploadedFile={removeUploadedFile}
+              />
+            )}
+          </div>
+
+          <div className="h-full px-2">
+            <MedicineForm
+              open={isAddFormOpen}
+              onOpenChange={setIsAddFormOpen}
+              onSubmit={handleMedicineSubmit}
+              medicineData={medicineSelected}
+              categories={categories}
+              forms={forms}
+            />
+          </div>
+      </PageTransitionComponent>
+    </div>
   )
 }

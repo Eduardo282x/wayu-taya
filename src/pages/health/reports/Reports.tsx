@@ -10,7 +10,7 @@ import { LuChartNoAxesCombined } from "react-icons/lu"
 import { BiDonateHeart } from "react-icons/bi"
 import { generateReportDonations, generateReportInventory, generateReportStore, getReport } from "@/services/reports/report.service"
 import { BodyReport, GraphicStorage, IReports, ProductByStorage, ReportDonations } from "@/services/reports/report.interface"
-import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ReportDialogs, WareHouseDialog } from "./ReportDialogs"
 import { IStore, StoreContent } from "@/services/store/store.interface"
 import { getStore } from "@/services/store/store.service"
@@ -51,6 +51,63 @@ const monthlyDonations = [
     { month: "May", amount: 22100 },
     { month: "Jun", amount: 19800 },
 ]
+
+const ReportsSkeleton = () => {
+    return (
+        <div className="max-w-7xl mx-auto p-6 space-y-8">
+            <section>
+                <div className="flex items-center justify-between mb-6">
+                    <Skeleton className="h-8 w-48" />
+                    <Skeleton className="h-10 w-[180px] rounded-md" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
+                            <div className="flex items-center space-x-3">
+                                <Skeleton className="h-9 w-9 rounded-lg" />
+                                <Skeleton className="h-5 w-40" />
+                            </div>
+                            <Skeleton className="h-4 w-52" />
+                            <Skeleton className="h-9 w-full rounded-md" />
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="space-y-6">
+                <Skeleton className="h-8 w-64" />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-3">
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-8 w-20" />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
+                            <Skeleton className="h-5 w-44" />
+                            <Skeleton className="h-4 w-64" />
+                            <Skeleton className="h-[300px] w-full rounded-md" />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
+                    <Skeleton className="h-5 w-48" />
+                    <Skeleton className="h-4 w-64" />
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <Skeleton key={i} className="h-14 w-full rounded-lg" />
+                    ))}
+                </div>
+            </section>
+        </div>
+    )
+}
 
 export const Reports = () => {
     const now = new Date();
@@ -192,7 +249,6 @@ export const Reports = () => {
 
     return (
         <div className="h-full overflow-x-hidden">
-            {loading && <ScreenLoader />}
             {/* Header */}
             <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 gap-4 text-white manrope">
                 <LuChartNoAxesCombined size={60} />
@@ -202,6 +258,7 @@ export const Reports = () => {
                 </div>
             </div>
 
+            {loading ? <ReportsSkeleton /> : (
             <div className="max-w-7xl mx-auto p-6 space-y-8">
                 {/* Selección de Reportes */}
                 <section>
@@ -414,6 +471,7 @@ export const Reports = () => {
                     </Card>
                 </section>
             </div>
+            )}
 
 
             <ReportDialogs

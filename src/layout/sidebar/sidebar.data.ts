@@ -9,6 +9,9 @@ import { BiDonateHeart } from "react-icons/bi";
 import { FaUserTie } from "react-icons/fa6";
 import { LuChartNoAxesCombined } from "react-icons/lu";
 import { FiUser } from "react-icons/fi";
+import { GiMedicines } from "react-icons/gi";
+import { LuWarehouse } from "react-icons/lu";
+
 export interface IMenu {
     label: string;
     url: string;
@@ -156,7 +159,7 @@ export const menuHealth: IMenuSection[] = [
                 label: 'Almacenes',
                 active: false,
                 url: '/salud/almacenes',
-                icon: MdOutlineWarehouse,
+                icon: LuWarehouse,
             },
             {
                 label: 'Eventos',
@@ -168,7 +171,7 @@ export const menuHealth: IMenuSection[] = [
                 label: 'Medicamentos e Insumos',
                 active: false,
                 url: '/salud/medicamentos',
-                icon: AiOutlineProduct,
+                icon: GiMedicines,
             },
         ],
     },

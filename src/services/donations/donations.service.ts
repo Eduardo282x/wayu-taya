@@ -1,5 +1,6 @@
 import { getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
-import { DonationBody, DonationsContent, IDonations } from "./donations.interface";
+import { DonationBody, DonationsContent, IDonations, LotesContent } from "./donations.interface";
+import { BaseResponse } from "../base.interface";
 
 const donationsUrl = "/donations";
 
@@ -11,10 +12,10 @@ export const getDonations = async (): Promise<DonationsContent> => {
     return response.data;
 }
 
-export const getLotes = async (): Promise<string[]> => {
-    const response = await getDataApi<string[]>(`${donationsUrl}/lotes`);
+export const getLotes = async (): Promise<LotesContent> => {
+    const response = await getDataApi<LotesContent>(`${donationsUrl}/lotes`);
     if (response.data == null) {
-        return []
+        return { lotes: [] }
     }
     return response.data;
 }
@@ -23,12 +24,10 @@ export const getDonationsReport = (id: number) => {
     return getDataFileApi(`${donationsUrl}/download/${id}`);
 }
 
-export const postDonation = async (data: DonationBody): Promise<IDonations | null> => {
-    const response = await postDataApi<DonationBody, IDonations>(donationsUrl, data);
-    return response.data;
+export const postDonation = async (data: DonationBody): Promise<BaseResponse<IDonations | null>> => {
+    return postDataApi<DonationBody, IDonations>(donationsUrl, data);
 }
 
-export const putDonation = async (id: number, data: DonationBody): Promise<IDonations | null> => {
-    const response = await putDataApi<DonationBody, IDonations>(`${donationsUrl}/${id}`, data);
-    return response.data;
+export const putDonation = async (id: number, data: DonationBody): Promise<BaseResponse<IDonations | null>> => {
+    return putDataApi<DonationBody, IDonations>(`${donationsUrl}/${id}`, data);
 }

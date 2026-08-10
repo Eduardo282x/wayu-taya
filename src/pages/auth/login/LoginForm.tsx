@@ -46,7 +46,7 @@ export const LoginForm = ({ onForgotPassword, setLoading, loading }: LoginFormPr
           login(dataLogin.user, dataLogin.token)
         }
         setTimeout(() => {
-          navigate('/')
+          navigate('/salud/inventario')
         }, 500);
       }
     } catch {

@@ -1,15 +1,15 @@
 export interface MedicineBody {
     name: string;
     description: string;
-    categoryId: number;
+    code: string;
+    category: string;
     medicine: boolean;
-    unit: string;
-    amount: number;
+    form: string;
+    presentation: string;
     temperate: string;
     manufacturer: string;
     activeIngredient: string;
-    formId: number;
-    benefited: number;
+    countryOfOrigin: string;
 }
 
 export interface MedicineContent {
@@ -17,37 +17,37 @@ export interface MedicineContent {
 }
 
 export interface IMedicine {
-    id:               number;
-    name:             string;
-    description:      string;
-    code:             null;
-    categoryId:       number;
-    medicine:         boolean;
-    presentation:     string;
-    temperate:        string;
-    manufacturer:     string;
+    id: number;
+    name: string;
+    description: string;
+    code: null;
+    categoryId: number;
+    medicine: boolean;
+    presentation: string;
+    temperate: string;
+    manufacturer: string;
     activeIngredient: string;
-    countryOfOrigin:  string;
-    formId:           number;
-    category:         Category;
-    form:             Form;
+    countryOfOrigin: string;
+    formId: number;
+    category: Category;
+    form: Form;
 }
 
 export interface Category {
-    id:       number;
+    id: number;
     category: string;
 }
 
 export interface Form {
-    id:    number;
+    id: number;
     forms: string;
 }
 
-export interface CategoryContent { 
+export interface CategoryContent {
     categories: Category[]
 }
 
-export interface FormContent { 
+export interface FormContent {
     forms: Form[]
 }
 

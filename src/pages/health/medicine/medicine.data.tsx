@@ -84,13 +84,13 @@ export const medicineColumns: Column[] = [
 export const baseMedicine: MedicineBody = {
   name: "",
   description: "",
-  categoryId: 0,
+  category: '',
   medicine: true,
-  unit: "",
-  amount: 0,
+  presentation: "",
   temperate: "",
   manufacturer: "",
   activeIngredient: "",
-  formId: 0,
-  benefited: 1,
+  countryOfOrigin: '',
+  form: '',
+  code: ''
 }

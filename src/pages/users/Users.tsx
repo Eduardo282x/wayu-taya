@@ -92,57 +92,55 @@ export const Users = () => {
       {loading && (
         <ScreenLoader />
       )}
-      <div className="w-full">
-        <PageTransitionComponent toggle={open}>
-          <div className="h-full overflow-auto">
-            <HeaderPages title="Usuarios" Icon={PiUsersThree} />
+      <PageTransitionComponent toggle={open}>
+        <div className="h-full overflow-auto">
+          <HeaderPages title="Usuarios" Icon={PiUsersThree} />
 
-            <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
-              <div className="flex items-center ">
-                <FilterComponent
-                  data={users.users}
-                  columns={usersColumns}
-                  setDataFilter={setUserFilter}
-                  placeholder="Buscar usuarios..."
-                />
-                <Button
-                  variant={"animated"}
-                  className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
-                  onClick={newUser}
-                >
-                  <TiUserAddOutline className='size-4 lg:size-6 ' />
-                  Crear Usuario
-                </Button>
-              </div>
-            </div>
-
-            <div className="mt-1 lg:mt-4 ">
-              <TableComponents
+          <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+            <div className="flex items-center ">
+              <FilterComponent
                 data={users.users}
-                column={usersColumns}
-                actionTable={getActionTable}
+                columns={usersColumns}
+                setDataFilter={setUserFilter}
+                placeholder="Buscar usuarios..."
               />
+              <Button
+                variant={"animated"}
+                className="w-fit lg:h-full text-[0.8rem] lg:text-[1rem]"
+                onClick={newUser}
+              >
+                <TiUserAddOutline className='size-4 lg:size-6 ' />
+                Crear Usuario
+              </Button>
             </div>
+          </div>
 
-            <ConfirmDeleteDialog
-              open={isDeleteDialogOpen}
-              onOpenChange={setIsDeleteDialogOpen}
-              onConfirm={handleConfirmDelete}
-              userName={userSelected?.name}
+          <div className="mt-1 lg:mt-4 ">
+            <TableComponents
+              data={users.users}
+              column={usersColumns}
+              actionTable={getActionTable}
             />
           </div>
 
-          <div className="h-full px-2">
-            <UsersForm
-              open={open}
-              onOpenChange={setOpen}
-              user={userSelected}
-              roles={roles.roles}
-              onSubmit={getActionForm}
-            />
-          </div>
-        </PageTransitionComponent>
-      </div>
+          <ConfirmDeleteDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+            onConfirm={handleConfirmDelete}
+            userName={userSelected?.name}
+          />
+        </div>
+
+        <div className="h-full px-2">
+          <UsersForm
+            open={open}
+            onOpenChange={setOpen}
+            user={userSelected}
+            roles={roles.roles}
+            onSubmit={getActionForm}
+          />
+        </div>
+      </PageTransitionComponent>
     </div>
   );
 };

@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { BiCartAdd } from "react-icons/bi";
+import { FaArrowLeft } from "react-icons/fa";
 import FormInput from "@/components/formInput/FormInputCustom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select";
-import { IMedicine, MedicineBody, ICategory, IForm } from "@/services/medicine/medicine.interface";
+import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface";
 import { baseMedicine } from "./medicine.data";
 import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2";
 
@@ -16,41 +15,14 @@ interface MedicineFormProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: MedicineBody) => void;
   medicineData: IMedicine | null;
-  categories: ICategory[];
-  forms: IForm[];
+  categories: Category[];
+  forms: Form[];
 }
-
-const unitOptions = [
-  "Unidad(es) (ud)",
-  "Caja(s) (caja)",
-  "Blíster(s) (bl)",
-  "Dosis (dosis)",
-  "Vial(es) (vial)",
-  "Ampolla(s) (amp)",
-  "Miligramos (mg)",
-  "Gramos (g)",
-  "Microgramos (μg)",
-  "Mililitros (mL)",
-  "Litros (L)",
-  "Tabletas (tab)",
-  "Cápsulas (cap)",
-  "Supositorios (sup)",
-  "Óvulos (óv)",
-  "Parches (pch)",
-  "Inhaladores (inh)",
-  "Frascos (frasco)",
-  "Tubos (tubo)",
-  "Jeringas (jer)",
-  "Gotas (gtt)",
-  "Sprays (spr)",
-  "Sobres (sobre)",
-  "Otros",
-];
 
 export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, onSubmit, medicineData, categories, forms }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">("medicamento");
 
-  const { register, handleSubmit, reset, control, setValue, watch, formState: { errors } } = useForm<MedicineBody>({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<MedicineBody>({
     defaultValues: baseMedicine,
   });
 
@@ -59,22 +31,22 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
       reset({
         name: medicineData.name,
         description: medicineData.description,
-        categoryId: medicineData.categoryId,
+        code: medicineData.code ?? "",
+        category: medicineData.category?.category ?? "",
         medicine: medicineData.medicine,
-        unit: medicineData.unit,
-        amount: medicineData.amount,
-        temperate: medicineData.temperate,
-        manufacturer: medicineData.manufacturer,
-        activeIngredient: medicineData.activeIngredient,
-        formId: medicineData.formId || 0,
-        benefited: medicineData.benefited || 0,
+        presentation: medicineData.presentation ?? "",
+        temperate: medicineData.temperate ?? "",
+        manufacturer: medicineData.manufacturer ?? "",
+        activeIngredient: medicineData.activeIngredient ?? "",
+        countryOfOrigin: medicineData.countryOfOrigin ?? "",
+        form: medicineData.form?.forms ?? "",
       });
 
       setCurrentTab(medicineData.medicine ? "medicamento" : "producto");
     } else {
       reset(baseMedicine)
     }
-  }, [open, reset, medicineData, categories, forms]);
+  }, [open, reset, medicineData]);
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value as "medicamento" | "producto");
@@ -84,7 +56,8 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
       setValue("temperate", "");
       setValue("manufacturer", "");
       setValue("activeIngredient", "");
-      setValue("formId", 14)
+      setValue("presentation", "");
+      setValue("form", "");
     }
   };
 
@@ -94,240 +67,173 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg manrope max-h-[95vh] overflow-y-auto bg-gray-300">
-        <DialogHeader>
-          <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
-            {medicineData ? "Editar Elemento" : "Agregar Nuevo Elemento"}{" "}
-          </DialogTitle>
-          <DialogDescription className="manrope">
-            Selecciona si deseas agregar un medicamento o un producto.
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs
-          defaultValue="medicamento"
-          className="w-full gap-2"
-          onValueChange={handleTabChange}
-          value={currentTab}
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
+        <div>
+          <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+            {medicineData ? "Editar Elemento" : "Agregar Nuevo Elemento"}
+          </h2>
+          <p className="manrope text-sm text-gray-600">
+            {medicineData
+              ? "Modifica los datos del elemento y guarda los cambios."
+              : "Completa los datos para registrar un nuevo elemento."}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => onOpenChange(false)}
+          className="flex items-center gap-2"
         >
-          <TabsList className="w-full flex gap-1 bg-gray-200 rounded-lg p-1">
-            <TabsTrigger
-              value="medicamento"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
-            >
-              Medicamento
-            </TabsTrigger>
-            <TabsTrigger
-              value="producto"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
-            >
-              Producto
-            </TabsTrigger>
-          </TabsList>
+          <FaArrowLeft /> Volver
+        </Button>
+      </div>
 
-          <form
-            onSubmit={handleSubmit(handleFormSubmit)}
-            className="grid gap-2 pt-2"
+      <Tabs
+        defaultValue="medicamento"
+        className="w-full gap-2"
+        onValueChange={handleTabChange}
+        value={currentTab}
+      >
+        <TabsList className="w-full flex gap-1 bg-gray-200 rounded-lg p-1">
+          <TabsTrigger
+            value="medicamento"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
           >
-            <FormInput
-              label="Nombre"
-              id="nombre"
-              autoFocus
-              placeholder="Ibuprofeno"
-              {...register("name", {
-                required: "El nombre es obligatorio",
-                minLength: { value: 2, message: "Mínimo 2 caracteres" },
-              })}
-              error={errors.name?.message}
-            />
-            <FormInput
-              label="Descripción"
-              id="descripcion"
-              placeholder="Analgésico para el dolor"
-              {...register("description", {
-                required: "La descripción es obligatoria",
-              })}
-              error={errors.description?.message}
-            />
+            Medicamento
+          </TabsTrigger>
+          <TabsTrigger
+            value="producto"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
+          >
+            Producto
+          </TabsTrigger>
+        </TabsList>
 
-            <FormAutocompleteV2
-              data={categories.map(ca => ({ label: ca.category, value: ca.id.toString() }))}
-              label={"Categorías"}
-              valueDefault={watch('categoryId')}
-              placeholder={"Seleccionar una categoría"}
-              onChange={(value) => setValue('categoryId', Number(value))}
-            />
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="grid grid-cols-3 gap-2 p-4 overflow-y-auto"
+        >
+          <FormInput
+            label="Nombre"
+            id="nombre"
+            autoFocus
+            placeholder="Ibuprofeno"
+            {...register("name", {
+              required: "El nombre es obligatorio",
+              minLength: { value: 2, message: "Mínimo 2 caracteres" },
+            })}
+            error={errors.name?.message}
+          />
+          <FormInput
+            label="Descripción"
+            id="descripcion"
+            placeholder="Analgésico para el dolor"
+            {...register("description", {
+              required: "La descripción es obligatoria",
+            })}
+            error={errors.description?.message}
+          />
 
-            {currentTab === "medicamento" && (
-              <TabsContent value="medicamento" className="mt-0 flex flex-col gap-2">
-                <input type="hidden" {...register("medicine")} />
+          <FormAutocompleteV2
+            data={categories.map(ca => ({ label: ca.category, value: ca.category }))}
+            label="Categoría"
+            freeText
+            appendTo='body'
+            valueDefault={watch('category')}
+            placeholder="Seleccionar o escribir una categoría"
+            onChange={(value) => setValue('category', value)}
+          />
 
-                <FormInput
-                  label="Temperatura de Almacenamiento"
-                  id="temperatura"
-                  placeholder="Ambiente"
-                  {...register("temperate", {
-                    required:
-                      currentTab === "medicamento"
-                        ? "La temperatura es obligatoria"
-                        : false,
-                  })}
-                  error={errors.temperate?.message}
-                />
-                <FormInput
-                  label="Manufactura"
-                  id="manufactura"
-                  placeholder="Bayer"
-                  {...register("manufacturer", {
-                    required:
-                      currentTab === "medicamento"
-                        ? "La manufactura es obligatoria"
-                        : false,
-                  })}
-                  error={errors.manufacturer?.message}
-                />
-                <FormInput
-                  label="Principio Activo"
-                  id="principio_activo"
-                  placeholder="Paracetamol"
-                  {...register("activeIngredient", {
-                    required:
-                      currentTab === "medicamento"
-                        ? "El principio activo es obligatorio"
-                        : false,
-                  })}
-                  error={errors.activeIngredient?.message}
-                />
+          <input type="hidden" {...register("medicine")} />
 
-                <Controller
-                  name="formId"
-                  control={control}
-                  rules={{
-                    required:
-                      currentTab === "medicamento"
-                        ? "La presentación es obligatoria"
-                        : false,
-                  }}
-                  render={({ field }) => (
-                    <FormAutocompleteV2
-                      data={forms.map(ca => ({ label: ca.forms, value: ca.id.toString() }))}
-                      label={"Presentación"}
-                      valueDefault={field.value}
-                      placeholder={"Seleccionar una Presentación"}
-                      onChange={(value) => setValue('formId', Number(value))}
-                    />
-                  )}
-                />
+          {currentTab === "medicamento" && (
+            <TabsContent value="medicamento" className="col-span-3 grid grid-cols-3 mt-0 gap-2 ">
+              <FormInput
+                label="Temperatura de Almacenamiento"
+                id="temperatura"
+                placeholder="Ambiente"
+                {...register("temperate", {
+                  required:
+                    currentTab === "medicamento"
+                      ? "La temperatura es obligatoria"
+                      : false,
+                })}
+                error={errors.temperate?.message}
+              />
+              <FormInput
+                label="Manufactura"
+                id="manufactura"
+                placeholder="Bayer"
+                {...register("manufacturer", {
+                  required:
+                    currentTab === "medicamento"
+                      ? "La manufactura es obligatoria"
+                      : false,
+                })}
+                error={errors.manufacturer?.message}
+              />
+              <FormInput
+                label="Principio Activo"
+                id="principio_activo"
+                placeholder="Paracetamol"
+                {...register("activeIngredient", {
+                  required:
+                    currentTab === "medicamento"
+                      ? "El principio activo es obligatorio"
+                      : false,
+                })}
+                error={errors.activeIngredient?.message}
+              />
 
-                <div className="flex items-start gap-2">
-                  <FormInput
-                    label="Cantidad"
-                    id="cantidad"
-                    type="number"
-                    min="0"
-                    placeholder="500"
-                    {...register("amount", {
-                      required:
-                        currentTab === "medicamento"
-                          ? "La cantidad es obligatoria"
-                          : false,
-                      min: {
-                        value: 0,
-                        message: "La cantidad no puede ser negativa",
-                      },
-                      valueAsNumber: true,
-                    })}
-                    error={errors.amount?.message}
-                  />
+              <FormAutocompleteV2
+                data={forms.map(f => ({ label: f.forms, value: f.forms }))}
+                label="Forma"
+                freeText
+                appendTo='body'
+                valueDefault={watch('form')}
+                placeholder="Seleccionar o escribir una forma"
+                onChange={(value) => setValue('form', value)}
+              />
 
-                  <Controller
-                    name="unit"
-                    control={control}
-                    rules={{
-                      required:
-                        currentTab === "medicamento"
-                          ? "La unidad es obligatoria"
-                          : false,
-                    }}
-                    render={({ field }) => (
-                      <div className="space-y-1 w-1/2">
-                        <label
-                          htmlFor="unidad-select"
-                          className="text-sm font-medium leading-none text-blue-800"
-                        >
-                          Unidad
-                        </label>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger className="w-full" id="unidad-select">
-                            <SelectValue placeholder="Selecciona una unidad" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectLabel>Unidades</SelectLabel>
-                              {unitOptions.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                        {errors.unit && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.unit.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  />
-                </div>
+              <FormInput
+                label="Presentación"
+                id="presentacion"
+                placeholder="500 mg"
+                {...register("presentation", {
+                  required:
+                    currentTab === "medicamento"
+                      ? "La presentación es obligatoria"
+                      : false,
+                })}
+                error={errors.presentation?.message}
+              />
 
+              <FormInput
+                label="País de Origen"
+                id="pais_origen"
+                placeholder="Venezuela"
+                {...register("countryOfOrigin")}
+              />
+            </TabsContent>
+          )}
 
-              </TabsContent>
-            )}
+          {currentTab === "producto" && (
+            <TabsContent value="producto" className="mt-0">
+              <input type="hidden" {...register("medicine")} />
+            </TabsContent>
+          )}
 
-            <FormInput
-              label="Beneficiados"
-              id="benefited"
-              type="number"
-              min="0"
-              placeholder="1"
-              {...register("benefited", {
-                required:
-                  currentTab === "medicamento"
-                    ? "La cantidad es obligatoria"
-                    : false,
-                min: {
-                  value: 1,
-                  message: "La cantidad no puede ser negativa",
-                },
-                valueAsNumber: true,
-              })}
-              error={errors.benefited?.message}
-            />
-
-            {currentTab === "producto" && (
-              <TabsContent value="producto" className="mt-0">
-                <input type="hidden" {...register("medicine")} />
-              </TabsContent>
-            )}
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                variant="animated"
-                className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
-                type="submit"
-              >
-                <BiCartAdd className="self-center size-5" /> Agregar
-              </Button>
-            </div>
-          </form>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+          <div className="col-span-3 flex items-center justify-center pt-4">
+            <Button
+              variant="animated"
+              className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
+              type="submit"
+            >
+              <BiCartAdd className="self-center size-5" /> {medicineData ? "Guardar" : "Agregar"}
+            </Button>
+          </div>
+        </form>
+      </Tabs>
+    </div>
   );
 };

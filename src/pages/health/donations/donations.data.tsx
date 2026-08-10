@@ -84,7 +84,7 @@ export const detDonationsColumns: Column[] = [
         column: "medicine.name",
         visible: true,
         isIcon: false,
-        element: (data: DetDonation) => `${data.medicine.name} ${data.medicine.amount}${data.medicine.unit}`,
+        element: (data: DetDonation) => `${data.medicine.name} ${data.medicine.presentation}`,
         className: () => 'bg-[#193db9] text-white',
         disabledClassName: true,
     },

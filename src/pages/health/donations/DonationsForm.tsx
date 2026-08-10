@@ -1,7 +1,7 @@
 import { DonationBody, DonationMedicine, TypeDonation, IDonations } from "@/services/donations/donations.interface"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { Button } from "@/components/ui/button"
-import { StyledDialogFooter } from "@/components/StyledDialog/StyledDialog"
+import { FaArrowLeft } from "react-icons/fa"
 import { useState, useEffect } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -15,6 +15,11 @@ import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
 import { formatDate, formatDateForInput } from "@/utils/formatters"
 
+export interface SaveDonationResult {
+  success: boolean;
+  message?: string;
+}
+
 interface DonationsFormProps {
   donation: IDonations | null;
   providers: IProviders[];
@@ -22,7 +27,7 @@ interface DonationsFormProps {
   inventory: IInventory[];
   medicines: IMedicine[];
   institutions: IInstitution[];
-  onSave: (donation: DonationBody) => void
+  onSave: (donation: DonationBody) => Promise<SaveDonationResult>
   onCancel: () => void
 }
 
@@ -32,6 +37,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
   const [alert, setAlert] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
+  const [saving, setSaving] = useState<boolean>(false);
   // const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
 
   const { register, handleSubmit, reset, watch, setValue, getValues } = useForm<DonationBody>({
@@ -62,6 +68,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   ])
 
   useEffect(() => {
+    setAlert(false);
+    setMessage('');
+
     if (donation) {
       reset({
         providerId: donation.type === 'Entrada' ? Number(donation.providerId) : 0,
@@ -197,7 +206,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     return JSON.stringify(currentDetails) !== JSON.stringify(originalDetails);
   };
 
-  const onSubmit = (data: DonationBody) => {
+  const onSubmit = async (data: DonationBody) => {
     if (data.lote == '' || data.date == '') {
       setAlert(true)
       setMessage('Alguno de los campos esta vacio.')
@@ -213,23 +222,37 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       }).flat()
     ).flat()
 
-    const parseData = {
+    const parseData: DonationBody = {
       providerId: data.providerId == 0 ? null : Number(data.providerId),
       institutionId: data.institutionId == 0 ? null : Number(data.institutionId),
       type: data.type,
       lote: data.lote,
       date: new Date(data.date),
+      changeDonDetails: donation ? hasDonationDetailsChanged() : false,
       medicines: parseMedicineDetails.map(det => {
         return {
-          ...det,
-          storageId: det.storageId == 0 ? 1 : det.storageId,
+          medicineId: det.medicineId == 0 ? undefined : Number(det.medicineId),
+          amount: Number(det.amount),
+          storageId: det.storageId == 0 ? 1 : Number(det.storageId),
+          lote: det.lote ?? undefined,
           admissionDate: new Date(det.admissionDate),
           expirationDate: new Date(det.expirationDate),
         }
       }),
-      changeDonDetails: donation ? hasDonationDetailsChanged() : false,
     };
-    onSave(parseData);
+    let result: SaveDonationResult;
+    setSaving(true);
+    try {
+      result = await onSave(parseData);
+    } catch {
+      result = { success: false, message: 'Error inesperado al guardar la donación.' };
+    }
+    setSaving(false);
+
+    if (!result.success) {
+      setAlert(true);
+      setMessage(result.message || 'Error al guardar la donación.');
+    }
   }
 
   const filteredOptions = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
@@ -249,7 +272,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       })
       .map(med => ({
         value: med.id.toString(),
-        label: `${med.name} ${med.amount}${med.unit}`,
+        label: `${med.name} ${med.presentation}`,
       }))
   }
 
@@ -270,12 +293,33 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       })
       .map(med => ({
         value: med.medicine.id.toString(),
-        label: `${med.medicine.name} ${med.medicine.amount}${med.medicine.unit}`,
+        label: `${med.medicine.name} ${med.medicine.presentation}`,
       }))
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
+        <div>
+          <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+            {donation ? "Editar Donación" : "Registrar Nueva Donación"}
+          </h2>
+          <p className="manrope text-sm text-gray-600">
+            {donation
+              ? "Modifica los datos de la donación y guarda los cambios."
+              : "Completa los datos para registrar una nueva donación."}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={onCancel}
+          className="flex items-center gap-2"
+        >
+          <FaArrowLeft /> Volver
+        </Button>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4 overflow-y-auto">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">
           Información General
@@ -298,6 +342,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             {typeDonation == 'Entrada' ?
               <FormAutocompleteV2
                 label="Proveedor"
+                appendTo='body'
                 placeholder="Selecciona un proveedor"
                 valueDefault={Number(getValues('providerId'))}
                 data={providers.map(provider => ({
@@ -309,6 +354,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
               :
               <FormAutocompleteV2
                 label="Institución"
+                appendTo='body'
                 placeholder="Selecciona una institución"
                 valueDefault={Number(getValues('institutionId'))}
                 data={institutions.map(institution => ({
@@ -389,27 +435,28 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
       </div>
 
-      <StyledDialogFooter className="flex justify-between pt-4 w-full ">
-        <div className=" w-1/2">
-          {alert && (
-            <p className="text-red-600 font-semibold">{message}</p>
-          )}
-        </div>
+        <div className="flex justify-between pt-4 w-full">
+          <div className=" w-1/2">
+            {alert && (
+              <p className="text-red-600 font-semibold">{message}</p>
+            )}
+          </div>
 
-        <div className="flex gap-2 w-1/2 justify-end">
-          <Button
-            type="button"
-            variant={'destructive'}
-            onClick={onCancel}
-          >
-            Cancelar
-          </Button>
-          <Button type="submit" variant={'animated'}>
-            {donation ? "Actualizar" : "Registrar"} Donación
-          </Button>
+          <div className="flex gap-2 w-1/2 justify-end">
+            <Button
+              type="button"
+              variant={'destructive'}
+              onClick={onCancel}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" variant={'animated'} disabled={saving}>
+              {saving ? "Guardando..." : `${donation ? "Actualizar" : "Registrar"} Donación`}
+            </Button>
+          </div>
         </div>
-      </StyledDialogFooter>
-    </form>
+      </form>
+    </div>
   )
 }
 
@@ -461,6 +508,7 @@ const DonationDetailFormEntry = ({
         <div className="w-60">
           <FormAutocompleteV2
             label="Medicina"
+            appendTo='body'
             placeholder="Nombre de la medicina"
             data={filteredOptions(detail, index)}
             valueDefault={detail.medicineId}
@@ -585,6 +633,7 @@ const DonationDetailFormExit = ({
         <div className="w-60">
           <FormAutocompleteV2
             label="Medicina"
+            appendTo='body'
             placeholder="Nombre de la medicina"
             data={filteredOptions(detail, index)}
             valueDefault={detail.medicineId}
