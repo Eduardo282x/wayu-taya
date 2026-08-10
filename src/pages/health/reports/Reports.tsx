@@ -162,7 +162,6 @@ export const Reports = () => {
     const getReportApi = async () => {
         setLoading(true)
         const response = await getReport(filtersDate);
-        console.log(response)
         if (response) {
             setReport(response);
 
@@ -259,225 +258,225 @@ export const Reports = () => {
             </div>
 
             {loading ? <ReportsSkeleton /> : (
-            <div className="max-w-7xl mx-auto p-6 space-y-8">
-                {/* Selección de Reportes */}
-                <section>
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-semibold text-gray-800">Generar Reportes</h2>
+                <div className="max-w-7xl mx-auto p-6 space-y-8">
+                    {/* Selección de Reportes */}
+                    <section>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-semibold text-gray-800">Generar Reportes</h2>
 
-                        <Select value={month} onValueChange={(val) => {
-                            setMonth(val);
-                            const [year, m] = val.split('-').map(Number);
-                            setFiltersDate({
-                                from: new Date(year, m - 1, 1),
-                                to: new Date(year, m, 0),
-                            });
-                            getReportApi(); // Si quieres recargar los datos al cambiar el mes
-                        }}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Fecha" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {monthsList.map((m) => (
-                                    <SelectItem key={m.value} value={m.value}>
-                                        {m.label.charAt(0).toUpperCase() + m.label.slice(1)}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                            <Select value={month} onValueChange={(val) => {
+                                setMonth(val);
+                                const [year, m] = val.split('-').map(Number);
+                                setFiltersDate({
+                                    from: new Date(year, m - 1, 1),
+                                    to: new Date(year, m, 0),
+                                });
+                                getReportApi(); // Si quieres recargar los datos al cambiar el mes
+                            }}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Fecha" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {monthsList.map((m) => (
+                                        <SelectItem key={m.value} value={m.value}>
+                                            {m.label.charAt(0).toUpperCase() + m.label.slice(1)}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {reportTypes.map((report) => {
-                            const IconComponent = report.icon
-                            return (
-                                <Card key={report.id} className="hover:shadow-lg transition-shadow duration-200 relative overflow-hidden">
-                                    {/* {!report.done && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {reportTypes.map((report) => {
+                                const IconComponent = report.icon
+                                return (
+                                    <Card key={report.id} className="hover:shadow-lg transition-shadow duration-200 relative overflow-hidden">
+                                        {/* {!report.done && (
                                         <div className="absolute top-0 left-0 bg-black opacity-40 flex items-center justify-center w-full h-full">
                                             <p className="text-white">Próximamente...</p>
                                         </div>
                                     )} */}
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center space-x-3">
-                                            <div className={`p-2 rounded-lg ${report.color}`}>
-                                                <IconComponent className="h-5 w-5 text-white" />
+                                        <CardHeader className="pb-3">
+                                            <div className="flex items-center space-x-3">
+                                                <div className={`p-2 rounded-lg ${report.color}`}>
+                                                    <IconComponent className="h-5 w-5 text-white" />
+                                                </div>
+                                                <div>
+                                                    <CardTitle className="text-lg">{report.title}</CardTitle>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <CardTitle className="text-lg">{report.title}</CardTitle>
+                                            <CardDescription className="text-sm">{report.description}</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="pt-0 h-full flex items-end w-full">
+                                            <div className="flex items-end w-full">
+                                                <Button
+                                                    size="sm"
+                                                    variant="animated"
+                                                    className="flex-1 bg-transparent"
+                                                    onClick={() => handleDownloadReport(report.id)}
+                                                >
+                                                    <Download className="h-4 w-4 mr-1" />
+                                                    Generar
+                                                </Button>
                                             </div>
-                                        </div>
-                                        <CardDescription className="text-sm">{report.description}</CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="pt-0 h-full flex items-end w-full">
-                                        <div className="flex items-end w-full">
-                                            <Button
-                                                size="sm"
-                                                variant="animated"
-                                                className="flex-1 bg-transparent"
-                                                onClick={() => handleDownloadReport(report.id)}
+                                        </CardContent>
+                                    </Card>
+                                )
+                            })}
+                        </div>
+                    </section>
+
+                    {/* Dashboard de Métricas */}
+                    <section>
+                        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Dashboard de Métricas</h2>
+
+                        {/* Métricas Principales */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                    <CardTitle className="text-sm font-medium">Donaciones Este Mes</CardTitle>
+                                    <BiDonateHeart className="text-blue-800 h-4 w-4" />
+                                </CardHeader>
+                                <CardContent className="-mt-3">
+                                    <div className="text-2xl font-bold text-[#024dae]">{report?.donations.length}</div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                    <CardTitle className="text-sm font-medium">Items en Inventario</CardTitle>
+                                    <Package className="text-blue-800 h-4 w-4" />
+                                </CardHeader>
+                                <CardContent className="-mt-3">
+                                    <div className="text-2xl font-bold text-[#024dae]">{report?.totalInventory}</div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Gráficas */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                            {/* Gráfica de Donaciones Mensuales */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center space-x-2">
+                                        <TrendingUp className="h-5 w-5 text-[#024dae]" />
+                                        <span>Donaciones por Mes</span>
+                                    </CardTitle>
+                                    <CardDescription>Evolución de donaciones en los últimos 6 meses</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <ChartContainer
+                                        config={{
+                                            amount: {
+                                                label: "Monto",
+                                                color: "#024dae",
+                                            },
+                                        }}
+                                        className="h-[300px]"
+                                    >
+                                        <LineChart data={monthlyDonations}>
+                                            <XAxis dataKey="month" />
+                                            <YAxis />
+                                            <ChartTooltip content={<ChartTooltipContent />} />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="amount"
+                                                stroke="#024dae"
+                                                strokeWidth={3}
+                                                dot={{ fill: "#5cdee5", strokeWidth: 2, r: 4 }}
+                                            />
+                                        </LineChart>
+                                    </ChartContainer>
+                                </CardContent>
+                            </Card>
+
+                            {/* Gráfica de Utilización de Almacenes */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center space-x-2">
+                                        <Warehouse className="h-5 w-5 text-[#024dae]" />
+                                        <span>Utilización de Almacenes</span>
+                                    </CardTitle>
+                                    <CardDescription>Distribución de productos por almacén</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <ChartContainer
+                                        config={{
+                                            value: {
+                                                label: "Cantidad en almacén",
+                                            },
+                                        }}
+                                        className="h-[300px]"
+                                    >
+                                        <PieChart>
+                                            <Pie
+                                                data={warehouseData}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={60}
+                                                outerRadius={100}
+                                                paddingAngle={5}
+                                                dataKey="value"
                                             >
-                                                <Download className="h-4 w-4 mr-1" />
-                                                Generar
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )
-                        })}
-                    </div>
-                </section>
+                                                {warehouseData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                                ))}
+                                            </Pie>
+                                            <ChartTooltip content={<ChartTooltipContent />} />
+                                        </PieChart>
+                                    </ChartContainer>
+                                    <div className="flex flex-wrap gap-2 mt-4">
+                                        {warehouseData.map((item, index) => (
+                                            <div key={index} className="flex items-center space-x-2">
+                                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
+                                                <span className="text-sm text-gray-600">{item.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
 
-                {/* Dashboard de Métricas */}
-                <section>
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-6">Dashboard de Métricas</h2>
-
-                    {/* Métricas Principales */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                                <CardTitle className="text-sm font-medium">Donaciones Este Mes</CardTitle>
-                                <BiDonateHeart className="text-blue-800 h-4 w-4" />
-                            </CardHeader>
-                            <CardContent className="-mt-3">
-                                <div className="text-2xl font-bold text-[#024dae]">{report?.donations.length}</div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                                <CardTitle className="text-sm font-medium">Items en Inventario</CardTitle>
-                                <Package className="text-blue-800 h-4 w-4" />
-                            </CardHeader>
-                            <CardContent className="-mt-3">
-                                <div className="text-2xl font-bold text-[#024dae]">{report?.totalInventory}</div>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Gráficas */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        {/* Gráfica de Donaciones Mensuales */}
+                        {/* Items de Mayor Impacto */}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center space-x-2">
-                                    <TrendingUp className="h-5 w-5 text-[#024dae]" />
-                                    <span>Donaciones por Mes</span>
+                                    <Heart className="h-5 w-5 text-[#024dae]" />
+                                    <span>Items con Mayor Impacto</span>
                                 </CardTitle>
-                                <CardDescription>Evolución de donaciones en los últimos 6 meses</CardDescription>
+                                <CardDescription>Productos que generan mayor beneficio social</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <ChartContainer
-                                    config={{
-                                        amount: {
-                                            label: "Monto",
-                                            color: "#024dae",
-                                        },
-                                    }}
-                                    className="h-[300px]"
-                                >
-                                    <LineChart data={monthlyDonations}>
-                                        <XAxis dataKey="month" />
-                                        <YAxis />
-                                        <ChartTooltip content={<ChartTooltipContent />} />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="amount"
-                                            stroke="#024dae"
-                                            strokeWidth={3}
-                                            dot={{ fill: "#5cdee5", strokeWidth: 2, r: 4 }}
-                                        />
-                                    </LineChart>
-                                </ChartContainer>
-                            </CardContent>
-                        </Card>
-
-                        {/* Gráfica de Utilización de Almacenes */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
-                                    <Warehouse className="h-5 w-5 text-[#024dae]" />
-                                    <span>Utilización de Almacenes</span>
-                                </CardTitle>
-                                <CardDescription>Distribución de productos por almacén</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <ChartContainer
-                                    config={{
-                                        value: {
-                                            label: "Cantidad en almacén",
-                                        },
-                                    }}
-                                    className="h-[300px]"
-                                >
-                                    <PieChart>
-                                        <Pie
-                                            data={warehouseData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={100}
-                                            paddingAngle={5}
-                                            dataKey="value"
-                                        >
-                                            {warehouseData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.fill} />
-                                            ))}
-                                        </Pie>
-                                        <ChartTooltip content={<ChartTooltipContent />} />
-                                    </PieChart>
-                                </ChartContainer>
-                                <div className="flex flex-wrap gap-2 mt-4">
-                                    {warehouseData.map((item, index) => (
-                                        <div key={index} className="flex items-center space-x-2">
-                                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                                            <span className="text-sm text-gray-600">{item.name}</span>
+                                <div className="space-y-4">
+                                    {report && report.productMostDonated.map((item, index) => (
+                                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                            <div className="flex-1">
+                                                <h4 className="font-medium text-gray-800">{item.product}</h4>
+                                                <p className="text-sm text-gray-600">{item.amount} donaciones</p>
+                                            </div>
+                                            <div className="flex items-center space-x-3">
+                                                <div className="text-right">
+                                                    <div className="text-lg font-bold text-[#024dae]">{item.percentage}%</div>
+                                                    <div className="text-xs text-gray-500">Impacto</div>
+                                                </div>
+                                                <Badge variant="secondary" className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] text-white">
+                                                    #{index + 1}
+                                                </Badge>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
                             </CardContent>
                         </Card>
-                    </div>
-
-                    {/* Items de Mayor Impacto */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center space-x-2">
-                                <Heart className="h-5 w-5 text-[#024dae]" />
-                                <span>Items con Mayor Impacto</span>
-                            </CardTitle>
-                            <CardDescription>Productos que generan mayor beneficio social</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {report && report.productMostDonated.map((item, index) => (
-                                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                        <div className="flex-1">
-                                            <h4 className="font-medium text-gray-800">{item.product}</h4>
-                                            <p className="text-sm text-gray-600">{item.amount} donaciones</p>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <div className="text-right">
-                                                <div className="text-lg font-bold text-[#024dae]">{item.percentage}%</div>
-                                                <div className="text-xs text-gray-500">Impacto</div>
-                                            </div>
-                                            <Badge variant="secondary" className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] text-white">
-                                                #{index + 1}
-                                            </Badge>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </section>
-            </div>
+                    </section>
+                </div>
             )}
 
 
             <ReportDialogs
                 open={open}
                 setOpen={setOpen}
-                lotes={report ? report.lotes : []}
+                lotes={report ? report.lotes : { lotes: [] }}
                 provider={report ? report.providers : []}
                 onSubmitData={generateReportApi}
             />

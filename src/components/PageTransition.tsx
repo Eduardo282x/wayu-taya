@@ -1,4 +1,4 @@
-import { Children, type ReactNode } from "react";
+import { Children, useEffect, useState, type ReactNode } from "react";
 
 interface PageTransitionComponentProps {
     toggle: boolean;
@@ -16,11 +16,23 @@ export default function PageTransitionComponent({ children, toggle }: PageTransi
     const primaryView = views[0] ?? null;
     const secondaryView = views[1] ?? null;
 
+    const [forceRerender, setForceRerender] = useState(false);
+
+    useEffect(() => {
+        const id = requestAnimationFrame(() => {
+            setForceRerender(true);
+            requestAnimationFrame(() => {
+                setForceRerender(false);
+            });
+        });
+        return () => cancelAnimationFrame(id);
+    }, []);
+
     return (
         <div className="relative w-full h-full overflow-hidden">
 
             <div
-                className={`flex w-[200%] h-full transition-transform duration-500 ease-in-out ${toggle ? '-translate-x-1/2' : 'translate-x-0'}`}
+                className={`flex h-full transition-transform duration-500 ease-in-out ${forceRerender ? 'w-[100%]' : 'w-[200%]'} ${toggle ? '-translate-x-1/2' : 'translate-x-0'}`}
             >
 
                 <div className="w-1/2 shrink-0 h-full overflow-auto">{primaryView}</div>

@@ -8,6 +8,7 @@ import {
     StyledDialogDescription,
 } from "@/components/StyledDialog/StyledDialog"
 import { Button } from "@/components/ui/button";
+import { LotesContent } from "@/services/donations/donations.interface";
 import { ReportDonations } from "@/services/reports/report.interface";
 import { IStore } from "@/services/store/store.interface";
 import { useState } from "react";
@@ -16,7 +17,7 @@ interface ReportDialogsProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     provider: { provider: string, id: number }[];
-    lotes: string[]
+    lotes: LotesContent
     onSubmitData: (data: ReportDonations) => void
 }
 
@@ -65,7 +66,7 @@ export const ReportDialogs = ({ open, setOpen, provider, lotes, onSubmitData }: 
                         <FormAutocompleteV2
                             label="Lotes"
                             placeholder="Selecciona los lotes"
-                            data={lotes.map(lo => ({
+                            data={lotes.lotes.map(lo => ({
                                 value: lo,
                                 label: lo,
                             }))}

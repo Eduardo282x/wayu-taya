@@ -1,3 +1,5 @@
+import { LotesContent } from "../donations/donations.interface";
+
 export interface BodyReport {
     from: Date;
     to: Date;
@@ -15,7 +17,7 @@ export interface IReports {
     totalInventory: number;
     period: Periodo;
     providers: { provider: string, id: number }[];
-    lotes: string[];
+    lotes: LotesContent;
 }
 
 export interface ProductByStorage {
