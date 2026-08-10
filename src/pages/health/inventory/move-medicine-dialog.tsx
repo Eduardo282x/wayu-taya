@@ -189,8 +189,7 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
                           <SelectContent>
                             {inventory.map((inv) => (
                               <SelectItem key={inv.id} value={inv.medicine.id.toString()}>
-                                {inv.medicine.name} {inv.medicine.amount}
-                                {inv.medicine.unit}
+                                {inv.medicine.name} {inv.medicine.presentation}
                               </SelectItem>
                             ))}
                           </SelectContent>

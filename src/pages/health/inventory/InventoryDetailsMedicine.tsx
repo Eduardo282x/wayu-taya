@@ -15,8 +15,7 @@ export const InventoryDetailsMedicine = ({ inventory }: InventoryDetailsMedicine
         <h3 className="font-semibold text-lg text-blue-700">{medicine.name}</h3>
         <p className="text-gray-700">{medicine.description}</p>
         <div className="flex flex-wrap gap-4 mt-2 text-sm">
-          <div><strong>Unidad:</strong> {medicine.unit}</div>
-          <div><strong>Cantidad por unidad:</strong> {medicine.amount}</div>
+          <div><strong>Presentación:</strong> {medicine.presentation}</div>
           <div><strong>Temperatura:</strong> {medicine.temperate}</div>
           <div><strong>Fabricante:</strong> {medicine.manufacturer}</div>
           <div><strong>Principio Activo:</strong> {medicine.activeIngredient}</div>
