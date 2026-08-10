@@ -38,7 +38,7 @@ export const TableComponents: FC<TableProps> = ({
   const [columns, setColumns] = useState<Column[]>(column);
   const indexOfLastItem = (page + 1) * Number(rowsPerPage);
   const indexOfFirstItem = indexOfLastItem - Number(rowsPerPage);
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = data && data.length ? data.slice(indexOfFirstItem, indexOfLastItem) : [];
   const totalItems = data.length;
 
   useEffect(() => {

@@ -1,17 +1,27 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { ProviderBody } from "./provider.interface";
+import { GroupProviders, IProviders, ProviderBody } from "./provider.interface";
 
 const providersUrl = "/proveedores";
 
-export const getProviders = async () => {
-    return await getDataApi(providersUrl);
+export const getProviders = async (): Promise<GroupProviders> => {
+    const response = await getDataApi<GroupProviders>(providersUrl);
+    if (response.data == null) {
+        return { allProviders: [], providers: [] }
+    }
+    return response.data;
 }
-export const postProviders = async (data: ProviderBody) => {
-    return await postDataApi(providersUrl, data)
+
+export const postProviders = async (data: ProviderBody): Promise<IProviders | null> => {
+    const response = await postDataApi<ProviderBody, IProviders>(providersUrl, data);
+    return response.data;
 }
-export const putProviders = async (id: number, data: ProviderBody) => {
-    return await putDataApi(`${providersUrl}/${id}`, data)
+
+export const putProviders = async (id: number, data: ProviderBody): Promise<IProviders | null> => {
+    const response = await putDataApi<ProviderBody, IProviders>(`${providersUrl}/${id}`, data);
+    return response.data;
 }
-export const deleteProviders = async (id: number) => {
-    return await deleteDataApi(`${providersUrl}/${id}`)
+
+export const deleteProviders = async (id: number): Promise<IProviders | null> => {
+    const response = await deleteDataApi<IProviders>(`${providersUrl}/${id}`);
+    return response.data;
 }

@@ -1,7 +1,7 @@
 import { IMedicine } from "../medicine/medicine.interface";
+import { IStore } from "../store/store.interface";
 
-export interface GroupInventory {
-    allInventory: IInventory[];
+export interface InventoryContent {
     inventory: IInventory[];
 }
 
@@ -9,7 +9,7 @@ export interface IInventory {
     id: number;
     medicine: IMedicine;
     totalStock: number;
-    stores: Store[];
+    stores: IStore[];
     datesMedicine: DatesMedicine[];
     lotes: ILotes[];
 }
@@ -35,7 +35,7 @@ export interface IInventoryHistory {
     createAt: Date;
     updateAt: Date;
     medicine: IMedicine;
-    store: Store;
+    store: IStore;
     donation: Donation;
 }
 
@@ -52,11 +52,4 @@ export interface Donation {
 export interface DatesMedicine {
     admissionDate: Date;
     expirationDate: Date;
-}
-
-export interface Store {
-    id: number;
-    name: string;
-    address: string;
-    amount: number;
 }

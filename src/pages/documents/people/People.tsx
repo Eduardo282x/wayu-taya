@@ -28,8 +28,8 @@ export const People = () => {
   const getPeopleApi = async () => {
     setLoading(true)
     try {
-      const response: IPeople[] = await getPeople();
-      setPeople({ allPeople: response, people: response })
+      const response: GroupPeople = await getPeople();
+      setPeople(response)
     } catch (err) {
       console.log(err);
     }

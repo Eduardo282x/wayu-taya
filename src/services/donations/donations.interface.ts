@@ -1,4 +1,5 @@
 import { IMedicine } from "../medicine/medicine.interface";
+import { IInstitution } from "../institution/institution.interface";
 import { IProviders } from "../provider/provider.interface";
 
 export type TypeDonation = "Entrada" | "Salida";
@@ -41,7 +42,7 @@ export interface IDonations {
     institutionId: null;
     providerId: number;
     provider: IProviders;
-    institution: IProviders;
+    institution: IInstitution;
     type: TypeDonation;
     date: Date;
     lote: string;
@@ -58,13 +59,4 @@ export interface DetDonation {
     medicine: IMedicine;
     admissionDate: Date;
     expirationDate: Date;
-}
-
-export type DonationType = "Entrada" | "Salida";
-
-export interface DonationForm {
-    providerName: string;
-    type: DonationType;
-    lote: string;
-    date: Date | string;
 }

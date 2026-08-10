@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Column } from "@/components/table/table.interface";
 import { FaRegTrashAlt, FaRegEdit, FaPlus } from "react-icons/fa";
@@ -86,7 +87,7 @@ export const Providers = () => {
 
     useEffect(() => {
         getProviders()
-            .then((res) => setData(res))
+            .then((res) => setData(res.providers))
             .finally(() => setLoading(false));
     }, []);
 

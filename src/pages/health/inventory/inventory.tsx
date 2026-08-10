@@ -7,7 +7,7 @@ import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/layout/header/Header"
 import { getInventory, getInventoryHistorial, moveInventoryStorage } from "@/services/inventory/inventory.service"
-import type { GroupInventory, IInventory, IInventoryHistory } from "@/services/inventory/inventory.interface"
+import type { IInventory, IInventoryHistory, InventoryContent } from "@/services/inventory/inventory.interface"
 import { TableComponents } from "@/components/table/TableComponents"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { FaHistory, FaExchangeAlt } from "react-icons/fa"
@@ -15,11 +15,11 @@ import { Button } from "@/components/ui/button"
 import { MoveMedicineDialog, MoveMedicineFormData } from "./move-medicine-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getStore } from "@/services/store/store.service"
-import { IStore } from "@/services/store/store.interface"
+import { IStore, StoreContent } from "@/services/store/store.interface"
 // import { SuccessDialog } from "./success-dialog"
 
 export const Inventory = () => {
-  const [inventory, setInventory] = useState<GroupInventory>({ allInventory: [], inventory: [] })
+  const [inventory, setInventory] = useState<InventoryContent>({ inventory: [] })
   const [alertOpen, setAlertOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [inventorySelected, setInventorySelected] = useState<IInventory | null>(null)
@@ -39,8 +39,8 @@ export const Inventory = () => {
   const getStoreApi = async () => {
     setLoading(true);
     try {
-      const response: IStore[] = await getStore();
-      setStores(response);
+      const response: StoreContent = await getStore();
+      setStores(response.stores);
     } catch (err) {
       console.error("Error al obtener almacenes:", err);
     }
@@ -50,8 +50,8 @@ export const Inventory = () => {
   const getInventoryApi = async () => {
     setLoading(true)
     try {
-      const response: IInventory[] = await getInventory()
-      setInventory({ allInventory: response, inventory: response })
+      const response: InventoryContent = await getInventory()
+      setInventory(response)
     } catch (err) {
       console.log(err)
     }
@@ -80,17 +80,18 @@ export const Inventory = () => {
   }
 
   const filterInventoryByStore = (storeId: string) => {
-    const filtered = inventory.allInventory
-      .filter(item => item.stores.some(store => store.id === Number(storeId)))
-      .map(item => ({
-        ...item,
-        stores: item.stores.filter(store => store.id === Number(storeId)), // solo ese almacén
-      }));
+    console.log(storeId)
+    // const filtered = inventory.allInventory
+    //   .filter(item => item.stores.some(store => store.id === Number(storeId)))
+    //   .map(item => ({
+    //     ...item,
+    //     stores: item.stores.filter(store => store.id === Number(storeId)), // solo ese almacén
+    //   }));
 
-    setInventory(prev => ({
-      ...prev,
-      inventory: storeId == 'all' ? prev.allInventory : filtered
-    }))
+    // setInventory(prev => ({
+    //   ...prev,
+    //   inventory: storeId == 'all' ? prev.allInventory : filtered
+    // }))
   }
 
   const onSubmitMovedInventory = async (data: MoveMedicineFormData) => {
@@ -145,7 +146,7 @@ export const Inventory = () => {
           </Select>
 
           <FilterComponent
-            data={inventory.allInventory}
+            data={inventory.inventory}
             setDataFilter={(data) =>
               setInventory((prev) => {
                 return { ...prev, inventory: data }

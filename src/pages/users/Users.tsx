@@ -6,15 +6,15 @@ import UsersForm from "./UserForms";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { HeaderPages } from "../../layout/header/Header"
 import { TableComponents } from "@/components/table/TableComponents";
-import { GroupUsers, IUsers, Role, UsersBody } from "@/services/users/user.interface";
+import { UsersContent, IUsers, UsersBody, RolesContent } from "@/services/users/user.interface";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { usersColumns } from "./user.data";
 import { deleteUsers, getRoles, getUsers, postUsers, putUsers } from "@/services/users/user.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 
 export const Users = () => {
-  const [users, setUsers] = useState<GroupUsers>({ allUsers: [], users: [] });
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [users, setUsers] = useState<UsersContent>({ users: [] });
+  const [roles, setRoles] = useState<RolesContent>({ roles: [] });
   const [userSelected, setUserSelected] = useState<IUsers | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,7 +28,7 @@ export const Users = () => {
 
   const getRolesApi = async () => {
     try {
-      const response: Role[] = await getRoles();
+      const response = await getRoles();
       setRoles(response)
     } catch (err) {
       console.log(err);
@@ -37,8 +37,8 @@ export const Users = () => {
   const getUsersApi = async () => {
     setLoading(true)
     try {
-      const response: IUsers[] = await getUsers();
-      setUsers({ allUsers: response, users: response })
+      const response: UsersContent = await getUsers();
+      setUsers(response)
     } catch (err) {
       console.log(err);
     }
@@ -96,7 +96,7 @@ export const Users = () => {
       <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
         <div className="flex items-center ">
           <FilterComponent
-            data={users.allUsers}
+            data={users.users}
             columns={usersColumns}
             setDataFilter={setUserFilter}
             placeholder="Buscar usuarios..."
@@ -123,7 +123,7 @@ export const Users = () => {
           open={open}
           onOpenChange={setOpen}
           user={userSelected}
-          roles={roles}
+          roles={roles.roles}
           onSubmit={getActionForm}
         />
 

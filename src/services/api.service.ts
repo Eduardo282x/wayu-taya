@@ -1,91 +1,91 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from 'axios';
+import { useAuthStore } from "@/store/auth.store";
+import axios from "axios";
+import { BaseResponse } from "./base.interface";
 
 export const api = axios.create({
-    baseURL: `${import.meta.env.VITE_BASE_URL_API || 'https://wayu-taya-api.onrender.com'}/api`,
-    // baseURL: `https://wayu-taya-api.onrender.com/api`,
-    timeout: 10000
-})
+    baseURL: `${import.meta.env.VITE_API_URL}/api`,
+});
 
-export const getDataApi = async (url: string) => {
-    try {
-        return await api.get(url).then(res => {
-            return res.data
-        })
-    } catch (err) {
-        console.log(err);
+const getApiError = (error: unknown): BaseResponse<null> => {
+    if (axios.isAxiosError(error)) {
+        return {
+            message: error.response?.data?.message || error.message || "Error de servidor",
+            statusCode: error.response?.status || 500,
+            success: false,
+            data: null,
+        };
     }
-}
 
-export const getDataFileApi = (url: string) => {
+    return {
+        message: "Error inesperado",
+        statusCode: 500,
+        success: false,
+        data: null,
+    };
+};
+
+export const getDataApi = async <R>(url: string): Promise<BaseResponse<R | null>> => {
     try {
-        return api.get(url, {
-            responseType: 'blob',
-        },).then((response) => {
-            return response.data;
-        }).catch(err => {
-            return err.response.data;
-        })
-    } catch (err) {
-        console.log(err);
+        const res = await api.get<BaseResponse<R>>(url);
+        return res.data;
+    } catch (error) {
+        return getApiError(error);
     }
-}
+};
 
-export const postDataApi = async (url: string, body: any) => {
+export const getDataFileApi = (endpoint: string) => {
+    return api.get(endpoint, {
+        responseType: 'blob',
+    },).then((response) => {
+        return response.data;
+    }).catch(err => {
+        return err.response?.data ?? new Blob();
+    })
+};
+
+export const postDataApi = async <T, R>(url: string, data: T): Promise<BaseResponse<R | null>> => {
     try {
-        return await api.post(url, body).then(res => {
-            return res.data
-        })
-    } catch (err) {
-        console.log(err);
+        const res = await api.post<BaseResponse<R>>(url, data).then((response) => response.data);
+        return res;
+    } catch (error: unknown) {
+        return getApiError(error);
     }
-}
+};
 
-export const postFilesDataApi = async (endpoint: string, formData: FormData) => {
-    return await api.post(endpoint, formData, {
+export const postFilesDataApi = (endpoint: string, formData: FormData) => {
+    return api.post(endpoint, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         },
-    }).then((response) => {
-        return response.data;
-    }).catch((err) => {
-        return err.response.data;
-    })
-}
+    }).then((response) => response.data).catch((err) => err.response?.data ?? null);
+};
 
-export const postDataFileApi = async (endpoint: string, data: any) => {
-    return await api.post(endpoint, data, { responseType: 'blob' }).then((response) => {
-        return response.data;
-    }).catch((err) => {
-        return err.response.data;
-    })
-}
+export const postDataFileApi = (endpoint: string, data: unknown) => {
+    return api.post(endpoint, data, { responseType: 'blob' }).then((response) => response.data).catch((err) => err.response?.data ?? new Blob());
+};
 
-export const putDataApi = async (url: string, body: any) => {
+export const putDataApi = async <T, R>(endpoint: string, data: T): Promise<BaseResponse<R | null>> => {
     try {
-        return await api.put(url, body).then(res => {
-            return res.data
-        })
-    } catch (err) {
-        console.log(err);
+        const response = await api.put<BaseResponse<R>>(endpoint, data);
+        return response.data;
+    } catch (error: unknown) {
+        return getApiError(error);
     }
-}
+};
 
-export const deleteDataApi = async (url: string) => {
+export const deleteDataApi = async <R>(endpoint: string): Promise<BaseResponse<R | null>> => {
     try {
-        return await api.delete(url).then(res => {
-            return res.data
-        })
-    } catch (err) {
-        console.log(err);
-    }
-}
+        const response = await api.delete<BaseResponse<R>>(`${endpoint}`);
+        return response.data;
+    } catch (error: unknown) {
+        return getApiError(error);
+    };
+};
 
 // Interceptors
 api.interceptors.request.use(
     (config) => {
-        // const token = useAuthStore.getState().token || localStorage.getItem("token");
-        const token = localStorage.getItem("token");
+        const token = useAuthStore.getState().token || localStorage.getItem("token");
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -95,3 +95,14 @@ api.interceptors.request.use(
     },
     (error) => Promise.reject(error),
 );
+
+// api.interceptors.response.use(
+//     (res) => res,
+//     (error) => {
+//         if (error.response?.status === 401) {
+//             useAuthStore.getState().clearSession();
+//             window.location.href = "/login";
+//         }
+//         return Promise.reject(error);
+//     },
+// );

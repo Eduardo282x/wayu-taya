@@ -1,3 +1,5 @@
+import { Parish } from "../institution/institution.interface";
+
 export interface PeopleBody {
     id_parroquia: number;
     name: string;
@@ -32,10 +34,4 @@ export interface IPeople {
     updateAt:       Date;
     deleted:        boolean;
     parish:         Parish;
-}
-
-export interface Parish {
-    id:     number;
-    name:   string;
-    townId: number;
 }

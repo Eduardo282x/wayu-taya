@@ -10,9 +10,12 @@ export interface UsersBodyPassword {
     newPassword: string;
 }
 
-export interface GroupUsers {
-    allUsers: IUsers[];
+export interface UsersContent {
     users: IUsers[]
+}
+
+export interface RolesContent {
+    roles: Role[];
 }
 
 export interface Role {

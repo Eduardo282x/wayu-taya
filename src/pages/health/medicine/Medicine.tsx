@@ -1,4 +1,4 @@
-import type { GroupMedicine, IMedicine, MedicineBody, ICategory, IForm } from "@/services/medicine/medicine.interface"
+import type { GroupMedicine, GroupCategory, GroupForm, IMedicine, MedicineBody, ICategory, IForm } from "@/services/medicine/medicine.interface"
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter"
 import { TableComponents } from "@/components/table/TableComponents"
 import { FilterComponent } from "@/components/table/FilterComponent"
@@ -47,8 +47,8 @@ export const Medicine = () => {
   const getMedicineApi = async () => {
     setLoading(true)
     try {
-      const response: IMedicine[] = await getMedicine()
-      setMedicines({ allMedicine: response, medicine: response })
+      const response: GroupMedicine = await getMedicine()
+      setMedicines(response)
     } catch (err) {
       console.error("Error al obtener medicamentos:", err)
     }
@@ -57,10 +57,10 @@ export const Medicine = () => {
 
   const getCategoriesAndForms = async () => {
     try {
-      const responseCategory: ICategory[] = await getCategories()
-      setCategories(responseCategory)
-      const responseForms: IForm[] = await getForms()
-      setForms(responseForms)
+      const responseCategory: GroupCategory = await getCategories()
+      setCategories(responseCategory.categories)
+      const responseForms: GroupForm = await getForms()
+      setForms(responseForms.forms)
     } catch (error) {
       console.error("Error al cargar categorías o formas:", error)
     }

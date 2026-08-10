@@ -4,12 +4,14 @@ import { CategoryCardProps, optionsMenu } from "./menu.data";
 import toast from "react-hot-toast";
 import { Snackbar } from "@/components/snackbar/Snackbar";
 import { IoBuildOutline } from "react-icons/io5";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function Home() {
   const navigate = useNavigate();
+  const logoutStore = useAuthStore((state) => state.logout);
 
   const logout = () => {
-    localStorage.removeItem('token');
+    logoutStore();
     navigate('/login')
   }
 

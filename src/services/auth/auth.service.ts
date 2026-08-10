@@ -5,9 +5,9 @@ import { BaseResponse } from "../base.interface";
 
 const authUrl = "/auth";
 
-export const authLogin = async (auth: Login): Promise<BaseResponse<LoginResponse> | null>=> {
+export const authLogin = async (auth: Login): Promise<BaseResponse<LoginResponse | null> | null>=> {
     try {
-        return await postDataApi(`${authUrl}/login`, auth);
+        return await postDataApi<Login, LoginResponse>(`${authUrl}/login`, auth);
     } catch (error) {
         console.log(error)
         return null

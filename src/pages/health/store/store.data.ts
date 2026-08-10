@@ -3,11 +3,6 @@ import { IStore } from "@/services/store/store.interface";
 import { FiTrash2 } from "react-icons/fi";
 import { MdEdit } from "react-icons/md";
 
-export interface StoreData {
-  name: string;
-  address: string;
-}
-
 export const storeColumns: Column[] = [
   {
     label: "Almacén",

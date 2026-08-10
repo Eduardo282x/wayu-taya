@@ -1,3 +1,6 @@
+import { Parish } from "../institution/institution.interface";
+import { IProviders } from "../provider/provider.interface";
+
 export interface EventsBody {
     parishId: number;
     name: string;
@@ -28,21 +31,5 @@ export interface IEvents {
     createAt: Date;
     updateAt: Date;
     parish: Parish;
-    providersEvents: ProvidersEvent[];
-}
-
-export interface Parish {
-    id: number;
-    name: string;
-    townId: number;
-}
-
-export interface ProvidersEvent {
-    id: number;
-    name: string;
-    rif: string;
-    address: string;
-    country: string;
-    email: string;
-    deleted: boolean;
+    providersEvents: IProviders[];
 }

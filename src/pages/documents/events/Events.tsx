@@ -33,8 +33,8 @@ export const Events = () => {
 
   const getProvidersApi = async () => {
     try {
-      const response: IProviders[] = await getProviders()
-      setProviders(response)
+      const response = await getProviders()
+      setProviders(response.providers)
     } catch (err) {
       console.log(err)
     }
@@ -43,8 +43,8 @@ export const Events = () => {
   const getEventsApi = async () => {
     setLoading(true)
     try {
-      const response: IEvents[] = await getEvents()
-      setEvents({ allEvents: response, events: response })
+      const response: GroupEvents = await getEvents()
+      setEvents(response)
     } catch (err) {
       console.log(err)
     }

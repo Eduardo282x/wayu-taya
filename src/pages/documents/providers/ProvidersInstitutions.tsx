@@ -50,8 +50,8 @@ export const ProvidersInstitutions = () => {
 	const getProvidersApi = async () => {
 		setLoading(true)
 		try {
-			const response: IProviders[] = await getProviders();
-			setProviders({ allProviders: response, providers: response })
+			const response: GroupProviders = await getProviders();
+			setProviders(response)
 		} catch (err) {
 			console.log(err);
 		}
@@ -61,8 +61,8 @@ export const ProvidersInstitutions = () => {
 	const getInstitutionsApi = async () => {
 		setLoading(true)
 		try {
-			const response: IInstitution[] = await getInstitutions();
-			setInstitution({ allInstitution: response, institution: response })
+			const response: GroupInstitution = await getInstitutions();
+			setInstitution(response)
 		} catch (err) {
 			console.log(err);
 		}

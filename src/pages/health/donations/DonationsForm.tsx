@@ -1,4 +1,4 @@
-import { DonationBody, DonationMedicine, DonationType, IDonations } from "@/services/donations/donations.interface"
+import { DonationBody, DonationMedicine, TypeDonation, IDonations } from "@/services/donations/donations.interface"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { Button } from "@/components/ui/button"
 import { StyledDialogFooter } from "@/components/StyledDialog/StyledDialog"
@@ -66,7 +66,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       reset({
         providerId: donation.type === 'Entrada' ? Number(donation.providerId) : 0,
         institutionId: donation.type === 'Salida' ? Number(donation.institutionId) : 0,
-        type: donation.type as DonationType || "Entrada",
+        type: donation.type as TypeDonation || "Entrada",
         lote: donation.lote,
         date: new Date(donation.date).toISOString().split('T')[0],
       });

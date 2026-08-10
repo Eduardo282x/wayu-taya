@@ -1,25 +1,33 @@
 import { deleteDataApi, getDataApi, getDataFileApi, postDataFileApi } from "../api.service";
-// import { DocumentUploadFileBody } from "./document.interface";
+import { IDocument } from "./document.interface";
 
 const documentUrl = "/documents";
 
-export const getDocument = async () => {
-    return await getDataApi(documentUrl);
+export const getDocument = async (): Promise<IDocument[]> => {
+    const response = await getDataApi<IDocument[]>(documentUrl);
+    if (response.data == null) {
+        return []
+    }
+    return response.data;
 }
 
-export const getDocumentAdult = async () => {
-    return await getDataFileApi(`${documentUrl}/pdf/adulto`);
+export const getDocumentAdult = () => {
+    return getDataFileApi(`${documentUrl}/pdf/adulto`);
 }
 
-export const getDocumentLegalRepresentative = async () => {
-    return await getDataFileApi(`${documentUrl}/pdf/representante-legal`);
+export const getDocumentLegalRepresentative = () => {
+    return getDataFileApi(`${documentUrl}/pdf/representante-legal`);
 }
-export const downloadFile = async (id: number) => {
-    return await getDataFileApi(`${documentUrl}/download/${id}`);
+
+export const downloadFile = (id: number) => {
+    return getDataFileApi(`${documentUrl}/download/${id}`);
 }
-export const uploadFileDocument = async (data: FormData) => {
-    return await postDataFileApi(`${documentUrl}/upload`, data);
+
+export const uploadFileDocument = (data: FormData) => {
+    return postDataFileApi(`${documentUrl}/upload`, data);
 }
-export const deleteDocument = async (id: number) => {
-    return await deleteDataApi(`${documentUrl}/${id}`);
+
+export const deleteDocument = async (id: number): Promise<IDocument | null> => {
+    const response = await deleteDataApi<IDocument>(`${documentUrl}/${id}`);
+    return response.data;
 }

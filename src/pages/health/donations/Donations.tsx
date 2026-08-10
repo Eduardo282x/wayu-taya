@@ -14,7 +14,7 @@ import { Plus } from "lucide-react"
 import { IProviders } from "@/services/provider/provider.interface"
 import { getProviders } from "@/services/provider/provider.service"
 import { getStore } from "@/services/store/store.service"
-import { IStore } from "@/services/store/store.interface"
+import { IStore, StoreContent } from "@/services/store/store.interface"
 import { getMedicine } from "@/services/medicine/medicine.service"
 import { IMedicine } from "@/services/medicine/medicine.interface"
 import { IInstitution } from "@/services/institution/institution.interface"
@@ -62,16 +62,16 @@ export const Donations = () => {
   }
   const getProvidersApi = async () => {
     try {
-      const response: IProviders[] = await getProviders()
-      setProviders(response)
+      const response = await getProviders()
+      setProviders(response.providers)
     } catch (err) {
       console.log(err)
     }
   }
   const getInstitutionsApi = async () => {
     try {
-      const response: IInstitution[] = await getInstitutions()
-      setInstitutions(response)
+      const response = await getInstitutions()
+      setInstitutions(response.institution)
     } catch (err) {
       console.log(err)
     }
@@ -79,8 +79,8 @@ export const Donations = () => {
 
   const getStoresApi = async () => {
     try {
-      const response: IStore[] = await getStore()
-      setStores(response)
+      const response: StoreContent = await getStore()
+      setStores(response.stores)
     } catch (err) {
       console.log(err)
     }
@@ -88,8 +88,8 @@ export const Donations = () => {
 
   const getMedicinesApi = async () => {
     try {
-      const response: IMedicine[] = await getMedicine()
-      setMedicines(response)
+      const response = await getMedicine()
+      setMedicines(response.medicine)
     } catch (err) {
       console.log(err)
     }
@@ -97,8 +97,8 @@ export const Donations = () => {
 
   const getInventoryApi = async () => {
     try {
-      const response: IInventory[] = await getInventory()
-      setInventory(response)
+      const response = await getInventory()
+      setInventory(response.inventory)
     } catch (err) {
       console.log(err)
     }
@@ -107,8 +107,8 @@ export const Donations = () => {
   const getDonationsApi = async () => {
     setLoading(true)
     try {
-      const response: IDonations[] = await getDonations()
-      setDonations({ allDonations: response, donations: response })
+      const response: GroupDonations = await getDonations()
+      setDonations(response)
     } catch (err) {
       console.log(err)
     }

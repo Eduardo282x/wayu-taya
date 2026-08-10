@@ -12,7 +12,7 @@ import { generateReportDonations, generateReportInventory, generateReportStore, 
 import { BodyReport, GraphicStorage, IReports, ProductByStorage, ReportDonations } from "@/services/reports/report.interface"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { ReportDialogs, WareHouseDialog } from "./ReportDialogs"
-import { IStore } from "@/services/store/store.interface"
+import { IStore, StoreContent } from "@/services/store/store.interface"
 import { getStore } from "@/services/store/store.service"
 
 // Datos de ejemplo
@@ -104,7 +104,7 @@ export const Reports = () => {
 
     const getReportApi = async () => {
         setLoading(true)
-        const response = await getReport(filtersDate) as IReports;
+        const response = await getReport(filtersDate);
         console.log(response)
         if (response) {
             setReport(response);
@@ -131,8 +131,8 @@ export const Reports = () => {
     const getStoreApi = async () => {
         setLoading(true);
         try {
-            const response: IStore[] = await getStore();
-            setStores(response);
+            const response: StoreContent = await getStore();
+            setStores(response.stores);
         } catch (err) {
             console.error("Error al obtener almacenes:", err);
         }

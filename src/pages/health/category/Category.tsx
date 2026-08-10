@@ -29,10 +29,10 @@ export const Category = () => {
     const getDataCategoryFormApi = async () => {
         setLoading(true);
         try {
-            const responseCategory: ICategory[] = await getCategories();
-            setCategories({ allCategories: responseCategory, categories: responseCategory });
-            const responseForm: IForm[] = await getForms();
-            setForms({ allForms: responseForm, forms: responseForm });
+            const responseCategory: GroupCategory = await getCategories();
+            setCategories(responseCategory);
+            const responseForm: GroupForm = await getForms();
+            setForms(responseForm);
         } catch (err) {
             console.error("Error al cargar datos:", err);
         }

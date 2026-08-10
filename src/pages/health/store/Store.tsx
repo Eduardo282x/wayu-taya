@@ -1,10 +1,10 @@
-import { GroupStore, IStore } from "@/services/store/store.interface";
+import { GroupStore, IStore, StoreBody, StoreContent } from "@/services/store/store.interface";
 import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { getStore, postStore, putStore, deleteStore } from "@/services/store/store.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { HeaderPages } from "@/layout/header/Header";
-import { storeColumns, StoreData } from "./store.data";
+import { storeColumns } from "./store.data";
 import { Button } from "@/components/ui/button";
 import { FaWarehouse } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -26,8 +26,8 @@ export const Store = () => {
   const getStoreApi = async () => {
     setLoading(true);
     try {
-      const response: IStore[] = await getStore();
-      setStores({ allStores: response, stores: response });
+      const response: StoreContent = await getStore();
+      setStores({ allStores: response.stores, stores: response.stores });
     } catch (err) {
       console.error("Error al obtener almacenes:", err);
     }
@@ -39,7 +39,7 @@ export const Store = () => {
     setIsAddFormOpen(true);
   };
 
-  const handleAddOrEditStoreSubmit = async (formData: StoreData) => {
+  const handleAddOrEditStoreSubmit = async (formData: StoreBody) => {
     setLoading(true);
     try {
       if (storeSelected) {

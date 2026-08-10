@@ -8,10 +8,9 @@ import { Badge } from "@/components/ui/badge"
 // import { Separator } from "@/components/ui/separator"
 import { User, Mail, Edit3, Save, X, Lock } from "lucide-react"
 import { FaRegSave, FaRegUser } from "react-icons/fa"
-import { User as UserType, LoginResponse } from "@/services/auth/auth.interfaces"
+import { User as UserType } from "@/services/auth/auth.interfaces"
 import { baseUser } from "./profile.data"
 import { putPassword, putProfile } from "@/services/users/user.service"
-import { UsersBody } from "@/services/users/user.interface"
 import { useAuthStore } from "@/store/auth.store"
 import {
   StyledDialog,
@@ -52,8 +51,7 @@ export const Profile = () => {
   }
 
   const updateUser = async () => {
-    const response = await putProfile(Number(storeUser?.id), editUserData as unknown as UsersBody);
-    const data = response?.data as LoginResponse | null | undefined;
+    const data = await putProfile(Number(storeUser?.id), editUserData);
     if (data?.user && data.token) {
       setUser(data.user);
       setToken(data.token);

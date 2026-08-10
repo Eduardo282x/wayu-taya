@@ -4,19 +4,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { MdDomainAdd } from "react-icons/md";
 import FormInput from "@/components/formInput/FormInputCustom";
-import { IStore } from "@/services/store/store.interface";
-import { StoreData } from "./store.data";
+import { IStore, StoreBody } from "@/services/store/store.interface";
 
 
 interface StoreFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: StoreData) => void;
+  onSubmit: (data: StoreBody) => void;
   store: IStore | null;
 }
 
 export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubmit, store, }) => {
-  const { register, handleSubmit, reset, formState: { errors }, } = useForm<StoreData>({
+  const { register, handleSubmit, reset, formState: { errors }, } = useForm<StoreBody>({
     defaultValues: {
       name: "",
       address: "",
@@ -32,7 +31,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubm
     }
   }, [open, reset, store]);
 
-  const handleFormSubmit = (data: StoreData) => {
+  const handleFormSubmit = (data: StoreBody) => {
     onSubmit(data);
     onOpenChange(false);
   };

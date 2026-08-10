@@ -1,23 +1,37 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { PeopleBody } from "./people.interface";
+import { GroupPeople, IPeople, PeopleBody } from "./people.interface";
 
 const peopleUrl = "/people";
 
-export const getPeople = async () => {
-    return await getDataApi(peopleUrl);
+export const getPeople = async (): Promise<GroupPeople> => {
+    const response = await getDataApi<GroupPeople>(peopleUrl);
+    if (response.data == null) {
+        return { allPeople: [], people: [] }
+    }
+    return response.data;
 }
-export const postPeopleNormal = async (data: PeopleBody) => {
-    return await postDataApi(`${peopleUrl}/normal`, data)
+
+export const postPeopleNormal = async (data: PeopleBody): Promise<IPeople | null> => {
+    const response = await postDataApi<PeopleBody, IPeople>(`${peopleUrl}/normal`, data);
+    return response.data;
 }
-export const postPeople = async (data: PeopleBody) => {
-    return await postDataApi(peopleUrl, data)
+
+export const postPeople = async (data: PeopleBody): Promise<IPeople | null> => {
+    const response = await postDataApi<PeopleBody, IPeople>(peopleUrl, data);
+    return response.data;
 }
-export const putPeopleNormal = async (id: number, data: PeopleBody) => {
-    return await putDataApi(`${peopleUrl}/normal/${id}`, data)
+
+export const putPeopleNormal = async (id: number, data: PeopleBody): Promise<IPeople | null> => {
+    const response = await putDataApi<PeopleBody, IPeople>(`${peopleUrl}/normal/${id}`, data);
+    return response.data;
 }
-export const putPeople = async (id: number, data: PeopleBody) => {
-    return await putDataApi(`${peopleUrl}/${id}`, data)
+
+export const putPeople = async (id: number, data: PeopleBody): Promise<IPeople | null> => {
+    const response = await putDataApi<PeopleBody, IPeople>(`${peopleUrl}/${id}`, data);
+    return response.data;
 }
-export const deletePeople = async (id: number) => {
-    return await deleteDataApi(`${peopleUrl}/${id}`)
+
+export const deletePeople = async (id: number): Promise<IPeople | null> => {
+    const response = await deleteDataApi<IPeople>(`${peopleUrl}/${id}`);
+    return response.data;
 }

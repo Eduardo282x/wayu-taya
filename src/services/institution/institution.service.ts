@@ -1,21 +1,36 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { InstitutionsBody } from "./institution.interface";
+import { GroupInstitution, IInstitution, InstitutionsBody, IParish } from "./institution.interface";
 
 const institutionsUrl = "/institutions";
 const parishUrl = "/parroquias";
 
-export const getInstitutions = async () => {
-    return await getDataApi(institutionsUrl);
+export const getInstitutions = async (): Promise<GroupInstitution> => {
+    const response = await getDataApi<GroupInstitution>(institutionsUrl);
+    if (response.data == null) {
+        return { allInstitution: [], institution: [] }
+    }
+    return response.data;
 }
-export const getParish = async () => {
-    return await getDataApi(parishUrl);
+
+export const getParish = async (): Promise<IParish[]> => {
+    const response = await getDataApi<IParish[]>(parishUrl);
+    if (response.data == null) {
+        return []
+    }
+    return response.data;
 }
-export const postInstitutions = async (data: InstitutionsBody) => {
-    return await postDataApi(institutionsUrl, data)
+
+export const postInstitutions = async (data: InstitutionsBody): Promise<IInstitution | null> => {
+    const response = await postDataApi<InstitutionsBody, IInstitution>(institutionsUrl, data);
+    return response.data;
 }
-export const putInstitutions = async (id: number, data: InstitutionsBody) => {
-    return await putDataApi(`${institutionsUrl}/${id}`, data)
+
+export const putInstitutions = async (id: number, data: InstitutionsBody): Promise<IInstitution | null> => {
+    const response = await putDataApi<InstitutionsBody, IInstitution>(`${institutionsUrl}/${id}`, data);
+    return response.data;
 }
-export const deleteInstitutions = async (id: number) => {
-    return await deleteDataApi(`${institutionsUrl}/${id}`)
+
+export const deleteInstitutions = async (id: number): Promise<IInstitution | null> => {
+    const response = await deleteDataApi<IInstitution>(`${institutionsUrl}/${id}`);
+    return response.data;
 }

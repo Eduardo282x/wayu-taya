@@ -1,7 +1,4 @@
-export interface BodyLogin {
-    username: string;
-    password: string;
-}
+import { Role } from "../users/user.interface";
 
 export interface BodyRecoverPassword {
     email: string;
@@ -22,14 +19,5 @@ export interface User {
     correo:   string;
     username: string;
     rolId:    number;
-    rol:      Rol;
+    rol:      Role;
 }
-
-export interface Rol {
-    id:  number;
-    rol: string;
-}
-
-export type Role = 'Super Admin' |
-    'Administrador' |
-    'Usuarios' | ''

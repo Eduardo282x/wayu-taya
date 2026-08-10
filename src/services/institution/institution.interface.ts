@@ -11,12 +11,18 @@ export interface IInstitution {
     country: string;
     email: string;
     type: string;
-    parish: Parish;
+    parish: ParishRef;
     parishId: number;
     deleted: boolean;
 }
 
 export interface Parish {
+    id: number;
+    name: string;
+    townId: number;
+}
+
+export interface ParishRef {
     name: string;
 }
 
