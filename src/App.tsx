@@ -43,30 +43,34 @@ function App() {
             <Route path='/' element={<Home />}></Route>
 
             <Route element={<Layout />}>
-              <Route path='/documentos' element={<Documents />}></Route>
-              <Route path='/documentos/personas' element={<People />}></Route>
-              <Route path='/documentos/actividades' element={<Activities />}></Route>
-              <Route path='/documentos/documentos' element={<Documents />}></Route>
-              <Route path='/documentos/eventos' element={<Events />}></Route>
-              <Route path='/documentos/proveedores' element={<ProvidersInstitutions />}></Route>
+              <Route path='documentos'>
+                <Route index element={<Documents />} />
+                <Route path='personas' element={<People />} />
+                <Route path='actividades' element={<Activities />} />
+                <Route path='documentos' element={<Documents />} />
+                <Route path='eventos' element={<Events />} />
+                <Route path='proveedores' element={<ProvidersInstitutions />} />
+              </Route>
 
-              <Route path='/salud' element={<Health />}></Route>
-              <Route path='/salud/donaciones' element={<Donations />}></Route>
-              <Route path='/salud/reportes' element={<Reports />}></Route>
-              <Route path='/salud/eventos' element={<Events />}></Route>
-              <Route path='/salud/inventario' element={<Inventory />}></Route>
-              <Route path='/salud/medicamentos' element={<Medicine />}></Route>
-              <Route path='/salud/almacenes' element={<Store />}></Route>
-              <Route path='/salud/categorías' element={<Category />}></Route>
-              <Route path='/salud/proveedores' element={<ProvidersInstitutions />}></Route>
-              <Route path='/salud/instituciones' element={<ProvidersInstitutions />} />
+              <Route path='salud'>
+                <Route index element={<Health />} />
+                <Route path='donaciones' element={<Donations />} />
+                <Route path='reportes' element={<Reports />} />
+                <Route path='eventos' element={<Events />} />
+                <Route path='inventario' element={<Inventory />} />
+                <Route path='medicamentos' element={<Medicine />} />
+                <Route path='almacenes' element={<Store />} />
+                <Route path='categorías' element={<Category />} />
+                <Route path='proveedores' element={<ProvidersInstitutions />} />
+                <Route path='instituciones' element={<ProvidersInstitutions />} />
+              </Route>
 
-              <Route path='/musica' element={<Music />}></Route>
-              <Route path='/alimentos' element={<Food />}></Route>
-              <Route path='/agua' element={<Water />}></Route>
+              <Route path='musica' element={<Music />}></Route>
+              <Route path='alimentos' element={<Food />}></Route>
+              <Route path='agua' element={<Water />}></Route>
 
-              <Route path='/usuarios' element={<Users />}></Route>
-              <Route path='/perfil' element={<Profile />}></Route>
+              <Route path='usuarios' element={<Users />}></Route>
+              <Route path='perfil' element={<Profile />}></Route>
             </Route>
           </Route>
 

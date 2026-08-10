@@ -3,7 +3,7 @@ import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { getStore, postStore, putStore, deleteStore } from "@/services/store/store.service";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
-import { HeaderPages } from "@/pages/layout/Header";
+import { HeaderPages } from "@/layout/header/Header";
 import { storeColumns, StoreData } from "./store.data";
 import { Button } from "@/components/ui/button";
 import { FaWarehouse } from "react-icons/fa";

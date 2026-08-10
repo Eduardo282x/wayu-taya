@@ -5,7 +5,7 @@ import { categoryColumns } from "./category.data";
 import { formColumns } from "./form.data";
 import { useState, useEffect } from "react";
 import ConfirmDeleteCategoryOrFormDialog from "./ConfirmDeleteCategoryOrFormDialog"; // Nuevo nombre
-import { HeaderPages } from "@/pages/layout/Header";
+import { HeaderPages } from "@/layout/header/Header";
 import { TableComponents } from "@/components/table/TableComponents";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { Button } from "@/components/ui/button";

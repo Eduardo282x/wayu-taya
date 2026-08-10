@@ -5,16 +5,18 @@ import { type Login, userSchema } from "./login.data"
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
 import { useNavigate } from "react-router"
 import { authLogin } from "@/services/auth/auth.service"
-import { SnackbarProps } from "@/components/snackbar/Snackbar"
+import { Snackbar, SnackbarProps } from "@/components/snackbar/Snackbar"
+import toast from 'react-hot-toast'
 
 // Definir la interfaz para las props
 interface LoginFormProps {
   onForgotPassword: () => void
   setLoading: (loader: boolean) => void
+  loading: boolean
 }
 
 
-export const LoginForm = ({ onForgotPassword, setLoading }: LoginFormProps) => {
+export const LoginForm = ({ onForgotPassword, setLoading, loading }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
   const {
@@ -31,15 +33,22 @@ export const LoginForm = ({ onForgotPassword, setLoading }: LoginFormProps) => {
 
   const onSubmit = async (data: Login) => {
     setLoading(true)
-    await authLogin(data).then((res: SnackbarProps) => {
-      if (res.success) {
+    try {
+      const res: SnackbarProps = await authLogin(data)
+      if (res?.success) {
         localStorage.setItem('token', String(res.token))
         setTimeout(() => {
           navigate('/')
         }, 1000);
       }
-    })
-    setLoading(false)
+    } catch {
+      toast.custom(<Snackbar success={false} message="Error al iniciar sesión, intenta de nuevo." />, {
+        duration: 1500,
+        position: 'bottom-center'
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -96,7 +105,7 @@ export const LoginForm = ({ onForgotPassword, setLoading }: LoginFormProps) => {
       </div>
 
       <div className="flex justify-center items-center lg:w-full h-[20%] lg:h-auto">
-        <button className="lg:text-[1rem] p-3 text-[0.77rem] lg:py-4 manrope text-white font-medium rounded-xl bg-[#34A8D5] transition 100ms ease-in hover:bg-[#3449D5]   text-center cursor-pointer shadow-xl w-[70%] lg:w-[70%] h-[60%]">
+        <button disabled={loading} className="lg:text-[1rem] p-3 text-[0.77rem] lg:py-4 manrope text-white font-medium rounded-xl bg-[#34A8D5] transition 100ms ease-in hover:bg-[#3449D5] disabled:opacity-60 disabled:cursor-not-allowed text-center cursor-pointer shadow-xl w-[70%] lg:w-[70%] h-[60%]">
           Iniciar Sesión
         </button>
       </div>

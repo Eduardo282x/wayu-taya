@@ -4,7 +4,7 @@ import { TiUserAddOutline } from "react-icons/ti";
 import { useEffect, useState } from "react";
 import UsersForm from "./UserForms";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
-import { HeaderPages } from "../layout/Header"
+import { HeaderPages } from "../../layout/header/Header"
 import { TableComponents } from "@/components/table/TableComponents";
 import { GroupUsers, IUsers, Role, UsersBody } from "@/services/users/user.interface";
 import { FilterComponent } from "@/components/table/FilterComponent";

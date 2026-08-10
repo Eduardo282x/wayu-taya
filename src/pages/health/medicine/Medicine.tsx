@@ -15,7 +15,7 @@ import {
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import type { Column } from "@/components/table/table.interface"
 import { MedicineForm } from "./MedicineForm"
-import { HeaderPages } from "@/pages/layout/Header"
+import { HeaderPages } from "@/layout/header/Header"
 import { medicineColumns } from "./medicine.data"
 import { Button } from "@/components/ui/button"
 import { GiMedicines } from "react-icons/gi"

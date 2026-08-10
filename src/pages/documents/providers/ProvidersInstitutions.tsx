@@ -4,7 +4,7 @@ import { FaPlus, FaUserTie } from "react-icons/fa";
 import { deleteProviders, getProviders, postProviders, putProviders } from "@/services/provider/provider.service"; // Importa el servicio
 import { GroupProviders, IProviders, ProviderBody } from "@/services/provider/provider.interface";
 import { ScreenLoader } from "@/components/loaders/ScreenLoader";
-import { HeaderPages } from "@/pages/layout/Header";
+import { HeaderPages } from "@/layout/header/Header";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { Button } from "@/components/ui/button";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";

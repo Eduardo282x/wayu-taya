@@ -1,4 +1,4 @@
-import { HeaderPages } from "@/pages/layout/Header"
+import { HeaderPages } from "@/layout/header/Header"
 import { MdAccessTime } from "react-icons/md"
 
 export const Activities = () => {

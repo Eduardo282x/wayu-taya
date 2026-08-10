@@ -1,6 +1,6 @@
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
-import { HeaderPages } from "@/pages/layout/Header"
+import { HeaderPages } from "@/layout/header/Header.tsx"
 import { DonationBody, GroupDonations, IDonations } from "@/services/donations/donations.interface"
 import { getDonations, getDonationsReport, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
 import { useEffect, useState } from "react"

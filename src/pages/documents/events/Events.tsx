@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { HeaderPages } from "@/pages/layout/Header"
+import { HeaderPages } from "@/layout/header/Header"
 import { FaRegCalendarAlt } from "react-icons/fa"
 import { FaArrowCircleDown } from "react-icons/fa"
 import { formatTimeRange } from "./events.data"

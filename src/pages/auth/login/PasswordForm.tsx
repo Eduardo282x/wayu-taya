@@ -14,6 +14,7 @@ interface PasswordFormProps {
 export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [loading, setLoading] = useState(false)
   const {
     register,
     handleSubmit,
@@ -29,10 +30,15 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
   })
 
   const onSubmit = async (data: BodyRecoverPassword) => {
-    const response = await recoverPasswordLogin(data);
-    if (response.success) {
-      onBackToLogin();
-      reset();
+    setLoading(true)
+    try {
+      const response = await recoverPasswordLogin(data);
+      if (response?.success) {
+        onBackToLogin();
+        reset();
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -117,7 +123,8 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       <div className='flex  lg:w-[70%]'>
         <button
           type="submit"
-          className="lg:text-[1rem] p-3 text-[0.77rem] lg:py-[4%] manrope text-white font-medium rounded-xl bg-[#34A8D5] transition 100ms ease-in hover:bg-[#3449D5]  cursor-pointer shadow-xl w-[50%] lg:w-[70%] lg:h-[10%] h-[50%]">
+          disabled={loading}
+          className="lg:text-[1rem] p-3 text-[0.77rem] lg:py-[4%] manrope text-white font-medium rounded-xl bg-[#34A8D5] transition 100ms ease-in hover:bg-[#3449D5] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer shadow-xl w-[50%] lg:w-[70%] lg:h-[10%] h-[50%]">
           Confirmar
         </button>
 

@@ -1,7 +1,7 @@
 import { TableComponents } from "@/components/table/TableComponents";
 import { columnPeople } from "./people.data";
 import { useEffect, useState } from "react";
-import { HeaderPages } from "@/pages/layout/Header";
+import { HeaderPages } from "@/layout/header/Header";
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import { IoPersonAddOutline } from "react-icons/io5";

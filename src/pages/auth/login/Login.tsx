@@ -88,7 +88,7 @@ export const Login = () => {
                 <div className="text-gray-500 manrope lg:text-xl opacity-70 ml-1">Ingresa tus datos....</div>
               </div>
 
-              <LoginForm onForgotPassword={handleForgotPassword} setLoading={setLoading}/>
+              <LoginForm onForgotPassword={handleForgotPassword} setLoading={setLoading} loading={loading} />
             </div>
           ) : null}
 
