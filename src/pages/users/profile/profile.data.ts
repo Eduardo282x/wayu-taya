@@ -1,11 +1,10 @@
-import { UserToken } from "@/services/auth/auth.interfaces";
+import { User } from "@/services/auth/auth.interfaces";
 
-export const baseUser: UserToken = {
+export const baseUser: User = {
     id: 0,
     name: '',
     lastName: '',
     correo: '',
-    password: '',
     username: '',
     rol: {
         rol: '',

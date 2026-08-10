@@ -8,9 +8,11 @@ import { Badge } from "@/components/ui/badge"
 // import { Separator } from "@/components/ui/separator"
 import { User, Mail, Edit3, Save, X, Lock } from "lucide-react"
 import { FaRegSave, FaRegUser } from "react-icons/fa"
-import { UserToken } from "@/services/auth/auth.interfaces"
+import { User as UserType, LoginResponse } from "@/services/auth/auth.interfaces"
 import { baseUser } from "./profile.data"
 import { putPassword, putProfile } from "@/services/users/user.service"
+import { UsersBody } from "@/services/users/user.interface"
+import { useAuthStore } from "@/store/auth.store"
 import {
   StyledDialog,
   StyledDialogContent,
@@ -20,8 +22,10 @@ import {
 } from "@/components/StyledDialog/StyledDialog"
 
 export const Profile = () => {
-  const [userData, setUserData] = useState<UserToken | null>(null);
-  const [editUserData, setEditUserData] = useState<UserToken>(baseUser);
+  const storeUser = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
+  const setToken = useAuthStore((state) => state.setToken);
+  const [editUserData, setEditUserData] = useState<UserType>(baseUser);
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -30,10 +34,10 @@ export const Profile = () => {
   const [messageAlert, setMessageAlert] = useState("");
 
   useEffect(() => {
-    const localUser = JSON.parse(localStorage.getItem('token') as string);
-    setUserData(localUser);
-    setEditUserData(localUser);
-  }, [])
+    if (storeUser) {
+      setEditUserData(storeUser);
+    }
+  }, [storeUser])
 
   const handleEdit = () => {
     setIsEditing(true)
@@ -48,9 +52,12 @@ export const Profile = () => {
   }
 
   const updateUser = async () => {
-    const response = await putProfile(Number(userData?.id), editUserData);
-    localStorage.setItem('token', response.token);
-    setUserData(JSON.parse(response.token));
+    const response = await putProfile(Number(storeUser?.id), editUserData as unknown as UsersBody);
+    const data = response?.data as LoginResponse | null | undefined;
+    if (data?.user && data.token) {
+      setUser(data.user);
+      setToken(data.token);
+    }
     setIsEditing(false);
   }
 
@@ -74,11 +81,11 @@ export const Profile = () => {
   }
 
   const updatePassword = async () => {
-    await putPassword(Number(userData?.id), { newPassword });
+    await putPassword(Number(storeUser?.id), { newPassword });
     closeDialog(false);
   }
 
-  const handleInputChange = (field: keyof UserToken, value: string) => {
+  const handleInputChange = (field: keyof UserType, value: string) => {
     setEditUserData((prev) => ({
       ...prev,
       [field]: value,
@@ -109,17 +116,17 @@ export const Profile = () => {
                   <Avatar className="h-20 w-20">
                     <AvatarImage src={"/placeholder.svg"} alt="Foto de perfil" />
                     <AvatarFallback className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] text-white text-xl">
-                      {userData && getInitials(userData.name, userData.lastName)}
+                      {storeUser && getInitials(storeUser.name, storeUser.lastName)}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 <div>
                   <CardTitle className="text-2xl">
-                    {userData ? `${userData.name} ${userData.lastName}` : ''}
+                    {storeUser ? `${storeUser.name} ${storeUser.lastName}` : ''}
                   </CardTitle>
-                  <CardDescription className="text-base mt-1">{userData && userData.username}</CardDescription>
+                  <CardDescription className="text-base mt-1">{storeUser && storeUser.username}</CardDescription>
                   <Badge variant="secondary" className="mt-2 bg-blue-100 text-blue-800">
-                    {userData && userData.rol.rol}
+                    {storeUser && storeUser.rol.rol}
                   </Badge>
                 </div>
               </div>
@@ -178,7 +185,7 @@ export const Profile = () => {
                         placeholder="Ingresa tu nombre"
                       />
                     ) : (
-                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{userData && userData.name}</div>
+                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{storeUser && storeUser.name}</div>
                     )}
                   </div>
 
@@ -193,7 +200,7 @@ export const Profile = () => {
                         placeholder="Ingresa tu apellido"
                       />
                     ) : (
-                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{userData && userData.lastName}</div>
+                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{storeUser && storeUser.lastName}</div>
                     )}
                   </div>
                 </div>
@@ -209,7 +216,7 @@ export const Profile = () => {
                       placeholder="Ingresa tu nombre de usuario"
                     />
                   ) : (
-                    <div className="p-3 bg-gray-50 rounded-md text-gray-800">{userData && userData.username}</div>
+                    <div className="p-3 bg-gray-50 rounded-md text-gray-800">{storeUser && storeUser.username}</div>
                   )}
                 </div>
 
@@ -227,7 +234,7 @@ export const Profile = () => {
                   ) : (
                     <div className="p-3 bg-gray-50 rounded-md text-gray-800 flex items-center">
                       <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                      {userData && userData.correo}
+                      {storeUser && storeUser.correo}
                     </div>
                   )}
                 </div>
@@ -250,7 +257,7 @@ export const Profile = () => {
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">Miembro desde</p>
-                    <p className="text-sm text-gray-600">{userData.joinDate}</p>
+                    <p className="text-sm text-gray-600">{storeUser.joinDate}</p>
                   </div>
                 </div>
 
@@ -260,7 +267,7 @@ export const Profile = () => {
                   <MapPin className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">Ubicación</p>
-                    <p className="text-sm text-gray-600">{userData.location}</p>
+                    <p className="text-sm text-gray-600">{storeUser.location}</p>
                   </div>
                 </div>
               </CardContent>

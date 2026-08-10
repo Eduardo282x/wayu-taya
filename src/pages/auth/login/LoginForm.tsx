@@ -10,6 +10,7 @@ import { authLogin } from "@/services/auth/auth.service"
 import { Snackbar } from "@/components/snackbar/Snackbar"
 import toast from 'react-hot-toast'
 import { useNavigate } from "react-router"
+import { useAuthStore } from "@/store/auth.store"
 
 // Definir la interfaz para las props
 interface LoginFormProps {
@@ -22,6 +23,7 @@ interface LoginFormProps {
 export const LoginForm = ({ onForgotPassword, setLoading, loading }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
   const {
     register,
     handleSubmit,
@@ -39,8 +41,10 @@ export const LoginForm = ({ onForgotPassword, setLoading, loading }: LoginFormPr
     try {
       const res = await authLogin(data);
       if (res?.success) {
-        console.log(res)
-        localStorage.setItem('token', res.data.token)
+        const dataLogin = res.data;
+        if (dataLogin?.user && dataLogin.token) {
+          login(dataLogin.user, dataLogin.token)
+        }
         setTimeout(() => {
           navigate('/')
         }, 500);

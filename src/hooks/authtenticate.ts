@@ -1,8 +1,9 @@
 import { IToken, ITokenExp } from "@/services/users/user.interface";
 import { jwtDecode } from "jwt-decode";
+import { useAuthStore } from "@/store/auth.store";
 
 export const validateToken = (): ITokenExp | null => {
-    const getToken = localStorage.getItem('token');
+    const getToken = useAuthStore.getState().token;
 
     if (!getToken) {
         return null;

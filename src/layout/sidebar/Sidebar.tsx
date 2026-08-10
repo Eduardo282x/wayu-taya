@@ -13,10 +13,13 @@ import {
 import { FaRegUser } from 'react-icons/fa6';
 import { FiUser } from 'react-icons/fi';
 import { IoIosArrowDown } from 'react-icons/io';
+import { useAuthStore } from '@/store/auth.store';
 
 export const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const user = useAuthStore((state) => state.user);
+    const logoutStore = useAuthStore((state) => state.logout);
     const [menuData, setMenuData] = useState<IMenuSection[]>([{ items: menu }]);
 
     useEffect(() => {
@@ -60,15 +63,17 @@ export const Sidebar = () => {
     }, [location.pathname])
 
     const nameUser = (): string => {
-        const getUser = JSON.parse(localStorage.getItem('token') as string);
-        return `${getUser.name} ${getUser.lastName}`;
+        if (!user) {
+            return 'Administrador';
+        }
+        return `${user.name} ${user.lastName}`;
     }
 
     const goProfile = () => {
         navigate('/perfil')
     }
     const logout = () => {
-        localStorage.removeItem('token');
+        logoutStore();
         navigate('/login')
     }
 
