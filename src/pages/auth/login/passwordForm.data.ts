@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const passwordSchema = z.object({
-    email: z.string().email({
+    email: z.email({
         message: "Ingresa un correo electrónico válido"
     }),
 
