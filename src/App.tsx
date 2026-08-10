@@ -29,6 +29,7 @@ import { useAxiosInterceptor } from './services/Interceptor';
 import { Reports } from './pages/health/reports/Reports';
 import { Documents } from './pages/documents/documents/Documents';
 import { ProtectedRouter } from './layout/ProtectedRouter';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function App() {
   useAxiosInterceptor();
@@ -36,7 +37,8 @@ function App() {
     <>
       <Toaster />
       <BrowserRouter>
-        <Routes>
+        <ErrorBoundary>
+          <Routes>
           <Route path='/login' element={<Login />}></Route>
           <Route element={<ProtectedRouter />}>
             <Route path='/' element={<Home />}></Route>
@@ -72,7 +74,8 @@ function App() {
             </Route>
           </Route>
 
-        </Routes>
+          </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
 
     </>
