@@ -58,7 +58,7 @@ export const Login = () => {
   // }, [showLoginForm, isMobile])
 
   return (
-    <div className="bg-gradient-to-tr from-blue-800 to-blue-400 h-screen flex items-center justify-center font-sans">
+    <div className="bg-gradient-to-b from-blue-900 to-[#91d5ff] h-screen flex items-center justify-center font-sans">
 
       {loading && (
         <ScreenLoader />
@@ -84,7 +84,7 @@ export const Login = () => {
               </div>
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
-                <div className="text-[#34A8D5] manrope lg:text-xl mb-1">¡Bienvenido!</div>
+                <div className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope lg:text-xl mb-1">¡Bienvenido!</div>
                 <div className="text-gray-500 manrope lg:text-xl opacity-70 ml-1">Ingresa tus datos....</div>
               </div>
 
@@ -119,7 +119,7 @@ export const Login = () => {
         {!isMobile && (
           <div
             className={`
-              w-1/2 p-8 bg-[#3449D5] rounded-xl flex flex-wrap items-center justify-start text-black
+              w-1/2 p-8 bg-gradient-to-tr from-[#024dae] to-[#5cdee5] rounded-xl flex flex-wrap items-center justify-start text-white
               absolute h-full z-10 transition-all duration-600 ease-in-out  
               ${showLoginForm ? 'right-0 animate-slide-left' : 'right-0 animate-slide-right'}
             `}
@@ -131,7 +131,7 @@ export const Login = () => {
             />
             <div className="flex flex-col text-center cursor-default w-full ">
               <span className="oswald font-normal text-4xl">FUNDACIÓN</span>
-              <span className="julius-sans-one-regular text-[2.5rem] border-y-2 border-black">WAYUU TAYA</span>
+              <span className="julius-sans-one-regular text-[2.5rem] border-y-2 border-white">WAYUU TAYA</span>
             </div>
           </div>
         )}
