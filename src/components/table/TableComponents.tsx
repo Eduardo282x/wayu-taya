@@ -141,19 +141,6 @@ const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: Tab
   const [open, setOpen] = useState<boolean>(false);
   const rowRef = useRef<HTMLTableRowElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (rowRef.current && !rowRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <>
       <TableRow

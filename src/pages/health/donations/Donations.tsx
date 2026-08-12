@@ -249,7 +249,7 @@ export const Donations = () => {
               colSpanColumns={true}
               isExpansible={true}
               renderRow={(donations: IDonations, index: number) => (
-                <div key={index} className="max-h-100 overflow-y-auto w-full">
+                <div key={index} className="w-full [&_.table-shell]:max-h-none [&_.table-shell]:min-h-0">
                   <TableComponents data={donations.detDonation} column={detDonationsColumns} actionTable={getActionTable} />
                 </div>
               )}
