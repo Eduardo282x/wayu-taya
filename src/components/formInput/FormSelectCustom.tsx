@@ -81,7 +81,7 @@ const FormSelectCustom: React.FC<FormSelectProps> = ({
           id={id}
           name={name}
           className={cn(
-            "w-full rounded-md focus:outline-1 focus:outline-blue-800 px-3 py-1 bg-white shadow-xl border",
+            "w-full rounded-md focus:outline-1 focus:outline-blue-800 px-3 py-1 bg-white border",
             triggerClassName
           )}
         >

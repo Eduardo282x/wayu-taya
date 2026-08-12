@@ -215,7 +215,7 @@ export const Donations = () => {
         <ScreenLoader />
       )}
       <PageTransitionComponent toggle={openDialog}>
-        <div className="h-full overflow-auto">
+        <div className="h-full ">
           <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
 
           <div className="flex justify-between items-center px-2 pb-2 pt-1 border-b-2 border-gray-300">
@@ -249,7 +249,7 @@ export const Donations = () => {
               colSpanColumns={true}
               isExpansible={true}
               renderRow={(donations: IDonations, index: number) => (
-                <div key={index} className="max-h-32">
+                <div key={index} className="max-h-100 overflow-y-auto w-full">
                   <TableComponents data={donations.detDonation} column={detDonationsColumns} actionTable={getActionTable} />
                 </div>
               )}

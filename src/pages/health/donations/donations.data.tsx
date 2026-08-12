@@ -20,6 +20,7 @@ export const donationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: IDonations) => data.provider ? `${data.provider.name}` : `${data.institution.name}`,
+        className: () => 'w-100 max-w-100 text-ellipsis overflow-hidden'
     },
     {
         label: "Tipo",
@@ -34,6 +35,7 @@ export const donationsColumns: Column[] = [
                 {data.type}
             </p>
         ),
+        className: () => 'w-40 max-w-40 text-ellipsis overflow-hidden'
     },
     {
         label: "Lote",
@@ -41,6 +43,7 @@ export const donationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: IDonations) => data.lote,
+        className: () => 'w-40 max-w-40 text-ellipsis overflow-hidden'
     },
     {
         label: "Fecha",
@@ -48,6 +51,7 @@ export const donationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: IDonations) => formatDate(data.date),
+        className: () => 'w-60 max-w-60 text-ellipsis overflow-hidden'
     },
     {
         label: "Editar",
@@ -61,6 +65,7 @@ export const donationsColumns: Column[] = [
             className: "text-blue-800  font-bold",
             variant: "ghost",
         },
+        className: () => 'w-20 max-w-20 text-ellipsis overflow-hidden'
     },
     {
         label: "Descargar",
@@ -69,6 +74,7 @@ export const donationsColumns: Column[] = [
         isIcon: true,
         element: () => "",
         hiddenIcon: (data: IDonations) => data.type == 'Entrada',
+        className: () => 'w-28 max-w-28 text-ellipsis overflow-hidden',
         icon: {
             label: "Descargar donación",
             icon: Download,
@@ -84,9 +90,13 @@ export const detDonationsColumns: Column[] = [
         column: "medicine.name",
         visible: true,
         isIcon: false,
-        element: (data: DetDonation) => `${data.medicine.name} ${data.medicine.presentation}`,
-        className: () => 'bg-[#193db9] text-white',
+        element: (data: DetDonation) => (
+            <div className="w-100 max-w-100 truncate text-ellipsis overflow-hidden">
+                {data.medicine.name} ${data.medicine.presentation}
+            </div>
+        ),
         disabledClassName: true,
+        className: () => 'bg-[#193db9] text-white'
     },
     {
         label: "Cantidad",
@@ -94,7 +104,7 @@ export const detDonationsColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: DetDonation) => data.amount.toString(),
-        className: () => 'bg-[#193db9] text-white',
+        className: () => 'bg-[#193db9] text-white ',
         disabledClassName: true,
     },
     {

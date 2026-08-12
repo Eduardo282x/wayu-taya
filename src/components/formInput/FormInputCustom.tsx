@@ -89,7 +89,7 @@ const FormInputCustom: React.FC<FormInputProps> = ({
               type="button"
               variant="outline"
               className={cn(
-                "w-full justify-start rounded-md border bg-white px-3 py-1 text-left shadow-sm",
+                "w-full justify-start rounded-md border bg-white px-3 py-1 text-left",
                 !selectedDate && "text-muted-foreground",
                 className
               )}
@@ -99,13 +99,13 @@ const FormInputCustom: React.FC<FormInputProps> = ({
               {selectedDate ? format(selectedDate, "PPP", { locale: es }) : placeholder}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 overflow-hidden rounded-md" align="start">
+          <PopoverContent className="p-0 overflow-hidden rounded-md" align="start">
             <Calendar
               mode="single"
               locale={es}
               selected={selectedDate}
               onSelect={handleDateSelect}
-              className="rounded-lg border"
+              className="rounded-lg border w-full"
               captionLayout="dropdown"
             />
           </PopoverContent>
@@ -114,7 +114,7 @@ const FormInputCustom: React.FC<FormInputProps> = ({
         <input
           id={id}
           className={cn(
-            "w-full rounded-md focus:outline-1 focus:outline-blue-800 px-3 py-1 bg-white shadow-xl border",
+            "w-full rounded-md focus:outline-1 focus:outline-blue-800 px-3 py-1 bg-white border",
             className
           )}
           {...inputProps}

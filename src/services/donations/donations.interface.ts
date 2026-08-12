@@ -22,7 +22,6 @@ export interface DetDonationBody {
     benefited?: number | null;
     storageId: number;
     lote?: string;
-    admissionDate: Date | string;
     expirationDate: Date | string;
 }
 
@@ -45,7 +44,6 @@ export interface DonationMedicine {
     medicineId: number;
     details: DetailDonationMedicine[];
     benefited?: number | null;
-    admissionDate: Date | string;
     expirationDate: Date | string;
 }
 

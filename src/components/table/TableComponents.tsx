@@ -29,7 +29,7 @@ export const TableComponents: FC<TableProps> = ({
   isExpansible
 }) => {
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<string>("10");
+  const [rowsPerPage, setRowsPerPage] = useState<string>("100");
 
   useEffect(() => {
     setPage(0);
@@ -102,7 +102,7 @@ export const TableComponents: FC<TableProps> = ({
         </Table>
       </div>
 
-      {totalItems >= 10 && (
+      {totalItems >= 100 && (
         <PaginationTable
           page={page}
           setPage={setPage}
@@ -176,7 +176,7 @@ const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: Tab
 
       {/* Fila expandida */}
       <TableRow key={`expand-${index}`} className="bg-muted">
-        <TableCell colSpan={columns.length + 1} className="!p-0">
+        <TableCell colSpan={columns.length + 1} className="!p-0 max-w-full">
           <div
             className={`transition-all duration-300 ease-in-out w-full ${open ? 'h-auto px-4 py-2' : '!h-0'} interpolate overflow-hidden`}
           >
@@ -277,7 +277,7 @@ const PaginationTable = ({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                {[10, 20, 50, 100].map((value) => (
+                {[100, 200, 500].map((value) => (
                   <SelectItem key={value} value={value.toString()}>
                     {value}
                   </SelectItem>

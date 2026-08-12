@@ -25,10 +25,10 @@ const ConfirmDeleteMedicineDialog: React.FC<
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Confirmar eliminación de medicamento</DialogTitle>{" "}
-          <DialogDescription>
+          <DialogDescription className="text-gray-800 text-lg">
             ¿Estás seguro de que quieres eliminar el medicamento{" "}
             {medicineName ? `"${medicineName}"` : "seleccionado"}? Esta acción
             no se puede deshacer.
