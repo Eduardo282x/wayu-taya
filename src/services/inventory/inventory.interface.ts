@@ -1,8 +1,22 @@
 import { IMedicine } from "../medicine/medicine.interface";
 import { IStore } from "../store/store.interface";
+import { PaginationQuery } from "../base.interface";
 
 export interface InventoryContent {
     inventory: IInventory[];
+}
+
+export interface InventoryQueryParams extends PaginationQuery {
+    name?: string;
+    storeId?: number | null;
+}
+
+export interface PaginatedInventoryContent {
+    inventory: IInventory[];
+    page: number;
+    size: number;
+    total: number;
+    totalPages: number;
 }
 
 export interface IInventory {

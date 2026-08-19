@@ -1,71 +1,48 @@
 import { MdOutlineProductionQuantityLimits } from "react-icons/md"
 import { InventoryDetailsMedicine } from "./InventoryDetailsMedicine"
-import { FilterComponent } from "@/components/table/FilterComponent"
 import { historyColumns, inventoryColumns } from "./inventory.data"
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import ConfirmDeleteDialog from "./confirm-delete-dialog"
 import AlertDialog from "./alert-dialog"
 import { HeaderPages } from "@/layout/header/Header"
-import { getInventory, getInventoryHistorial, moveInventoryStorage } from "@/services/inventory/inventory.service"
-import type { IInventory, InventoryContent, InventoryHistoryContent } from "@/services/inventory/inventory.interface"
+import type { IInventory } from "@/services/inventory/inventory.interface"
 import { TableComponents } from "@/components/table/TableComponents"
-import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { FaHistory, FaExchangeAlt } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { MoveMedicineDialog, MoveMedicineFormData } from "./move-medicine-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { getStore } from "@/services/store/store.service"
-import { IStore, StoreContent } from "@/services/store/store.interface"
+import { IStore } from "@/services/store/store.interface"
+import { useInventoryQuery, useInventoryHistoryQuery, useAllInventoryQuery, useMoveInventoryMutation } from "./inventory.hook"
+import { useInventoryStore } from "./inventoryStore"
+import { useStoresQuery } from "@/pages/health/store/store.hook"
+import { debounce } from "@/lib/debounce"
 // import { SuccessDialog } from "./success-dialog"
 
 export const Inventory = () => {
-  const [inventory, setInventory] = useState<InventoryContent>({ inventory: [] })
   const [alertOpen, setAlertOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [inventorySelected, setInventorySelected] = useState<IInventory | null>(null)
-  const [loading, setLoading] = useState<boolean>(false)
   const [currentView, setCurrentView] = useState<"inventory" | "history">("inventory")
-  const [historyData, setHistoryData] = useState<InventoryHistoryContent>({ history: [] })
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   // const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
-  const [stores, setStores] = useState<IStore[]>([])
 
-  useEffect(() => {
-    getInventoryApi();
-    getInventoryHistorialApi();
-    getStoreApi();
-  }, [])
+  const { page, size, name, storeId, setPage, setSize, setName, setStoreId } = useInventoryStore()
+  const { data: inventoryData, isFetching } = useInventoryQuery()
+  const { data: historyData, isFetching: historyIsFetching } = useInventoryHistoryQuery()
+  const { data: allInventoryData } = useAllInventoryQuery()
+  const { data: storesData } = useStoresQuery()
+  const moveInventory = useMoveInventoryMutation()
 
-  const getStoreApi = async () => {
-    setLoading(true);
-    try {
-      const response: StoreContent = await getStore();
-      setStores(response.stores);
-    } catch (err) {
-      console.error("Error al obtener almacenes:", err);
-    }
-    setLoading(false);
-  };
+  const currentInventory = inventoryData?.inventory ?? []
+  const totalInventory = inventoryData?.total ?? 0
+  const stores: IStore[] = storesData?.stores ?? []
 
-  const getInventoryApi = async () => {
-    setLoading(true)
-    try {
-      const response: InventoryContent = await getInventory()
-      setInventory(response)
-    } catch (err) {
-      console.log(err)
-    }
-    setLoading(false)
-  }
+  const [searchInventory, setSearchInventory] = useState<string>(name)
 
-  const getInventoryHistorialApi = async () => {
-    try {
-      const response = await getInventoryHistorial()
-      setHistoryData(response)
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  const debouncedName = useMemo(
+    () => debounce((value: string) => setName(value), 300),
+    []
+  )
 
   const getActionTable = (action: string, data: IInventory) => {
     setInventorySelected(data)
@@ -79,19 +56,8 @@ export const Inventory = () => {
     setIsDeleteDialogOpen(false)
   }
 
-  const filterInventoryByStore = (storeId: string) => {
-    console.log(storeId)
-    // const filtered = inventory.allInventory
-    //   .filter(item => item.stores.some(store => store.id === Number(storeId)))
-    //   .map(item => ({
-    //     ...item,
-    //     stores: item.stores.filter(store => store.id === Number(storeId)), // solo ese almacén
-    //   }));
-
-    // setInventory(prev => ({
-    //   ...prev,
-    //   inventory: storeId == 'all' ? prev.allInventory : filtered
-    // }))
+  const filterInventoryByStore = (storeValue: string) => {
+    setStoreId(storeValue === 'all' ? null : Number(storeValue))
   }
 
   const onSubmitMovedInventory = async (data: MoveMedicineFormData) => {
@@ -104,16 +70,14 @@ export const Inventory = () => {
       }
     });
 
-    await moveInventoryStorage({ movements: parseData })
+    await moveInventory.mutateAsync({ movements: parseData })
 
     // Cerrar el diálogo de movimiento y abrir el de éxito
     setIsMoveDialogOpen(false);
-    await getInventoryApi();
   }
 
   return (
     <div className="lg:min-h-[90vh] max-h-[77vh] w-[79.5vw] pl-2 lg:pl-0 overflow-auto ">
-      {loading && <ScreenLoader />}
       <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits} />
 
       {/* Barra de herramientas con filtros */}
@@ -129,7 +93,7 @@ export const Inventory = () => {
         </Button>
 
         <div className="flex items-center gap-2">
-          <Select onValueChange={filterInventoryByStore}>
+          <Select value={storeId == null ? 'all' : storeId.toString()} onValueChange={filterInventoryByStore}>
             <SelectTrigger className="w-40">
               <SelectValue placeholder="Filtrar por almacén..." />
             </SelectTrigger>
@@ -145,15 +109,15 @@ export const Inventory = () => {
             </SelectContent>
           </Select>
 
-          <FilterComponent
-            data={inventory.inventory}
-            setDataFilter={(data) =>
-              setInventory((prev) => {
-                return { ...prev, inventory: data }
-              })
-            }
-            columns={inventoryColumns}
+          <input
+            type="search"
             placeholder="Buscar medicina..."
+            className="w-40 lg:w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+            value={searchInventory}
+            onChange={(e) => {
+              setSearchInventory(e.target.value)
+              debouncedName(e.target.value)
+            }}
           />
           <Button
             variant={currentView === "inventory" ? "default" : "outline"}
@@ -180,11 +144,17 @@ export const Inventory = () => {
         {currentView === "inventory" ? (
           <TableComponents
             key="inventory"
-            data={inventory.inventory}
+            data={currentInventory}
             column={inventoryColumns}
             actionTable={getActionTable}
             colSpanColumns={true}
             isExpansible={true}
+            totalItems={totalInventory}
+            page={page}
+            onPageChange={setPage}
+            rowsPerPage={size}
+            onRowsPerPageChange={setSize}
+            loading={isFetching}
             renderRow={(inventory: IInventory, index: number) => (
               <InventoryDetailsMedicine inventory={inventory} key={index} />
             )}
@@ -192,11 +162,12 @@ export const Inventory = () => {
         ) : (
           <TableComponents
             key="history"
-            data={historyData.history}
+            data={historyData?.history ?? []}
             column={historyColumns}
             actionTable={() => { }}
             colSpanColumns={false}
             isExpansible={false}
+            loading={historyIsFetching}
           />
         )}
 
@@ -212,7 +183,7 @@ export const Inventory = () => {
         <MoveMedicineDialog
           open={isMoveDialogOpen}
           onOpenChange={setIsMoveDialogOpen}
-          inventory={inventory.inventory}
+          inventory={allInventoryData?.inventory ?? []}
           stores={stores}
           onSubmit={onSubmitMovedInventory}
         />

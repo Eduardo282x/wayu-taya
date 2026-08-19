@@ -11,6 +11,7 @@ export const inventoryColumns: Column[] = [
     isIcon: false,
     element: (data: IInventory) =>
       `${data.medicine.name} ${data.medicine.presentation}`,
+    className: () => 'max-w-160 w-160 overflow-hidden text-ellipsis'
   },
   {
     label: "Cantidad",
@@ -67,6 +68,7 @@ export const historyColumns: Column[] = [
     visible: true,
     isIcon: false,
     element: (data: IInventoryHistory) => `${data.medicine.name} ${data.medicine.presentation}`,
+    className: () => 'max-w-160 w-160 overflow-hidden text-ellipsis'
   },
   {
     label: "Tipo",
