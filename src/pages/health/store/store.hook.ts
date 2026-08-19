@@ -1,16 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { StoreBody, StoreContent } from "@/services/store/store.interface"
+import { StoreBody } from "@/services/store/store.interface"
 import { getStore, postStore, putStore, deleteStore } from "@/services/store/store.service"
 
 export const storeKeys = {
     all: ["stores"] as const,
 }
 
-export const useStoresQuery = () => {
+export const useStoresQuery = (enabled = true) => {
     return useQuery({
         queryKey: storeKeys.all,
         queryFn: getStore,
-        select: (data: StoreContent) => data,
+        enabled,
         staleTime: Infinity,
         gcTime: Infinity,
     })

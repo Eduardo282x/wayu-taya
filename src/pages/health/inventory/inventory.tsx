@@ -28,8 +28,8 @@ export const Inventory = () => {
 
   const { page, size, name, storeId, setPage, setSize, setName, setStoreId } = useInventoryStore()
   const { data: inventoryData, isFetching } = useInventoryQuery()
-  const { data: historyData, isFetching: historyIsFetching } = useInventoryHistoryQuery()
-  const { data: allInventoryData } = useAllInventoryQuery()
+  const { data: historyData, isFetching: historyIsFetching } = useInventoryHistoryQuery(currentView === 'history')
+  const { data: allInventoryData } = useAllInventoryQuery(isMoveDialogOpen)
   const { data: storesData } = useStoresQuery()
   const moveInventory = useMoveInventoryMutation()
 

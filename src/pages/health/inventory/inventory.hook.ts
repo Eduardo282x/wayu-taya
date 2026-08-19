@@ -1,5 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { InventoryQueryParams, PaginatedInventoryContent, InventoryHistoryContent, InventoryContent } from "@/services/inventory/inventory.interface"
+import { InventoryQueryParams } from "@/services/inventory/inventory.interface"
 import { getInventory, getInventoryHistorial, getInventoryPage, moveInventoryStorage } from "@/services/inventory/inventory.service"
 import { MoveMedicineFormData } from "./move-medicine-dialog"
 import { useInventoryStore } from "./inventoryStore"
@@ -18,27 +18,26 @@ export const useInventoryQuery = () => {
         queryKey: inventoryKeys.list(params),
         queryFn: () => getInventoryPage(params),
         placeholderData: keepPreviousData,
-        select: (data: PaginatedInventoryContent) => data,
     })
 }
 
-export const useAllInventoryQuery = () => {
+export const useAllInventoryQuery = (enabled = true) => {
     return useQuery({
         queryKey: inventoryKeys.all,
         queryFn: getInventory,
-        select: (data: InventoryContent) => data,
+        enabled,
         staleTime: Infinity,
-        gcTime: Infinity,
+        gcTime: 30 * 60 * 1000,
     })
 }
 
-export const useInventoryHistoryQuery = () => {
+export const useInventoryHistoryQuery = (enabled = true) => {
     return useQuery({
         queryKey: inventoryKeys.history,
         queryFn: getInventoryHistorial,
-        select: (data: InventoryHistoryContent) => data,
+        enabled,
         staleTime: Infinity,
-        gcTime: Infinity,
+        gcTime: 30 * 60 * 1000,
     })
 }
 

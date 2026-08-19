@@ -1,4 +1,5 @@
 import { useForm, useFieldArray, Controller } from "react-hook-form"
+import { useMemo } from "react"
 import {
   StyledDialog,
   StyledDialogContent,
@@ -54,8 +55,14 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
 
   const watchedMovements = watch("movements")
 
+  const inventoryById = useMemo(() => {
+    const map = new Map<string, IInventory>();
+    inventory.forEach((inv) => map.set(inv.medicine.id.toString(), inv));
+    return map;
+  }, [inventory])
+
   const getMedicineById = (medicineId: string) => {
-    return inventory.find((inv) => inv.medicine.id.toString() === medicineId)
+    return inventoryById.get(medicineId)
   }
 
   const getStoresByMedicine = (medicineId: string) => {
