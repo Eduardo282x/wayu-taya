@@ -168,8 +168,8 @@ export const Donations = () => {
                 }}
               />
               <Button variant={"animated"} className="h-full" onClick={newDonations}>
-                <Plus className="w-4 h-4 mr-1" />
-                Agregar Donación
+                <Plus className="w-4 h-4" />
+                Donación
               </Button>
 
             </div>
