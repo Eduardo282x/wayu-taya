@@ -156,19 +156,23 @@ export const Donations = () => {
 
   const handleSaveDonation = async (donationData: DonationBody): Promise<{ success: boolean; message?: string }> => {
     setLoading(true);
+    try {
+      const response = donationSelected?.id
+        ? await putDonation(donationSelected.id, donationData)
+        : await postDonation(donationData);
 
-    const response = donationSelected?.id
-      ? await putDonation(donationSelected.id, donationData)
-      : await postDonation(donationData);
+      if (!response.success) {
+        return { success: false, message: response.message };
+      }
 
-    if (!response.success) {
+      handleCloseDialog();
+      getDonationsApi();
+      return { success: true };
+    } catch {
+      return { success: false, message: 'Error inesperado al guardar la donación.' };
+    } finally {
       setLoading(false);
-      return { success: false, message: response.message };
     }
-
-    handleCloseDialog();
-    getDonationsApi();
-    return { success: true };
   }
 
   useEffect(() => {

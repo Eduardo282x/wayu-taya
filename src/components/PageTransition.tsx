@@ -37,7 +37,7 @@ export default function PageTransitionComponent({ children, toggle }: PageTransi
 
                 <div className="w-1/2 shrink-0 h-full overflow-auto">{primaryView}</div>
 
-                <div className="w-1/2 shrink-0 h-full overflow-auto">{secondaryView}</div>
+                <div className="w-1/2 shrink-0 h-full overflow-hidden">{secondaryView}</div>
 
             </div>
 
