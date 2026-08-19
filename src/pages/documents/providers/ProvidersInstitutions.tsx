@@ -1,31 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Column } from "@/components/table/table.interface";
 import { FaPlus, FaUserTie } from "react-icons/fa";
-import { deleteProviders, getProviders, postProviders, putProviders } from "@/services/provider/provider.service"; // Importa el servicio
-import { ProvidersContent, IProviders, ProviderBody } from "@/services/provider/provider.interface";
-import { ScreenLoader } from "@/components/loaders/ScreenLoader";
+import { IProviders, ProviderBody } from "@/services/provider/provider.interface";
 import { HeaderPages } from "@/layout/header/Header";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { Button } from "@/components/ui/button";
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter";
-import { InstitutionContent, IInstitution, InstitutionsBody, IParish } from "@/services/institution/institution.interface";
-import { deleteInstitutions, getInstitutions, getParish, postInstitutions, putInstitutions } from "@/services/institution/institution.service";
+import { IInstitution, InstitutionsBody } from "@/services/institution/institution.interface";
 import { TableComponents } from "@/components/table/TableComponents";
 import { ProviderForm } from "./ProviderForm";
 import { InstitutionForm } from "./InstitutionForm";
 import { institutionColumns, providerColumns } from "./providerInstitution.data";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import PageTransitionComponent from "@/components/PageTransition";
+import {
+  useProvidersQuery,
+  useInstitutionsQuery,
+  useParishQuery,
+  useCreateProviderMutation,
+  useUpdateProviderMutation,
+  useDeleteProviderMutation,
+  useCreateInstitutionMutation,
+  useUpdateInstitutionMutation,
+  useDeleteInstitutionMutation,
+} from "./providers.hook";
+import { useProvidersStore } from "./providersStore";
 
 type view = 'provider' | 'institution';
 
 export const ProvidersInstitutions = () => {
 	const [columnsProviders, setColumnsProviders] = useState<Column[]>(providerColumns);
 	const [columnsInstitutions, setColumnsInstitutions] = useState<Column[]>(institutionColumns);
-	const [providers, setProviders] = useState<ProvidersContent>({ providers: [] });
-	const [parish, setParish] = useState<IParish[]>([]);
-	const [institution, setInstitution] = useState<InstitutionContent>({ institutions: [] });
-	const [loading, setLoading] = useState(true);
+	const [filteredProviders, setFilteredProviders] = useState<IProviders[]>([]);
+	const [filteredInstitutions, setFilteredInstitutions] = useState<IInstitution[]>([]);
 	const [currentView, setCurrentView] = useState<view>('provider');
 	const [openDialogDelete, setOpenDialogDelete] = useState(false);
 	const [openProvider, setOpenProvider] = useState(false);
@@ -33,42 +40,32 @@ export const ProvidersInstitutions = () => {
 	const [providerSelected, setProviderSelected] = useState<IProviders | null>(null);
 	const [institutionSelected, setInstitutionSelected] = useState<IInstitution | null>(null);
 
+	const {
+		providersPage, providersSize, setProvidersPage, setProvidersSize,
+		institutionsPage, institutionsSize, setInstitutionsPage, setInstitutionsSize,
+	} = useProvidersStore();
+	const { data: providersData, isFetching: providersIsFetching } = useProvidersQuery();
+	const { data: institutionsData, isFetching: institutionsIsFetching } = useInstitutionsQuery();
+	const { data: parishData } = useParishQuery();
+	const createProvider = useCreateProviderMutation();
+	const updateProvider = useUpdateProviderMutation();
+	const deleteProvider = useDeleteProviderMutation();
+	const createInstitution = useCreateInstitutionMutation();
+	const updateInstitution = useUpdateInstitutionMutation();
+	const deleteInstitution = useDeleteInstitutionMutation();
+
+	const currentProviders = useMemo(() => providersData?.providers ?? [], [providersData]);
+	const totalProviders = providersData?.total ?? 0;
+	const currentInstitutions = useMemo(() => institutionsData?.institutions ?? [], [institutionsData]);
+	const totalInstitutions = institutionsData?.total ?? 0;
+
 	useEffect(() => {
-		getProvidersApi();
-		getInstitutionsApi();
-		getParishApi();
-	}, []);
+		setFilteredProviders(currentProviders);
+	}, [currentProviders]);
 
-	const getParishApi = async () => {
-		try {
-			const response = await getParish();
-			setParish(response.parishes)
-		} catch (err) {
-			console.log(err);
-		}
-	}
-
-	const getProvidersApi = async () => {
-		setLoading(true)
-		try {
-			const response = await getProviders();
-			setProviders(response)
-		} catch (err) {
-			console.log(err);
-		}
-		setLoading(false)
-	}
-
-	const getInstitutionsApi = async () => {
-		setLoading(true)
-		try {
-			const response: InstitutionContent = await getInstitutions();
-			setInstitution(response)
-		} catch (err) {
-			console.log(err);
-		}
-		setLoading(false)
-	}
+	useEffect(() => {
+		setFilteredInstitutions(currentInstitutions);
+	}, [currentInstitutions]);
 
 	const tabSelected = (tab: view): string => {
 		if (tab == currentView) {
@@ -81,8 +78,8 @@ export const ProvidersInstitutions = () => {
 	}
 
 	const setFilter = (data: IProviders[] | IInstitution[]) => {
-		if (currentView == 'provider') setProviders((prev) => ({ ...prev, providers: data as IProviders[] }))
-		if (currentView == 'institution') setInstitution((prev) => ({ ...prev, institution: data as IInstitution[] }))
+		if (currentView == 'provider') setFilteredProviders(data as IProviders[])
+		if (currentView == 'institution') setFilteredInstitutions(data as IInstitution[])
 	}
 
 	const newElement = () => {
@@ -93,19 +90,20 @@ export const ProvidersInstitutions = () => {
 	}
 
 	const getActionForm = async (data: ProviderBody | InstitutionsBody) => {
-		if (providerSelected || institutionSelected) {
-			if (currentView == 'provider') await putProviders(Number(providerSelected?.id), data as ProviderBody)
-			if (currentView == 'institution') await putInstitutions(Number(institutionSelected?.id), data as InstitutionsBody)
-		} else {
-			if (currentView == 'provider') await postProviders(data as ProviderBody)
-			if (currentView == 'institution') await postInstitutions(data as InstitutionsBody)
+		try {
+			if (providerSelected || institutionSelected) {
+				if (currentView == 'provider') await updateProvider.mutateAsync({ id: Number(providerSelected?.id), data: data as ProviderBody })
+				if (currentView == 'institution') await updateInstitution.mutateAsync({ id: Number(institutionSelected?.id), data: data as InstitutionsBody })
+			} else {
+				if (currentView == 'provider') await createProvider.mutateAsync(data as ProviderBody)
+				if (currentView == 'institution') await createInstitution.mutateAsync(data as InstitutionsBody)
+			}
+		} catch (err) {
+			console.log(err);
 		}
 
 		setOpenInstitution(false);
 		setOpenProvider(false);
-
-		if (currentView == 'provider') await getProvidersApi();
-		if (currentView == 'institution') await getInstitutionsApi();
 	};
 
 	const getActionTable = (action: string, data: IProviders | IInstitution) => {
@@ -119,20 +117,18 @@ export const ProvidersInstitutions = () => {
 	};
 
 	const confirmDelete = async () => {
-		if (currentView == 'provider') await deleteProviders(Number(providerSelected?.id))
-		if (currentView == 'institution') await deleteInstitutions(Number(institutionSelected?.id))
+		try {
+			if (currentView == 'provider') await deleteProvider.mutateAsync(Number(providerSelected?.id))
+			if (currentView == 'institution') await deleteInstitution.mutateAsync(Number(institutionSelected?.id))
+		} catch (err) {
+			console.log(err);
+		}
 
 		setOpenDialogDelete(false);
-
-		if (currentView == 'provider') await getProvidersApi();
-		if (currentView == 'institution') await getInstitutionsApi();
 	};
 
 	return (
 		<div className='px-3 lg:p-0 h-full flex flex-col'>
-			{loading && (
-				<ScreenLoader />
-			)}
 			<PageTransitionComponent toggle={openProvider || openInstitution}>
 				<div className="h-full overflow-auto">
 					<HeaderPages title={currentView === "provider" ? "Proveedores" : "Instituciones"} Icon={FaUserTie} />
@@ -164,7 +160,7 @@ export const ProvidersInstitutions = () => {
 							)}
 
 							<FilterComponent
-								data={currentView == 'provider' ? providers.providers : institution.institutions}
+								data={currentView == 'provider' ? currentProviders : currentInstitutions}
 								columns={currentView == 'provider' ? providerColumns : institutionColumns}
 								setDataFilter={setFilter}
 								placeholder={currentView == 'provider' ? "Buscar proveedor..." : "Buscar Institución..."}
@@ -183,17 +179,29 @@ export const ProvidersInstitutions = () => {
 					<div className="mt-1 lg:mt-4 ">
 						{currentView == 'provider' && (
 							<TableComponents
-								data={providers.providers}
+								data={filteredProviders}
 								column={columnsProviders.filter(col => col.visible == true)}
 								actionTable={getActionTable}
+								totalItems={totalProviders}
+								page={providersPage}
+								onPageChange={setProvidersPage}
+								rowsPerPage={providersSize}
+								onRowsPerPageChange={setProvidersSize}
+								loading={providersIsFetching}
 							/>
 						)}
 
 						{currentView == 'institution' && (
 							<TableComponents
-							data={institution.institutions}
+							data={filteredInstitutions}
 								column={columnsInstitutions.filter(col => col.visible == true)}
 								actionTable={getActionTable}
+								totalItems={totalInstitutions}
+								page={institutionsPage}
+								onPageChange={setInstitutionsPage}
+								rowsPerPage={institutionsSize}
+								onRowsPerPageChange={setInstitutionsSize}
+								loading={institutionsIsFetching}
 							/>
 						)}
 					</div>
@@ -221,7 +229,7 @@ export const ProvidersInstitutions = () => {
 							onOpenChange={setOpenInstitution}
 							institution={institutionSelected}
 							onSubmit={getActionForm}
-							parish={parish}
+							parish={parishData?.parishes ?? []}
 						/>
 					</div>
 				</div>
