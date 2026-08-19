@@ -1,15 +1,8 @@
-import type { MedicineContent, IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface"
+import type { IMedicine, MedicineBody } from "@/services/medicine/medicine.interface"
 import { DropdownColumnFilter } from "@/components/table/DropdownColumnFilter"
 import { TableComponents } from "@/components/table/TableComponents"
-import { FilterComponent } from "@/components/table/FilterComponent"
 import {
-  getMedicine,
-  postMedicine,
-  putMedicine,
-  deleteMedicine,
   getMedicineTemplate,
-  getCategories,
-  getForms,
   uploadMedicineFile,
 } from "@/services/medicine/medicine.service"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
@@ -20,52 +13,57 @@ import { HeaderPages } from "@/layout/header/Header"
 import { medicineColumns } from "./medicine.data"
 import { Button } from "@/components/ui/button"
 import { GiMedicines } from "react-icons/gi"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { FaPills } from "react-icons/fa"
 import ConfirmDeleteMedicineDialog from "./ConfirmDeleteMedicineDialog"
 import { FaDownload, FaUpload } from "react-icons/fa6"
 import { UploadMedicineDialog } from "./UploadMedicineDialog"
+import {
+  useMedicinesQuery,
+  useCategoriesQuery,
+  useFormsQuery,
+  useCreateMedicineMutation,
+  useUpdateMedicineMutation,
+  useDeleteMedicineMutation,
+  medicineKeys,
+} from "./medicine.hook"
+import { useMedicineStore } from "./medicineStore"
+import { useQueryClient } from "@tanstack/react-query"
+import { debounce } from "@/lib/debounce"
 
 export const Medicine = () => {
-  const [medicines, setMedicines] = useState<MedicineContent>({ medicines: [] })
   const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(null)
   const [columns, setColumns] = useState<Column[]>(medicineColumns)
   const [isAddFormOpen, setIsAddFormOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [forms, setForms] = useState<Form[]>([])
 
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
   const [dragActive, setDragActive] = useState<boolean>(false)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
 
+  const { page, size, name, setPage, setSize, setName } = useMedicineStore()
+  const { data: medicinesData, isFetching } = useMedicinesQuery()
+  const { data: categoriesData } = useCategoriesQuery()
+  const { data: formsData } = useFormsQuery()
+  const createMedicine = useCreateMedicineMutation()
+  const updateMedicine = useUpdateMedicineMutation()
+  const deleteMedicine = useDeleteMedicineMutation()
+  const queryClient = useQueryClient()
+
+  const currentMedicines = medicinesData?.medicines ?? []
+  const totalMedicines = medicinesData?.total ?? 0
+
+  const [searchMedicine, setSearchMedicine] = useState<string>(name)
+
+  const debouncedName = useMemo(
+    () => debounce((value: string) => setName(value), 300),
+    []
+  )
+
   useEffect(() => {
-    getMedicineApi()
-    getCategoriesAndForms()
-  }, [])
-
-  const getMedicineApi = async () => {
-    setLoading(true)
-    try {
-      const response = await getMedicine()
-      setMedicines(response)
-    } catch (err) {
-      console.error("Error al obtener medicamentos:", err)
-    }
-    setLoading(false)
-  }
-
-  const getCategoriesAndForms = async () => {
-    try {
-      const responseCategory = await getCategories()
-      setCategories(responseCategory.categories)
-      const responseForms = await getForms()
-      setForms(responseForms.forms)
-    } catch (error) {
-      console.error("Error al cargar categorías o formas:", error)
-    }
-  }
+    setSearchMedicine(name)
+  }, [name])
 
   const openAddForm = () => {
     setMedicineSelected(null)
@@ -73,40 +71,28 @@ export const Medicine = () => {
   }
 
   const handleMedicineSubmit = async (formData: MedicineBody) => {
-    setLoading(true)
     try {
       if (medicineSelected) {
-        await putMedicine(medicineSelected.id, formData)
+        await updateMedicine.mutateAsync({ id: medicineSelected.id, data: formData })
       } else {
-        await postMedicine(formData)
+        await createMedicine.mutateAsync(formData)
       }
       setIsAddFormOpen(false)
-      await getMedicineApi()
     } catch (error) {
       console.error("Error al guardar el medicamento:", error)
-    } finally {
-      setLoading(false)
     }
   }
 
   const handleConfirmDeleteMedicine = async () => {
     if (medicineSelected) {
-      setLoading(true)
       try {
-        await deleteMedicine(medicineSelected.id)
-        await getMedicineApi()
+        await deleteMedicine.mutateAsync(medicineSelected.id)
         setIsDeleteDialogOpen(false)
         setMedicineSelected(null)
       } catch (error) {
         console.error("Error al eliminar el medicamento:", error)
-      } finally {
-        setLoading(false)
       }
     }
-  }
-
-  const setMedicineFilter = (filteredMedicines: IMedicine[]) => {
-    setMedicines((prev) => ({ ...prev, medicine: filteredMedicines }))
   }
 
   const getActionTable = (action: string, data: IMedicine) => {
@@ -178,7 +164,7 @@ export const Medicine = () => {
     await uploadMedicineFile(formData);
     setUploadedFile(null)
     setIsUploadOpen(false);
-    getMedicineApi();
+    queryClient.invalidateQueries({ queryKey: medicineKeys.all })
     setLoading(false);
   }
 
@@ -209,11 +195,15 @@ export const Medicine = () => {
               </div>
 
               <div className="flex items-center ">
-                <FilterComponent
-                  data={medicines.medicines}
-                  columns={medicineColumns}
+                <input
+                  type="search"
                   placeholder="Buscar medicamentos..."
-                  setDataFilter={setMedicineFilter}
+                  className="w-40 lg:w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+                  value={searchMedicine}
+                  onChange={(e) => {
+                    setSearchMedicine(e.target.value)
+                    debouncedName(e.target.value)
+                  }}
                 />
                 <Button variant={"animated"} className="h-full" onClick={openAddForm}>
                   <GiMedicines className="size-6" />
@@ -225,8 +215,14 @@ export const Medicine = () => {
             <div className="mt-4">
               <TableComponents
                 column={columns.filter((item) => item.visible === true)}
-                data={medicines.medicines}
+                data={currentMedicines}
                 actionTable={getActionTable}
+                totalItems={totalMedicines}
+                page={page}
+                onPageChange={setPage}
+                rowsPerPage={size}
+                onRowsPerPageChange={setSize}
+                loading={isFetching}
               />
             </div>
 
@@ -259,8 +255,8 @@ export const Medicine = () => {
               onOpenChange={setIsAddFormOpen}
               onSubmit={handleMedicineSubmit}
               medicineData={medicineSelected}
-              categories={categories}
-              forms={forms}
+              categories={categoriesData?.categories ?? []}
+              forms={formsData?.forms ?? []}
               ignoreHeader={false}
             />
           </div>
