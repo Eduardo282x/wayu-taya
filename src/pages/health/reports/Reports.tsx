@@ -12,8 +12,7 @@ import { generateReportDonations, generateReportInventory, generateReportStore, 
 import { BodyReport, GraphicStorage, IReports, ProductByStorage, ReportDonations } from "@/services/reports/report.interface"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ReportDialogs, WareHouseDialog } from "./ReportDialogs"
-import { IStore, StoreContent } from "@/services/store/store.interface"
-import { getStore } from "@/services/store/store.service"
+import { useStoresQuery } from "@/pages/health/store/store.hook"
 
 // Datos de ejemplo
 const reportTypes = [
@@ -114,9 +113,9 @@ export const Reports = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
     const [openWarehouse, setOpenWareHouse] = useState<boolean>(false);
-    const [stores, setStores] = useState<IStore[]>([])
     const [report, setReport] = useState<IReports>();
     const [warehouseData, setWarehouseData] = useState<GraphicStorage[]>([])
+    const { data: storesData } = useStoresQuery();
     const [filtersDate, setFiltersDate] = useState<BodyReport>({
         from: new Date(now.getFullYear(), now.getMonth(), 1),
         to: new Date(now.getFullYear(), now.getMonth() + 1, 0),
@@ -155,10 +154,6 @@ export const Reports = () => {
         getReportApi()
     }, [filtersDate])
 
-    useEffect(() => {
-        getStoreApi()
-    }, [])
-
     const getReportApi = async () => {
         setLoading(true)
         const response = await getReport(filtersDate);
@@ -183,17 +178,6 @@ export const Reports = () => {
         const randomIndex = Math.floor(Math.random() * colorCodes.length);
         return colorCodes[randomIndex];
     }
-
-    const getStoreApi = async () => {
-        setLoading(true);
-        try {
-            const response: StoreContent = await getStore();
-            setStores(response.stores);
-        } catch (err) {
-            console.error("Error al obtener almacenes:", err);
-        }
-        setLoading(false);
-    };
 
     const handleDownloadReport = (report: string) => {
         // Aquí iría la lógica para descargar el reporte
@@ -484,7 +468,7 @@ export const Reports = () => {
             <WareHouseDialog
                 open={openWarehouse}
                 setOpen={setOpenWareHouse}
-                stores={stores}
+                stores={storesData?.stores ?? []}
                 onSubmitData={generateReportStoreApi}
             />
         </div>

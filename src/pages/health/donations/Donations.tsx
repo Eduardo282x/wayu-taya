@@ -1,11 +1,6 @@
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/layout/header/Header.tsx"
 import { DonationBody, IDonations } from "@/services/donations/donations.interface"
-import { getProviders } from "@/services/provider/provider.service"
-import { getStore } from "@/services/store/store.service"
-import { getMedicine } from "@/services/medicine/medicine.service"
-import { getInstitutions } from "@/services/institution/institution.service"
-import { getInventory } from "@/services/inventory/inventory.service.ts"
 import { useEffect, useMemo, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
 import { detDonationsColumns, donationsColumns } from "./donations.data.tsx"
@@ -14,27 +9,26 @@ import { Button } from "@/components/ui/button"
 import { DonationsForm } from "./DonationsForm"
 import PageTransitionComponent from "@/components/PageTransition"
 import { Plus } from "lucide-react"
-import { IProviders } from "@/services/provider/provider.interface"
-import { IStore, StoreContent } from "@/services/store/store.interface"
-import { IMedicine } from "@/services/medicine/medicine.interface"
-import { IInstitution } from "@/services/institution/institution.interface"
 import { DonationFilterDropDown } from "./DonationFilters"
-import { IInventory } from "@/services/inventory/inventory.interface.ts"
 import { useDonationsQuery, useLotesQuery, useCreateDonationMutation, useUpdateDonationMutation } from "./donations.hook"
 import { useDonationStore } from "./donationStore"
+import { useStoresQuery } from "@/pages/health/store/store.hook"
+import { useAllInventoryQuery } from "@/pages/health/inventory/inventory.hook"
+import { useAllMedicinesQuery } from "@/pages/health/medicine/medicine.hook"
+import { useAllProvidersQuery, useAllInstitutionsQuery } from "@/pages/documents/providers/providers.hook"
 
 export const Donations = () => {
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
-  const [providers, setProviders] = useState<IProviders[]>([])
-  const [institutions, setInstitutions] = useState<IInstitution[]>([])
-  const [stores, setStores] = useState<IStore[]>([])
-  const [medicines, setMedicines] = useState<IMedicine[]>([])
-  const [inventory, setInventory] = useState<IInventory[]>([])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
   const { page, size, setPage, setSize, filters, setFilter } = useDonationStore()
   const { data: donationsData, isFetching } = useDonationsQuery()
   const { data: lotesData } = useLotesQuery()
+  const { data: storesData } = useStoresQuery()
+  const { data: allInventoryData } = useAllInventoryQuery()
+  const { data: allMedicinesData } = useAllMedicinesQuery()
+  const { data: allProvidersData } = useAllProvidersQuery()
+  const { data: allInstitutionsData } = useAllInstitutionsQuery()
   const createDonation = useCreateDonationMutation()
   const updateDonation = useUpdateDonationMutation()
 
@@ -51,60 +45,6 @@ export const Donations = () => {
   useEffect(() => {
     setSearchControl(filters.controlNumber)
   }, [filters.controlNumber])
-
-  useEffect(() => {
-    Promise.all([
-      getStoresApi(),
-      getProvidersApi(),
-      getMedicinesApi(),
-      getInventoryApi(),
-      getInstitutionsApi(),
-    ]);
-  }, [])
-
-  const getProvidersApi = async () => {
-    try {
-      const response = await getProviders()
-      setProviders(response.providers)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-  const getInstitutionsApi = async () => {
-    try {
-      const response = await getInstitutions()
-      setInstitutions(response.institutions)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const getStoresApi = async () => {
-    try {
-      const response: StoreContent = await getStore()
-      setStores(response.stores)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const getMedicinesApi = async () => {
-    try {
-      const response = await getMedicine()
-      setMedicines(response.medicines)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const getInventoryApi = async () => {
-    try {
-      const response = await getInventory()
-      setInventory(response.inventory)
-    } catch (err) {
-      console.log(err)
-    }
-  }
 
   const newDonations = () => {
     setDonationSelected(null)
@@ -152,8 +92,8 @@ export const Donations = () => {
 
           <div className="flex justify-between items-end gap-4 p-3 bg-white rounded-xl shadow-sm border border-gray-200">
             <DonationFilterDropDown
-              providers={providers}
-              institutions={institutions}
+              providers={allProvidersData?.providers ?? []}
+              institutions={allInstitutionsData?.institutions ?? []}
               lotes={lotesData?.lotes ?? []}
             />
             <div className="flex items-end gap-2">
@@ -200,11 +140,11 @@ export const Donations = () => {
         <div className="h-full px-2">
           <DonationsForm
             donation={donationSelected}
-            providers={providers}
-            stores={stores}
-            inventory={inventory}
-            medicines={medicines}
-            institutions={institutions}
+            providers={allProvidersData?.providers ?? []}
+            stores={storesData?.stores ?? []}
+            inventory={allInventoryData?.inventory ?? []}
+            medicines={allMedicinesData?.medicines ?? []}
+            institutions={allInstitutionsData?.institutions ?? []}
             onSave={handleSaveDonation}
             onCancel={handleCloseDialog} />
         </div>

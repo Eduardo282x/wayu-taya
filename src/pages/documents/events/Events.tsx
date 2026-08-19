@@ -13,8 +13,7 @@ import type { EventsBody, GroupEvents, IEvents } from "@/services/events/events.
 import { days, months } from "@/utils/formatters"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { Trash2 } from "lucide-react"
-import { IProviders } from "@/services/provider/provider.interface"
-import { getProviders } from "@/services/provider/provider.service"
+import { useAllProvidersQuery } from "@/pages/documents/providers/providers.hook"
 
 export const Events = () => {
   const [open, setOpen] = useState<boolean>(false)
@@ -23,22 +22,12 @@ export const Events = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [selectedEvent, setSelectedEvent] = useState<IEvents | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [providers, setProviders] = useState<IProviders[]>([]);
+  const { data: providersData } = useAllProvidersQuery();
 
 
   useEffect(() => {
     getEventsApi();
-    getProvidersApi();
   }, [])
-
-  const getProvidersApi = async () => {
-    try {
-      const response = await getProviders()
-      setProviders(response.providers)
-    } catch (err) {
-      console.log(err)
-    }
-  }
 
   const getEventsApi = async () => {
     setLoading(true)
@@ -125,7 +114,7 @@ export const Events = () => {
           <EventForm
             selectedEvent={selectedEvent}
             isEditing={isEditing}
-            providers={providers}
+            providers={providersData?.providers ?? []}
             onClose={() => setOpen(false)}
             onEventSaved={handleEventSaved}
           />

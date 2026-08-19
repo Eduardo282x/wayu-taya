@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Column } from "@/components/table/table.interface";
 import { FaRegTrashAlt, FaRegEdit, FaPlus } from "react-icons/fa";
 import { TableComponents } from "@/components/table/TableComponents";
-import { getProviders } from "@/services/provider/provider.service"; // Importa el servicio
+import { useAllProvidersQuery } from "@/pages/documents/providers/providers.hook";
 
 export const providerColumns: Column[] = [
     {
@@ -79,17 +79,15 @@ const initialForm = {
 };
 
 export const Providers = () => {
+    const { data: providersData, isLoading } = useAllProvidersQuery();
     const [data, setData] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [form, setForm] = useState(initialForm);
     const [editIndex, setEditIndex] = useState<number | null>(null);
 
     useEffect(() => {
-        getProviders()
-            .then((res) => setData(res.providers))
-            .finally(() => setLoading(false));
-    }, []);
+        setData(providersData?.providers ?? []);
+    }, [providersData]);
 
     // Maneja acciones de la tabla
     const handleActionTable = (action: string, row: any) => {
@@ -139,7 +137,7 @@ export const Providers = () => {
                     <FaPlus /> Agregar proveedor
                 </button>
             </div>
-            {loading ? (
+            {isLoading ? (
                 <div>Cargando...</div>
             ) : (
                 <TableComponents

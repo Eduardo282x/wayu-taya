@@ -36,6 +36,7 @@ export const useCreateDonationMutation = () => {
         onSuccess: (response) => {
             if (response.success) {
                 queryClient.invalidateQueries({ queryKey: donationsKeys.all })
+                queryClient.invalidateQueries({ queryKey: ["inventory"] })
             }
         },
     })
@@ -49,6 +50,7 @@ export const useUpdateDonationMutation = () => {
         onSuccess: (response) => {
             if (response.success) {
                 queryClient.invalidateQueries({ queryKey: donationsKeys.all })
+                queryClient.invalidateQueries({ queryKey: ["inventory"] })
             }
         },
     })
