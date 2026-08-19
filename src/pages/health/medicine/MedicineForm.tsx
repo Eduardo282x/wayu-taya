@@ -11,6 +11,7 @@ import { FormInput } from "@/components/formInput/FormInput";
 
 
 interface MedicineFormProps {
+  ignoreHeader: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: MedicineBody) => void;
@@ -19,7 +20,7 @@ interface MedicineFormProps {
   forms: Form[];
 }
 
-export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, onSubmit, medicineData, categories, forms }) => {
+export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, onOpenChange, onSubmit, medicineData, categories, forms }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">("medicamento");
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<MedicineBody>({
@@ -68,25 +69,27 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
-        <div>
-          <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
-            {medicineData ? "Editar Elemento" : "Agregar Nuevo Elemento"}
-          </h2>
-          <p className="manrope text-sm text-gray-600">
-            {medicineData
-              ? "Modifica los datos del elemento y guarda los cambios."
-              : "Completa los datos para registrar un nuevo elemento."}
-          </p>
+      {!ignoreHeader && (
+        <div className=" flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
+          <div>
+            <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+              {medicineData ? "Editar Elemento" : "Agregar Nuevo Elemento"}
+            </h2>
+            <p className="manrope text-sm text-gray-600">
+              {medicineData
+                ? "Modifica los datos del elemento y guarda los cambios."
+                : "Completa los datos para registrar un nuevo elemento."}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="flex items-center gap-2"
+          >
+            <FaArrowLeft /> Volver
+          </Button>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => onOpenChange(false)}
-          className="flex items-center gap-2"
-        >
-          <FaArrowLeft /> Volver
-        </Button>
-      </div>
+      )}
 
       <Tabs
         defaultValue="medicamento"
@@ -111,12 +114,12 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
 
         <form
           onSubmit={handleSubmit(handleFormSubmit)}
-          className="grid grid-cols-3 gap-2 p-4 overflow-y-auto"
+          className={`grid ${ignoreHeader ? 'grid-cols-2' : 'grid-cols-3'}  gap-2 p-4 overflow-y-auto`}
         >
           <input type="hidden" {...register("medicine")} />
 
           {currentTab === "medicamento" && (
-            <TabsContent value="medicamento" className="col-span-3 grid grid-cols-3 mt-0 gap-2 ">
+            <TabsContent value="medicamento" className={`col-span-3 grid ${ignoreHeader ? 'grid-cols-2' : 'grid-cols-3'}  mt-0 gap-2 `}>
               <FormInput
                 label="Nombre"
                 id="nombre"
@@ -213,7 +216,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ open, onOpenChange, 
           )}
 
           {currentTab === "producto" && (
-            <TabsContent value="producto" className="col-span-3 grid grid-cols-3 mt-0 gap-2">
+            <TabsContent value="producto" className={`col-span-3 grid ${ignoreHeader ? 'grid-cols-1' : 'grid-cols-3'} mt-0 gap-2`}>
               <FormInput
                 label="Nombre"
                 id="nombre_producto"

@@ -2,7 +2,7 @@ import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/layout/header/Header.tsx"
 import { DonationBody, DonationsContent, IDonations } from "@/services/donations/donations.interface"
-import { getDonations, getDonationsReport, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
+import { getDonations, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
 import { useEffect, useRef, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
 import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data.tsx"
@@ -128,20 +128,6 @@ export const Donations = () => {
 
     if (action == "edit") {
       setOpenDialog(true)
-    }
-
-    if (action == "download") {
-      setLoading(true)
-      const response = await getDonationsReport(data.id)
-      const url = URL.createObjectURL(response)
-      const link = window.document.createElement("a")
-      link.href = url
-      link.download = `Reporte de donación`
-      window.document.body.appendChild(link)
-      link.click()
-      window.document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-      setLoading(false)
     }
   }
 

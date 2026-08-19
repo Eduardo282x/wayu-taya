@@ -1,8 +1,8 @@
 import { Column } from "@/components/table/table.interface";
 import { DetDonation, IDonations } from "@/services/donations/donations.interface";
 import { formatDate } from "@/utils/formatters";
-import { Download } from "lucide-react";
 import { MdEdit } from "react-icons/md";
+import { DonationDownloadMenu } from "./DonationDownloadMenu";
 
 export interface IDonationsFilters {
     type: 'all' | 'Entrada' | 'Salida';
@@ -11,7 +11,7 @@ export interface IDonationsFilters {
     institutionId: number | null;
 }
 
-export type DonationTypeForm = 'medicineId' | 'amount' | 'storageId' | 'lote' | 'admissionDate' | 'expirationDate';
+export type DonationTypeForm = 'medicineId' | 'amount' | 'storageId' | 'lote' | 'benefited' | 'expirationDate';
 
 export const donationsColumns: Column[] = [
     {
@@ -71,16 +71,9 @@ export const donationsColumns: Column[] = [
         label: "Descargar",
         column: "download",
         visible: true,
-        isIcon: true,
-        element: () => "",
-        hiddenIcon: (data: IDonations) => data.type == 'Entrada',
-        className: () => 'w-28 max-w-28 text-ellipsis overflow-hidden',
-        icon: {
-            label: "Descargar donación",
-            icon: Download,
-            className: "text-blue-600",
-            variant: "ghost",
-        },
+        element: (data: IDonations) =>
+            data.type === 'Entrada' ? null : <DonationDownloadMenu donationId={data.id} />,
+        className: () => 'w-48 max-w-48 text-ellipsis overflow-hidden',
     },
 ];
 

@@ -51,6 +51,7 @@ export interface DetailDonationMedicine {
     amount: number;
     storageId: number;
     lote?: string;
+    benefited?: number;
 }
 
 

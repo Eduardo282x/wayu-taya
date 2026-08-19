@@ -20,8 +20,11 @@ export const getLotes = async (): Promise<LotesContent> => {
     return response.data;
 }
 
-export const getDonationsReport = (id: number) => {
+export const getDonationsNormalDownloadReport = (id: number) => {
     return getDataFileApi(`${donationsUrl}/download/${id}`);
+}
+export const getDonationsNoteDeliveryDownload = (id: number) => {
+    return getDataFileApi(`${donationsUrl}/note-delivery/${id}`);
 }
 
 export const postDonation = async (data: DonationBody): Promise<BaseResponse<IDonations | null>> => {

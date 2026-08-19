@@ -261,6 +261,7 @@ export const Medicine = () => {
               medicineData={medicineSelected}
               categories={categories}
               forms={forms}
+              ignoreHeader={false}
             />
           </div>
       </PageTransitionComponent>

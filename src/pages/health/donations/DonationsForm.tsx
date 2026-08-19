@@ -9,13 +9,22 @@ import { IProviders } from "@/services/provider/provider.interface"
 import FormSelectCustom from "@/components/formInput/FormSelectCustom"
 import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
 import { IStore } from "@/services/store/store.interface"
-import { IMedicine } from "@/services/medicine/medicine.interface"
+import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface"
+import { getCategories, getForms, postMedicine } from "@/services/medicine/medicine.service"
 import { IInstitution } from "@/services/institution/institution.interface"
 import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
 import { formatDate, formatDateForInput } from "@/utils/formatters"
 import { IoMdAdd } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  StyledDialog,
+  StyledDialogContent,
+  StyledDialogHeader,
+  StyledDialogTitle,
+  StyledDialogDescription,
+} from "@/components/StyledDialog/StyledDialog"
+import { MedicineForm } from "../medicine/MedicineForm"
 export interface SaveDonationResult {
   success: boolean;
   message?: string;
@@ -39,6 +48,11 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const [alert, setAlert] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
+  const [medicineFormOpen, setMedicineFormOpen] = useState<boolean>(false);
+  const [medicineFormIndex, setMedicineFormIndex] = useState<number | null>(null);
+  const [createdMedicines, setCreatedMedicines] = useState<IMedicine[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [forms, setForms] = useState<Form[]>([]);
   // const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
 
   const { register, handleSubmit, reset, watch, setValue, getValues } = useForm<DonationBody & { storeId: number }>({
@@ -61,7 +75,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     details: [{
       amount: 0,
       storageId: 0,
-      lote: ''
+      lote: '',
+      benefited: 1,
     }],
     expirationDate: defaultDate,
   })
@@ -100,6 +115,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             details: [{
               amount: det.amount || 0,
               storageId: 0,
+              benefited: det.benefited ?? 1,
             }],
             expirationDate: new Date(det.expirationDate)
           })),
@@ -107,6 +123,15 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       }
     }
   }, [donation, reset, setValue])
+
+  useEffect(() => {
+    getCategories()
+      .then((res) => setCategories(res.categories))
+      .catch(() => { });
+    getForms()
+      .then((res) => setForms(res.forms))
+      .catch(() => { });
+  }, [])
 
   const handleMedicineDetailChange = (index: number, field: DonationTypeForm, value: string | number, indexDet?: number) => {
     setMedicineDetails((prev) => {
@@ -153,6 +178,38 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     })
   }
 
+  const setMedicineIdOnRow = (index: number, medicineId: number) => {
+    setMedicineDetails((prev) =>
+      prev.map((detail, i) => (i === index ? { ...detail, medicineId } : detail))
+    );
+  }
+
+  const openCreateMedicine = (index: number) => {
+    setMedicineFormIndex(index);
+    setMedicineFormOpen(true);
+  }
+
+  const handleCreateMedicine = async (formData: MedicineBody) => {
+    try {
+      const created = await postMedicine(formData);
+      if (!created) {
+        setAlert(true);
+        setMessage('No se pudo crear la medicina.');
+        return;
+      }
+      const createdMedicine = (created as unknown as { medicine?: IMedicine })?.medicine ?? created;
+      setCreatedMedicines((prev) => [...prev, createdMedicine]);
+      if (medicineFormIndex !== null) {
+        setMedicineIdOnRow(medicineFormIndex, createdMedicine.id);
+      }
+      setMedicineFormOpen(false);
+      setMedicineFormIndex(null);
+    } catch {
+      setAlert(true);
+      setMessage('Error inesperado al crear la medicina.');
+    }
+  }
+
   const hasDonationDetailsChanged = () => {
     if (!donation) return false;
 
@@ -172,6 +229,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         amount: det.amount,
         storageId: det.storageId,
         lote: det.lote ?? '',
+        benefited: det.benefited ?? 1,
       })),
     }));
 
@@ -179,7 +237,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       medicineId: det.medicine?.id ?? det.medicineId,
       detailCount: 1,
       expirationDate: normalizeDate(det.expirationDate),
-      details: [{ amount: det.amount, storageId: 0, lote: '' }],
+      details: [{ amount: det.amount, storageId: 0, lote: '', benefited: det.benefited ?? 1 }],
     })) ?? [];
 
     return JSON.stringify(currentDetails) !== JSON.stringify(originalDetails);
@@ -216,6 +274,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         return {
           medicineId: det.medicineId == 0 ? undefined : Number(det.medicineId),
           amount: Number(det.amount),
+          benefited: det.benefited ?? 1,
           storageId: data.type === 'Entrada'
             ? globalStoreId
             : (det.storageId == 0 ? 1 : Number(det.storageId)),
@@ -246,7 +305,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }
 
   const filteredOptions = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
-    return medicines
+    const allMedicines = [...medicines, ...createdMedicines];
+    return allMedicines
       .filter(med => {
         // Obtén los ids seleccionados en otros campos (excepto el actual)
         const selectedIds = medicineDetails
@@ -410,6 +470,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     detail={detail}
                     medicineDetails={medicineDetails}
                     handleMedicineDetailChange={handleMedicineDetailChange}
+                    onCreateMedicine={openCreateMedicine}
                   />
                 </div>
               ))
@@ -425,6 +486,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     inventory={inventory}
                     medicineDetails={medicineDetails}
                     handleMedicineDetailChange={handleMedicineDetailChange}
+                    onCreateMedicine={openCreateMedicine}
                   />
                 </div>
               ))
@@ -464,6 +526,26 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           </div>
         </div>
       </form>
+
+      <StyledDialog open={medicineFormOpen} onOpenChange={setMedicineFormOpen}>
+        <StyledDialogContent className="sm:max-w-2xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <StyledDialogHeader>
+            <StyledDialogTitle>Agregar Nueva Medicina</StyledDialogTitle>
+            <StyledDialogDescription>
+              Completa los datos para registrar la medicina y se añadirá a la donación.
+            </StyledDialogDescription>
+          </StyledDialogHeader>
+          <MedicineForm
+            ignoreHeader={true}
+            open={medicineFormOpen}
+            onOpenChange={setMedicineFormOpen}
+            onSubmit={handleCreateMedicine}
+            medicineData={null}
+            categories={categories}
+            forms={forms}
+          />
+        </StyledDialogContent>
+      </StyledDialog>
     </div>
   )
 }
@@ -475,6 +557,7 @@ interface DonationDetailFormEntryProps {
   detail: DonationMedicine;
   medicineDetails: DonationMedicine[];
   handleMedicineDetailChange: (index: number, field: DonationTypeForm, value: string | number, indexDet?: number) => void;
+  onCreateMedicine: (index: number) => void;
 }
 const DonationDetailFormEntry = ({
   removeMedicineDetail,
@@ -482,7 +565,8 @@ const DonationDetailFormEntry = ({
   index,
   medicineDetails,
   detail,
-  handleMedicineDetailChange
+  handleMedicineDetailChange,
+  onCreateMedicine
 }: DonationDetailFormEntryProps) => {
   return (
     <div className="border border-gray-400 rounded-lg p-2 bg-white relative ">
@@ -517,6 +601,7 @@ const DonationDetailFormEntry = ({
                 size="icon"
                 variant="icon"
                 className="border-2 border-[#0250b0] text-[#0250b0]"
+                onClick={() => onCreateMedicine(index)}
               >
                 <IoMdAdd />
               </Button>
@@ -569,6 +654,9 @@ const DonationDetailFormExit = ({
 }: DonationDetailFormExitProps) => {
 
   const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
+  const availableStock = medicineSelected
+    ? medicineSelected.stores?.[0]?.amount ?? medicineSelected.totalStock ?? 0
+    : 0;
   const changeMedicine = (value: string) => {
 
     const setInventory = inventory.find(item => item.medicine.id == Number(value));
@@ -598,7 +686,7 @@ const DonationDetailFormExit = ({
         </div>
       )}
 
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-6 gap-4">
         <div className="col-span-2">
           <FormAutocompleteV2
             label="Medicina"
@@ -610,7 +698,7 @@ const DonationDetailFormExit = ({
           />
         </div>
         <FormInputCustom
-          label="Cantidad"
+          label={medicineSelected ? `Cantidad (${availableStock} items)` : "Cantidad"}
           id={`amount-${index}`}
           type="number"
           value={detail.details?.[0]?.amount?.toString() ?? '0'}
@@ -630,6 +718,16 @@ const DonationDetailFormExit = ({
           onChange={(value) =>
             handleMedicineDetailChange(index, "lote", value.target.value, 0)
           }
+        />
+        <FormInputCustom
+          label="Beneficiados"
+          id={`benefited-${index}`}
+          type="number"
+          value={detail.details?.[0]?.benefited?.toString() ?? '1'}
+          onChange={(e) =>
+            handleMedicineDetailChange(index, "benefited", Number(e.target.value), 0)
+          }
+          placeholder="Beneficiados"
         />
         <FormInputCustom
           label="Expira"
