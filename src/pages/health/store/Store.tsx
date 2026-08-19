@@ -1,38 +1,37 @@
-import { GroupStore, IStore, StoreBody, StoreContent } from "@/services/store/store.interface";
+import { IStore, StoreBody } from "@/services/store/store.interface";
 import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
-import { getStore, postStore, putStore, deleteStore } from "@/services/store/store.service";
-import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import { HeaderPages } from "@/layout/header/Header";
 import { storeColumns } from "./store.data";
 import { Button } from "@/components/ui/button";
 import { FaWarehouse } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdOutlineStore } from "react-icons/md";
 import ConfirmDeleteStoreDialog from "./ConfirmDeleteStoreDialog";
 import { StoreForm } from "./StoreForm";
+import {
+  useStoresQuery,
+  useCreateStoreMutation,
+  useUpdateStoreMutation,
+  useDeleteStoreMutation,
+} from "./store.hook";
 
 export const Store = () => {
-  const [stores, setStores] = useState<GroupStore>({ allStores: [], stores: [], });
+  const [filteredStores, setFilteredStores] = useState<IStore[]>([]);
   const [storeSelected, setStoreSelected] = useState<IStore | null>(null);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  useEffect(() => {
-    getStoreApi();
-  }, []);
+  const { data: storesData, isFetching } = useStoresQuery();
+  const createStore = useCreateStoreMutation();
+  const updateStore = useUpdateStoreMutation();
+  const deleteStore = useDeleteStoreMutation();
 
-  const getStoreApi = async () => {
-    setLoading(true);
-    try {
-      const response: StoreContent = await getStore();
-      setStores({ allStores: response.stores, stores: response.stores });
-    } catch (err) {
-      console.error("Error al obtener almacenes:", err);
-    }
-    setLoading(false);
-  };
+  const allStores = useMemo(() => storesData?.stores ?? [], [storesData]);
+
+  useEffect(() => {
+    setFilteredStores(allStores);
+  }, [allStores]);
 
   const openAddForm = () => {
     setStoreSelected(null);
@@ -40,40 +39,32 @@ export const Store = () => {
   };
 
   const handleAddOrEditStoreSubmit = async (formData: StoreBody) => {
-    setLoading(true);
     try {
       if (storeSelected) {
-        await putStore(storeSelected.id, formData);
+        await updateStore.mutateAsync({ id: storeSelected.id, data: formData });
       } else {
-        await postStore(formData);
+        await createStore.mutateAsync(formData);
       }
       setIsAddFormOpen(false);
-      await getStoreApi();
     } catch (error) {
       console.error("Error al guardar el almacén:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleConfirmDeleteStore = async () => {
     if (storeSelected) {
-      setLoading(true);
       try {
-        await deleteStore(storeSelected.id);
-        await getStoreApi();
+        await deleteStore.mutateAsync(storeSelected.id);
         setIsDeleteDialogOpen(false);
         setStoreSelected(null);
       } catch (error) {
         console.error("Error al eliminar el almacén:", error);
-      } finally {
-        setLoading(false);
       }
     }
   };
 
-  const setStoreFilter = (filteredStores: IStore[]) => {
-    setStores((prev) => ({ ...prev, stores: filteredStores }));
+  const setStoreFilter = (data: IStore[]) => {
+    setFilteredStores(data);
   };
 
   const getActionTable = (action: string, data: IStore) => {
@@ -88,7 +79,6 @@ export const Store = () => {
 
   return (
     <>
-      {loading && <ScreenLoader />}
       <div>
         <HeaderPages title="Almacenes" Icon={FaWarehouse} />
       </div>
@@ -96,7 +86,7 @@ export const Store = () => {
       <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
         <div className="flex items-center ">
           <FilterComponent
-            data={stores.allStores}
+            data={allStores}
             columns={storeColumns}
             placeholder="Buscar almacenes..."
             setDataFilter={setStoreFilter}
@@ -111,8 +101,9 @@ export const Store = () => {
       <div className="mt-4">
         <TableComponents
           column={storeColumns}
-          data={stores.stores}
+          data={filteredStores}
           actionTable={getActionTable}
+          loading={isFetching}
         />
       </div>
 
