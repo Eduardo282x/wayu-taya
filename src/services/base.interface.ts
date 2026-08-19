@@ -16,3 +16,8 @@ export interface Pagination {
     startDate?: string | Date;
     endDate?: string | Date;
 }
+
+export interface PaginationQuery {
+    page: number;
+    size: number;
+}

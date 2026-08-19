@@ -1,10 +1,11 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CategoryContent, FormContent, MedicineBody, MedicineQueryParams, PaginatedMedicineContent } from "@/services/medicine/medicine.interface"
-import { getCategories, getForms, getMedicinesPage, postMedicine, putMedicine, deleteMedicine } from "@/services/medicine/medicine.service"
+import { CategoryContent, FormContent, MedicineBody, MedicineContent, MedicineQueryParams, PaginatedMedicineContent } from "@/services/medicine/medicine.interface"
+import { getCategories, getForms, getMedicine, getMedicinesPage, postMedicine, putMedicine, deleteMedicine } from "@/services/medicine/medicine.service"
 import { useMedicineStore } from "./medicineStore"
 
 export const medicineKeys = {
     all: ["medicines"] as const,
+    allList: ["medicines", "all"] as const,
     list: (params: MedicineQueryParams) => ["medicines", "list", params] as const,
     categories: ["medicines", "categories"] as const,
     forms: ["medicines", "forms"] as const,
@@ -22,11 +23,23 @@ export const useMedicinesQuery = () => {
     })
 }
 
+export const useAllMedicinesQuery = () => {
+    return useQuery({
+        queryKey: medicineKeys.allList,
+        queryFn: getMedicine,
+        select: (data: MedicineContent) => data,
+        staleTime: Infinity,
+        gcTime: Infinity,
+    })
+}
+
 export const useCategoriesQuery = () => {
     return useQuery({
         queryKey: medicineKeys.categories,
         queryFn: getCategories,
         select: (data: CategoryContent) => data,
+        staleTime: Infinity,
+        gcTime: Infinity,
     })
 }
 
@@ -35,6 +48,8 @@ export const useFormsQuery = () => {
         queryKey: medicineKeys.forms,
         queryFn: getForms,
         select: (data: FormContent) => data,
+        staleTime: Infinity,
+        gcTime: Infinity,
     })
 }
 

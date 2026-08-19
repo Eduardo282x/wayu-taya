@@ -11,6 +11,8 @@ export const useStoresQuery = () => {
         queryKey: storeKeys.all,
         queryFn: getStore,
         select: (data: StoreContent) => data,
+        staleTime: Infinity,
+        gcTime: Infinity,
     })
 }
 
