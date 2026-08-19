@@ -1,6 +1,18 @@
+import { PaginationQuery } from "../base.interface";
+
 export interface InstitutionContent {
     institutions: IInstitution[];
 }
+
+export interface PaginatedInstitutionsContent {
+    institutions: IInstitution[];
+    page: number;
+    size: number;
+    total: number;
+    totalPages: number;
+}
+
+export type InstitutionsQueryParams = PaginationQuery;
 
 export interface IInstitution {
     id: number;

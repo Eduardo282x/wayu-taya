@@ -1,17 +1,19 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ProviderBody, ProvidersQueryParams, PaginatedProvidersContent } from "@/services/provider/provider.interface"
-import { deleteProviders, getProvidersPage, postProviders, putProviders } from "@/services/provider/provider.service"
-import { InstitutionsBody, InstitutionsQueryParams, PaginatedInstitutionsContent, ParishContent } from "@/services/institution/institution.interface"
-import { deleteInstitutions, getInstitutionsPage, getParish } from "@/services/institution/institution.service"
+import { ProviderBody, ProvidersQueryParams, PaginatedProvidersContent, ProvidersContent } from "@/services/provider/provider.interface"
+import { deleteProviders, getProviders, getProvidersPage, postProviders, putProviders } from "@/services/provider/provider.service"
+import { InstitutionsBody, InstitutionsQueryParams, PaginatedInstitutionsContent, ParishContent, InstitutionContent } from "@/services/institution/institution.interface"
+import { deleteInstitutions, getInstitutions, getInstitutionsPage, getParish } from "@/services/institution/institution.service"
 import { useProvidersStore } from "./providersStore"
 
 export const providersKeys = {
     all: ["providers"] as const,
+    allList: ["providers", "all"] as const,
     list: (params: ProvidersQueryParams) => ["providers", "list", params] as const,
 }
 
 export const institutionsKeys = {
     all: ["institutions"] as const,
+    allList: ["institutions", "all"] as const,
     list: (params: InstitutionsQueryParams) => ["institutions", "list", params] as const,
 }
 
@@ -48,6 +50,28 @@ export const useParishQuery = () => {
         queryKey: parishKeys.all,
         queryFn: getParish,
         select: (data: ParishContent) => data,
+        staleTime: Infinity,
+        gcTime: Infinity,
+    })
+}
+
+export const useAllProvidersQuery = () => {
+    return useQuery({
+        queryKey: providersKeys.allList,
+        queryFn: getProviders,
+        select: (data: ProvidersContent) => data,
+        staleTime: Infinity,
+        gcTime: Infinity,
+    })
+}
+
+export const useAllInstitutionsQuery = () => {
+    return useQuery({
+        queryKey: institutionsKeys.allList,
+        queryFn: getInstitutions,
+        select: (data: InstitutionContent) => data,
+        staleTime: Infinity,
+        gcTime: Infinity,
     })
 }
 

@@ -1,5 +1,5 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { InstitutionContent, IInstitution, InstitutionsBody, ParishContent } from "./institution.interface";
+import { InstitutionContent, IInstitution, InstitutionsBody, ParishContent, PaginatedInstitutionsContent, InstitutionsQueryParams } from "./institution.interface";
 
 const institutionsUrl = "/institutions";
 const parishUrl = "/parroquias";
@@ -8,6 +8,25 @@ export const getInstitutions = async (): Promise<InstitutionContent> => {
     const response = await getDataApi<InstitutionContent>(institutionsUrl);
     if (response.data == null) {
         return { institutions: [] }
+    }
+    return response.data;
+}
+
+export const getInstitutionsPage = async (params: InstitutionsQueryParams): Promise<PaginatedInstitutionsContent> => {
+    const queryParams: Record<string, string | number> = {
+        page: params?.page ?? 1,
+        size: params?.size ?? 100,
+    };
+
+    const response = await getDataApi<PaginatedInstitutionsContent>(institutionsUrl, { params: queryParams });
+    if (response.data == null) {
+        return {
+            institutions: [],
+            page: params?.page ?? 1,
+            size: params?.size ?? 100,
+            total: 0,
+            totalPages: 0,
+        }
     }
     return response.data;
 }

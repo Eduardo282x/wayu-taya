@@ -1,5 +1,5 @@
 import { deleteDataApi, getDataApi, postDataApi, putDataApi } from "@/services/api.service"
-import { ProvidersContent, IProviders, ProviderBody } from "./provider.interface";
+import { ProvidersContent, IProviders, ProviderBody, PaginatedProvidersContent, ProvidersQueryParams } from "./provider.interface";
 
 const providersUrl = "/providers";
 
@@ -7,6 +7,25 @@ export const getProviders = async (): Promise<ProvidersContent> => {
     const response = await getDataApi<ProvidersContent>(providersUrl);
     if (response.data == null) {
         return { providers: [] }
+    }
+    return response.data;
+}
+
+export const getProvidersPage = async (params: ProvidersQueryParams): Promise<PaginatedProvidersContent> => {
+    const queryParams: Record<string, string | number> = {
+        page: params?.page ?? 1,
+        size: params?.size ?? 100,
+    };
+
+    const response = await getDataApi<PaginatedProvidersContent>(providersUrl, { params: queryParams });
+    if (response.data == null) {
+        return {
+            providers: [],
+            page: params?.page ?? 1,
+            size: params?.size ?? 100,
+            total: 0,
+            totalPages: 0,
+        }
     }
     return response.data;
 }
