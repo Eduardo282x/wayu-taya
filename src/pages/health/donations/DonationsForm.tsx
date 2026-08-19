@@ -9,8 +9,8 @@ import { IProviders } from "@/services/provider/provider.interface"
 import FormSelectCustom from "@/components/formInput/FormSelectCustom"
 import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
 import { IStore } from "@/services/store/store.interface"
-import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface"
-import { getCategories, getForms, postMedicine } from "@/services/medicine/medicine.service"
+import { IMedicine, MedicineBody } from "@/services/medicine/medicine.interface"
+import { useCategoriesQuery, useFormsQuery, useCreateMedicineMutation } from "../medicine/medicine.hook"
 import { IInstitution } from "@/services/institution/institution.interface"
 import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
@@ -51,9 +51,11 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const [medicineFormOpen, setMedicineFormOpen] = useState<boolean>(false);
   const [medicineFormIndex, setMedicineFormIndex] = useState<number | null>(null);
   const [createdMedicines, setCreatedMedicines] = useState<IMedicine[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [forms, setForms] = useState<Form[]>([]);
   // const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
+
+  const { data: categoriesData } = useCategoriesQuery();
+  const { data: formsData } = useFormsQuery();
+  const createMedicine = useCreateMedicineMutation();
 
   const { register, handleSubmit, reset, watch, setValue, getValues } = useForm<DonationBody & { storeId: number }>({
     defaultValues: {
@@ -70,17 +72,22 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   const typeDonation = watch("type");
 
-  const createEmptyMedicine = (id: number): DonationMedicine => ({
+  const createEmptyMedicine = (id: number, defaultStorageId = 0): DonationMedicine => ({
     id,
     medicineId: 0,
     details: [{
       amount: 0,
-      storageId: 0,
+      storageId: defaultStorageId,
       lote: '',
       benefited: 1,
     }],
     expirationDate: defaultDate,
   })
+
+  const getDefaultStorageId = (): number => {
+    const selected = medicineDetails.find(d => Number(d.details?.[0]?.storageId) > 0);
+    return Number(selected?.details?.[0]?.storageId) || 0;
+  }
 
   const [medicineDetails, setMedicineDetails] = useState<DonationMedicine[]>([
     createEmptyMedicine(1),
@@ -116,7 +123,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             medicineId: det.medicine?.id || 0,
             details: [{
               amount: det.amount || 0,
-              storageId: 0,
+              storageId: det.storageId || 0,
               benefited: det.benefited ?? 1,
             }],
             expirationDate: new Date(det.expirationDate)
@@ -125,15 +132,6 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       }
     }
   }, [donation, reset, setValue])
-
-  useEffect(() => {
-    getCategories()
-      .then((res) => setCategories(res.categories))
-      .catch(() => { });
-    getForms()
-      .then((res) => setForms(res.forms))
-      .catch(() => { });
-  }, [])
 
   const handleMedicineDetailChange = (index: number, field: DonationTypeForm, value: string | number, indexDet?: number) => {
     setMedicineDetails((prev) => {
@@ -156,7 +154,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
       // Si se interactuó con la última fila, se crea una nueva automáticamente
       if (index === prev.length - 1) {
-        updated.push(createEmptyMedicine(prev.length + 1));
+        updated.push(createEmptyMedicine(prev.length + 1, getDefaultStorageId()));
       }
 
       return updated;
@@ -164,7 +162,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }
 
   const addMedicineDetail = () => {
-    setMedicineDetails((prev) => [...prev, createEmptyMedicine(prev.length + 1)])
+    setMedicineDetails((prev) => [...prev, createEmptyMedicine(prev.length + 1, getDefaultStorageId())])
   }
 
   const removeMedicineDetail = (index: number) => {
@@ -176,7 +174,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const handleMedicineDetailFocus = (index: number) => {
     setMedicineDetails((prev) => {
       if (index !== prev.length - 1) return prev;
-      return [...prev, createEmptyMedicine(prev.length + 1)];
+      return [...prev, createEmptyMedicine(prev.length + 1, getDefaultStorageId())];
     })
   }
 
@@ -193,16 +191,15 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   const handleCreateMedicine = async (formData: MedicineBody) => {
     try {
-      const created = await postMedicine(formData);
+      const created = await createMedicine.mutateAsync(formData);
       if (!created) {
         setAlert(true);
         setMessage('No se pudo crear la medicina.');
         return;
       }
-      const createdMedicine = (created as unknown as { medicine?: IMedicine })?.medicine ?? created;
-      setCreatedMedicines((prev) => [...prev, createdMedicine]);
+      setCreatedMedicines((prev) => [...prev, created]);
       if (medicineFormIndex !== null) {
-        setMedicineIdOnRow(medicineFormIndex, createdMedicine.id);
+        setMedicineIdOnRow(medicineFormIndex, created.id);
       }
       setMedicineFormOpen(false);
       setMedicineFormIndex(null);
@@ -239,7 +236,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       medicineId: det.medicine?.id ?? det.medicineId,
       detailCount: 1,
       expirationDate: normalizeDate(det.expirationDate),
-      details: [{ amount: det.amount, storageId: 0, lote: '', benefited: det.benefited ?? 1 }],
+      details: [{ amount: det.amount, storageId: det.storageId || 0, lote: det.lote ?? '', benefited: det.benefited ?? 1 }],
     })) ?? [];
 
     return JSON.stringify(currentDetails) !== JSON.stringify(originalDetails);
@@ -308,7 +305,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }
 
   const filteredOptions = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
-    const allMedicines = [...medicines, ...createdMedicines];
+    const allMedicines = [...medicines, ...createdMedicines].filter(
+      (med, i, arr) => arr.findIndex((m) => m.id === med.id) === i
+    );
     return allMedicines
       .filter(med => {
         // Obtén los ids seleccionados en otros campos (excepto el actual)
@@ -380,7 +379,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             </h3>
 
             {/* Caberera */}
-            <div className={`grid gap-4 bg-white rounded-2xl p-3 ${typeDonation == 'Entrada' ? 'grid-cols-7' : 'grid-cols-4'}`}>
+            <div className={`grid gap-4 bg-white rounded-2xl p-3 ${typeDonation == 'Entrada' ? 'grid-cols-7' : 'grid-cols-5'}`}>
               <FormInputCustom
                 label="N° Control"
                 id="controlNumber"
@@ -494,6 +493,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     index={index}
                     detail={detail}
                     inventory={inventory}
+                    stores={stores}
                     medicineDetails={medicineDetails}
                     handleMedicineDetailChange={handleMedicineDetailChange}
                     onCreateMedicine={openCreateMedicine}
@@ -551,8 +551,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             onOpenChange={setMedicineFormOpen}
             onSubmit={handleCreateMedicine}
             medicineData={null}
-            categories={categories}
-            forms={forms}
+            categories={categoriesData?.categories ?? []}
+            forms={formsData?.forms ?? []}
           />
         </StyledDialogContent>
       </StyledDialog>
@@ -652,6 +652,7 @@ const DonationDetailFormEntry = ({
 
 interface DonationDetailFormExitProps extends DonationDetailFormEntryProps {
   inventory: IInventory[];
+  stores: IStore[];
 }
 const DonationDetailFormExit = ({
   removeMedicineDetail,
@@ -660,22 +661,38 @@ const DonationDetailFormExit = ({
   medicineDetails,
   detail,
   inventory,
+  stores,
   handleMedicineDetailChange
 }: DonationDetailFormExitProps) => {
 
   const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
+  const rowStoreId = Number(detail.details?.[0]?.storageId) || 0;
+  const selectedStore = medicineSelected?.stores.find(store => store.id === rowStoreId);
   const availableStock = medicineSelected
-    ? medicineSelected.stores?.[0]?.amount ?? medicineSelected.totalStock ?? 0
+    ? selectedStore?.amount ?? medicineSelected.totalStock ?? 0
     : 0;
+  const availableStores = medicineSelected
+    ? medicineSelected.stores.filter(s => (s.amount ?? 0) > 0)
+    : stores;
+  const storeOptions = (availableStores.length > 0 ? availableStores : stores)
+    .map(store => ({
+      label: `${store.name} - ${store.amount ?? 0} unidades`,
+      value: store.id.toString(),
+    }));
   const changeMedicine = (value: string) => {
 
     const setInventory = inventory.find(item => item.medicine.id == Number(value));
     if (setInventory) {
       setMedicineSelected(setInventory);
 
+      const store = setInventory.stores.find(s => s.id === rowStoreId && (s.amount ?? 0) > 0);
+      const fallback = setInventory.stores.find(s => (s.amount ?? 0) > 0) ?? setInventory.stores[0];
+      const storageId = store?.id ?? fallback?.id ?? 0;
+      const lote = setInventory.lotes.find(l => l.storeId === storageId) ?? setInventory.lotes[0];
+
       handleMedicineDetailChange(index, "medicineId", Number(value))
-      handleMedicineDetailChange(index, "storageId", Number(setInventory.stores[0].id), 0)
-      handleMedicineDetailChange(index, "lote", setInventory.lotes[0].name, 0)
+      handleMedicineDetailChange(index, "storageId", storageId, 0)
+      handleMedicineDetailChange(index, "lote", lote?.name ?? '', 0)
     }
 
   }
@@ -696,7 +713,7 @@ const DonationDetailFormExit = ({
         </div>
       )}
 
-      <div className="grid grid-cols-6 gap-4">
+      <div className="grid grid-cols-7 gap-4">
         <div className="col-span-2">
           <FormAutocompleteV2
             label="Medicina"
@@ -707,6 +724,13 @@ const DonationDetailFormExit = ({
             onChange={(value) => changeMedicine(value)}
           />
         </div>
+        <FormSelectCustom
+          label="Almacén"
+          id={`storageId-${index}`}
+          value={rowStoreId}
+          options={storeOptions}
+          onChange={(e) => handleMedicineDetailChange(index, "storageId", Number(e.target.value), 0)}
+        />
         <FormInputCustom
           label={medicineSelected ? `Cantidad (${availableStock} items)` : "Cantidad"}
           id={`amount-${index}`}
@@ -720,10 +744,12 @@ const DonationDetailFormExit = ({
         <FormSelectCustom
           label="Lote"
           id={`lote-${index}`}
-          options={medicineSelected ? medicineSelected.lotes.map(lo => ({
-            label: lo.name,
-            value: lo.name.toString(),
-          })) : []}
+          options={medicineSelected ? medicineSelected.lotes
+            .filter(lo => !rowStoreId || lo.storeId === rowStoreId)
+            .map(lo => ({
+              label: lo.name,
+              value: lo.name.toString(),
+            })) : []}
           value={detail.details?.[0]?.lote}
           onChange={(value) =>
             handleMedicineDetailChange(index, "lote", value.target.value, 0)

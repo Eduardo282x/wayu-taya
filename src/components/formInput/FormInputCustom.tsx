@@ -71,7 +71,7 @@ const FormInputCustom: React.FC<FormInputProps> = ({
     <div className="w-full">
       <label
         htmlFor={id}
-        className="block text-sm font-medium mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent"
+        className="block text-sm whitespace-nowrap font-medium mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent"
       >
         {label}
         {required ? (
