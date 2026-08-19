@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/store/auth.store";
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { BaseResponse } from "./base.interface";
 
 export const api = axios.create({
@@ -24,9 +24,9 @@ const getApiError = (error: unknown): BaseResponse<null> => {
     };
 };
 
-export const getDataApi = async <R>(url: string): Promise<BaseResponse<R | null>> => {
+export const getDataApi = async <R>(url: string, config?: AxiosRequestConfig): Promise<BaseResponse<R | null>> => {
     try {
-        const res = await api.get<BaseResponse<R>>(url);
+        const res = await api.get<BaseResponse<R>>(url, config);
         return res.data;
     } catch (error) {
         return getApiError(error);

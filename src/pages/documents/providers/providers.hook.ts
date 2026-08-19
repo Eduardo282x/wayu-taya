@@ -2,7 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { ProviderBody, ProvidersQueryParams, PaginatedProvidersContent, ProvidersContent } from "@/services/provider/provider.interface"
 import { deleteProviders, getProviders, getProvidersPage, postProviders, putProviders } from "@/services/provider/provider.service"
 import { InstitutionsBody, InstitutionsQueryParams, PaginatedInstitutionsContent, ParishContent, InstitutionContent } from "@/services/institution/institution.interface"
-import { deleteInstitutions, getInstitutions, getInstitutionsPage, getParish } from "@/services/institution/institution.service"
+import { deleteInstitutions, getInstitutions, getInstitutionsPage, getParish, postInstitutions, putInstitutions } from "@/services/institution/institution.service"
 import { useProvidersStore } from "./providersStore"
 
 export const providersKeys = {
