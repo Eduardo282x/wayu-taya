@@ -10,6 +10,7 @@ export interface DonationBody {
     benefited?: number | null;
     type: TypeDonation;
     date: Date | string;
+    controlNumber: string;
     lote: string;
     changeDonDetails?: boolean;
     medicines: DetDonationBody[];
@@ -61,12 +62,34 @@ export interface LotesContent {
     lotes: string[]
 }
 
+export interface DonationsQueryParams {
+    page: number;
+    size: number;
+    type?: 'all' | TypeDonation;
+    lote?: string;
+    providerId?: number | null;
+    institutionId?: number | null;
+    startDate?: string | null;
+    endDate?: string | null;
+    controlNumber?: string;
+}
+
 export interface DonationsContent {
     donations: IDonations[];
 }
 
+export interface PaginatedDonationsContent {
+    donations: IDonations[];
+    page: number;
+    size: number;
+    total: number;
+    totalPages: number;
+    pagination?: { total: number; page: number; size: number; totalPages: number };
+}
+
 export interface IDonations {
     id: number;
+    controlNumber?: string | number;
     institutionId: null;
     providerId: number;
     provider: IProviders;

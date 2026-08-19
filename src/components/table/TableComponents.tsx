@@ -7,6 +7,7 @@ import { IoIosArrowBack, IoIosArrowDown, IoIosArrowForward } from "react-icons/i
 import { Column } from "@/components/table/table.interface";
 import { FC, Fragment, useEffect, useRef, useState } from "react";
 import { PagesInterface } from "./table.data";
+import { Skeleton } from "../ui/skeleton";
 
 import { Button } from "../ui/button";
 import "./table.css";
@@ -18,6 +19,12 @@ interface TableProps {
   renderRow?: (item: any, index: number) => React.ReactNode;
   colSpanColumns?: boolean;
   isExpansible?: boolean;
+  totalItems?: number;
+  page?: number;
+  onPageChange?: (page: number) => void;
+  rowsPerPage?: number;
+  onRowsPerPageChange?: (size: number) => void;
+  loading?: boolean;
 }
 
 export const TableComponents: FC<TableProps> = ({
@@ -26,20 +33,49 @@ export const TableComponents: FC<TableProps> = ({
   actionTable,
   renderRow,
   colSpanColumns,
-  isExpansible
+  isExpansible,
+  totalItems,
+  page: controlledPage,
+  onPageChange,
+  rowsPerPage: controlledRowsPerPage,
+  onRowsPerPageChange,
+  loading = false,
 }) => {
-  const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<string>("100");
+  const isServerSide = totalItems !== undefined;
+  const [page, setPage] = useState<number>(controlledPage ?? 0);
+  const [rowsPerPage, setRowsPerPage] = useState<string>((controlledRowsPerPage ?? 100).toString());
 
   useEffect(() => {
-    setPage(0);
-  }, [data, rowsPerPage]);
+    if (isServerSide && controlledPage !== undefined) setPage(controlledPage);
+  }, [isServerSide, controlledPage]);
+
+  useEffect(() => {
+    if (isServerSide && controlledRowsPerPage !== undefined) setRowsPerPage(controlledRowsPerPage.toString());
+  }, [isServerSide, controlledRowsPerPage]);
+
+  useEffect(() => {
+    if (!isServerSide) setPage(0);
+  }, [data, rowsPerPage, isServerSide]);
 
   const [columns, setColumns] = useState<Column[]>(column);
-  const indexOfLastItem = (page + 1) * Number(rowsPerPage);
-  const indexOfFirstItem = indexOfLastItem - Number(rowsPerPage);
-  const currentItems = data && data.length ? data.slice(indexOfFirstItem, indexOfLastItem) : [];
-  const totalItems = data.length;
+  const totalElements = isServerSide ? (totalItems ?? 0) : data.length;
+  const currentItems = isServerSide
+    ? data
+    : data && data.length ? data.slice(page * Number(rowsPerPage), (page + 1) * Number(rowsPerPage)) : [];
+
+  const handleSetPage = (nextPage: number) => {
+    setPage(nextPage);
+    if (isServerSide) onPageChange?.(nextPage);
+  };
+
+  const handleSetRowsPerPage = (nextRowsPerPage: string) => {
+    setRowsPerPage(nextRowsPerPage);
+    if (isServerSide) {
+      onRowsPerPageChange?.(Number(nextRowsPerPage));
+    } else {
+      setPage(0);
+    }
+  };
 
   useEffect(() => {
     filterColumnsByUser()
@@ -75,7 +111,9 @@ export const TableComponents: FC<TableProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => (
+            {loading ? (
+              <TableSkeleton columns={columns} isExpansible={isExpansible} />
+            ) : currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => (
               <Fragment key={index}>
                 {isExpansible ?
                   <TableRowExpansible index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
@@ -102,18 +140,45 @@ export const TableComponents: FC<TableProps> = ({
         </Table>
       </div>
 
-      {totalItems >= 100 && (
+      {!loading && (totalElements >= 100 || isServerSide && totalElements > 0) ? (
         <PaginationTable
           page={page}
-          setPage={setPage}
+          setPage={handleSetPage}
           rowsPerPage={rowsPerPage}
-          setRowsPerPage={setRowsPerPage}
-          totalElements={totalItems}
+          setRowsPerPage={handleSetRowsPerPage}
+          totalElements={totalElements}
         />
-      )}
+      ) : null}
     </div>
   );
 };
+
+interface TableSkeletonProps {
+  columns: Column[];
+  isExpansible?: boolean;
+  rows?: number;
+}
+
+const TableSkeleton = ({ columns, isExpansible, rows = 10 }: TableSkeletonProps) => {
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <TableRow key={rowIndex}>
+          {columns.map((col, index) => (
+            <TableCell key={index} className={col.className ? col.className(col) : undefined}>
+              <Skeleton className="h-4 w-full" />
+            </TableCell>
+          ))}
+          {isExpansible && (
+            <TableCell>
+              <Skeleton className="h-4 w-4 mx-auto" />
+            </TableCell>
+          )}
+        </TableRow>
+      ))}
+    </>
+  )
+}
 
 interface TableRowNormalProps<T> {
   index: number;

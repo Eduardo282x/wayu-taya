@@ -1,68 +1,67 @@
-import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { TableComponents } from "@/components/table/TableComponents"
 import { HeaderPages } from "@/layout/header/Header.tsx"
-import { DonationBody, DonationsContent, IDonations } from "@/services/donations/donations.interface"
-import { getDonations, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
-import { useEffect, useRef, useState } from "react"
+import { DonationBody, IDonations } from "@/services/donations/donations.interface"
+import { getProviders } from "@/services/provider/provider.service"
+import { getStore } from "@/services/store/store.service"
+import { getMedicine } from "@/services/medicine/medicine.service"
+import { getInstitutions } from "@/services/institution/institution.service"
+import { getInventory } from "@/services/inventory/inventory.service.ts"
+import { useEffect, useMemo, useState } from "react"
 import { BiDonateHeart } from "react-icons/bi"
-import { detDonationsColumns, donationsColumns, IDonationsFilters } from "./donations.data.tsx"
-import { FilterComponent } from "@/components/table/FilterComponent"
+import { detDonationsColumns, donationsColumns } from "./donations.data.tsx"
+import { debounce } from "@/lib/debounce"
 import { Button } from "@/components/ui/button"
 import { DonationsForm } from "./DonationsForm"
 import PageTransitionComponent from "@/components/PageTransition"
 import { Plus } from "lucide-react"
 import { IProviders } from "@/services/provider/provider.interface"
-import { getProviders } from "@/services/provider/provider.service"
-import { getStore } from "@/services/store/store.service"
 import { IStore, StoreContent } from "@/services/store/store.interface"
-import { getMedicine } from "@/services/medicine/medicine.service"
 import { IMedicine } from "@/services/medicine/medicine.interface"
 import { IInstitution } from "@/services/institution/institution.interface"
-import { getInstitutions } from "@/services/institution/institution.service"
 import { DonationFilterDropDown } from "./DonationFilters"
 import { IInventory } from "@/services/inventory/inventory.interface.ts"
-import { getInventory } from "@/services/inventory/inventory.service.ts"
+import { useDonationsQuery, useLotesQuery, useCreateDonationMutation, useUpdateDonationMutation } from "./donations.hook"
+import { useDonationStore } from "./donationStore"
 
 export const Donations = () => {
-  const [donations, setDonations] = useState<DonationsContent>({ donations: [] })
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
   const [providers, setProviders] = useState<IProviders[]>([])
   const [institutions, setInstitutions] = useState<IInstitution[]>([])
   const [stores, setStores] = useState<IStore[]>([])
   const [medicines, setMedicines] = useState<IMedicine[]>([])
   const [inventory, setInventory] = useState<IInventory[]>([])
-  const [lotes, setLotes] = useState<string[]>([])
   const [openDialog, setOpenDialog] = useState<boolean>(false)
 
-  const [loading, setLoading] = useState<boolean>(false)
-  const [donationsFilter, setDonationsFilter] = useState<IDonationsFilters>({
-    type: 'all',
-    lote: '',
-    providerId: null,
-    institutionId: null,
-  })
-  const filterAppliedRef = useRef<string>('');
+  const { page, size, setPage, setSize, filters, setFilter } = useDonationStore()
+  const { data: donationsData, isFetching } = useDonationsQuery()
+  const { data: lotesData } = useLotesQuery()
+  const createDonation = useCreateDonationMutation()
+  const updateDonation = useUpdateDonationMutation()
+
+  const currentDonations = donationsData?.donations ?? []
+  const totalDonations = donationsData?.total ?? 0
+
+  const [searchControl, setSearchControl] = useState<string>(filters.controlNumber)
+
+  const debouncedControlNumber = useMemo(
+    () => debounce((value: string) => setFilter('controlNumber', value), 300),
+    []
+  )
+
+  useEffect(() => {
+    setSearchControl(filters.controlNumber)
+  }, [filters.controlNumber])
 
   useEffect(() => {
     Promise.all([
       getStoresApi(),
-      getDonationsApi(),
       getProvidersApi(),
       getMedicinesApi(),
       getInventoryApi(),
       getInstitutionsApi(),
-      getLotesApi(),
     ]);
   }, [])
 
-  const getLotesApi = async () => {
-    try {
-      const response = await getLotes()
-      setLotes(response.lotes);
-    } catch (err) {
-      console.log(err)
-    }
-  }
   const getProvidersApi = async () => {
     try {
       const response = await getProviders()
@@ -107,17 +106,6 @@ export const Donations = () => {
     }
   }
 
-  const getDonationsApi = async () => {
-    setLoading(true)
-    try {
-      const response: DonationsContent = await getDonations()
-      setDonations(response)
-    } catch (err) {
-      console.log(err)
-    }
-    setLoading(false)
-  }
-
   const newDonations = () => {
     setDonationSelected(null)
     setOpenDialog(true)
@@ -131,97 +119,53 @@ export const Donations = () => {
     }
   }
 
-  const setDonationFilter = (filteredDonation: IDonations[]) => {
-    setDonations((prev) => ({ ...prev, donations: filteredDonation }))
-  }
-
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setDonationSelected(null);
   }
 
   const handleSaveDonation = async (donationData: DonationBody): Promise<{ success: boolean; message?: string }> => {
-    setLoading(true);
     try {
-      const response = donationSelected?.id
-        ? await putDonation(donationSelected.id, donationData)
-        : await postDonation(donationData);
+      let response;
+      if (donationSelected?.id) {
+        response = await updateDonation.mutateAsync({ id: donationSelected.id, data: donationData });
+      } else {
+        response = await createDonation.mutateAsync(donationData);
+      }
 
       if (!response.success) {
         return { success: false, message: response.message };
       }
 
       handleCloseDialog();
-      getDonationsApi();
       return { success: true };
     } catch {
       return { success: false, message: 'Error inesperado al guardar la donación.' };
-    } finally {
-      setLoading(false);
     }
-  }
-
-  useEffect(() => {
-    const filterKey = JSON.stringify(donationsFilter);
-    if (filterAppliedRef.current === filterKey) return;
-    filterAppliedRef.current = filterKey;
-
-    const filteredDonations = donations.donations.filter((donation) => {
-      const matchesType = donationsFilter.type === 'all' || donation.type === donationsFilter.type;
-      const matchesLote = donationsFilter.lote === 'all' || donation.lote.toLowerCase().includes(donationsFilter.lote.toLowerCase());
-      const matchesProvider = donationsFilter.providerId ? donation.providerId === donationsFilter.providerId : true;
-      const matchesInstitution = donationsFilter.institutionId ? donation.institutionId === donationsFilter.institutionId : true;
-
-      return matchesType && matchesLote && matchesProvider && matchesInstitution;
-    });
-
-    setDonations((prev) => ({ ...prev, donations: filteredDonations }));
-  }, [donations.donations, donationsFilter])
-
-  const handleDonationFilterChange = (filter: string, value: string | number) => {
-    if (filter === 'type') {
-      setDonationsFilter((prev) => ({ ...prev, type: value as 'Entrada' | 'Salida' }));
-    } else if (filter === 'lote') {
-      setDonationsFilter((prev) => ({ ...prev, lote: value.toString() }));
-    } else if (filter === 'providerId') {
-      setDonationsFilter((prev) => ({ ...prev, providerId: value ? Number(value) : null }));
-    } else if (filter === 'institutionId') {
-      setDonationsFilter((prev) => ({ ...prev, institutionId: value ? Number(value) : null }));
-    }
-  }
-
-  const cleanFilters = () => {
-    setDonationsFilter({
-      type: 'all',
-      lote: '',
-      providerId: null,
-      institutionId: null,
-    })
   }
 
   return (
     <div className='px-3 lg:p-0 h-full flex flex-col'>
-      {loading && (
-        <ScreenLoader />
-      )}
       <PageTransitionComponent toggle={openDialog}>
         <div className="h-full ">
           <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
 
-          <div className="flex justify-between items-center px-2 pb-2 pt-1 border-b-2 border-gray-300">
+          <div className="flex justify-between items-end gap-4 p-3 bg-white rounded-xl shadow-sm border border-gray-200">
             <DonationFilterDropDown
               providers={providers}
               institutions={institutions}
-              handleDonationFilterChange={handleDonationFilterChange}
-              cleanFilters={cleanFilters}
-              lotes={lotes}
+              lotes={lotesData?.lotes ?? []}
             />
-            <div className="flex items-center ">
-              <FilterComponent
-                data={donations.donations}
-                columns={donationsColumns}
+            <div className="flex items-end gap-2">
+              <input
+                type="search"
                 placeholder="Buscar donación..."
-                setDataFilter={setDonationFilter}
+                className="w-40 lg:w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+                value={searchControl}
+                onChange={(e) => {
+                  setSearchControl(e.target.value)
+                  debouncedControlNumber(e.target.value)
+                }}
               />
               <Button variant={"animated"} className="h-full" onClick={newDonations}>
                 <Plus className="w-4 h-4 mr-1" />
@@ -233,11 +177,17 @@ export const Donations = () => {
 
           <div className="mt-3">
             <TableComponents
-              data={donations.donations}
+              data={currentDonations}
               column={donationsColumns}
               actionTable={getActionTable}
               colSpanColumns={true}
               isExpansible={true}
+              totalItems={totalDonations}
+              page={page}
+              onPageChange={setPage}
+              rowsPerPage={size}
+              onRowsPerPageChange={setSize}
+              loading={isFetching}
               renderRow={(donations: IDonations, index: number) => (
                 <div key={index} className="w-full [&_.table-shell]:max-h-none [&_.table-shell]:min-h-0">
                   <TableComponents data={donations.detDonation} column={detDonationsColumns} actionTable={getActionTable} />

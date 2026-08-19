@@ -1,13 +1,32 @@
 import { getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
-import { DonationBody, DonationsContent, IDonations, LotesContent } from "./donations.interface";
+import { DonationBody, DonationsQueryParams, IDonations, LotesContent, PaginatedDonationsContent } from "./donations.interface";
 import { BaseResponse } from "../base.interface";
 
 const donationsUrl = "/donations";
 
-export const getDonations = async (): Promise<DonationsContent> => {
-    const response = await getDataApi<DonationsContent>(donationsUrl);
+export const getDonations = async (params?: DonationsQueryParams): Promise<PaginatedDonationsContent> => {
+    const queryParams: Record<string, string | number> = {
+        page: params?.page ?? 1,
+        size: params?.size ?? 100,
+    };
+
+    if (params?.type && params.type !== 'all') queryParams.type = params.type;
+    if (params?.lote) queryParams.lote = params.lote;
+    if (params?.providerId != null) queryParams.providerId = params.providerId;
+    if (params?.institutionId != null) queryParams.institutionId = params.institutionId;
+    if (params?.startDate) queryParams.startDate = params.startDate;
+    if (params?.endDate) queryParams.endDate = params.endDate;
+    if (params?.controlNumber) queryParams.controlNumber = params.controlNumber;
+
+    const response = await getDataApi<PaginatedDonationsContent>(donationsUrl, { params: queryParams });
     if (response.data == null) {
-        return { donations: [] }
+        return {
+            donations: [],
+            page: params?.page ?? 1,
+            size: params?.size ?? 100,
+            total: 0,
+            totalPages: 0,
+        }
     }
     return response.data;
 }

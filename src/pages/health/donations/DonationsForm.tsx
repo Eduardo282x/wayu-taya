@@ -61,6 +61,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       institutionId: 0,
       type: "Entrada",
       lote: "",
+      controlNumber: "",
       date: defaultDate,
       storeId: 0,
       medicines: []
@@ -100,6 +101,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         institutionId: donation.type === 'Salida' ? Number(donation.institutionId) : 0,
         type: donation.type as TypeDonation || "Entrada",
         lote: donation.lote,
+        controlNumber: donation.controlNumber == null ? undefined : String(donation.controlNumber),
         date: new Date(donation.date).toISOString().split('T')[0],
       });
 
@@ -268,6 +270,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       institutionId: data.institutionId == 0 ? null : Number(data.institutionId),
       type: data.type,
       lote: data.lote,
+      controlNumber: data.controlNumber,
       date: new Date(data.date),
       changeDonDetails: donation ? hasDonationDetailsChanged() : false,
       medicines: parseMedicineDetails.map(det => {
@@ -377,7 +380,14 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             </h3>
 
             {/* Caberera */}
-            <div className={`grid gap-4 bg-white rounded-2xl p-3 ${typeDonation == 'Entrada' ? 'grid-cols-6' : 'grid-cols-4'}`}>
+            <div className={`grid gap-4 bg-white rounded-2xl p-3 ${typeDonation == 'Entrada' ? 'grid-cols-7' : 'grid-cols-4'}`}>
+              <FormInputCustom
+                label="N° Control"
+                id="controlNumber"
+                value={watch("controlNumber")}
+                onChange={(e) => setValue("controlNumber", e.target.value)}
+                placeholder="controlNumber"
+              />
               <FormSelectCustom
                 label="Tipo"
                 id="type"
@@ -623,8 +633,8 @@ const DonationDetailFormEntry = ({
           label="Lote"
           id={`lote-${index}`}
           type="text"
-          value={detail.details?.[0]?.lote ?? '0'}
-          onChange={(e) => handleMedicineDetailChange(index, "lote", Number.parseInt(e.target.value) || 0, 0)}
+          value={detail.details?.[0]?.lote ?? ''}
+          onChange={(e) => handleMedicineDetailChange(index, "lote", e.target.value || '', 0)}
           placeholder="Lote"
         />
         <FormInputCustom

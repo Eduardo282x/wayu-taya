@@ -9,11 +9,22 @@ export interface IDonationsFilters {
     lote: string;
     providerId: number | null;
     institutionId: number | null;
+    startDate: string | null;
+    endDate: string | null;
+    controlNumber: string;
 }
 
 export type DonationTypeForm = 'medicineId' | 'amount' | 'storageId' | 'lote' | 'benefited' | 'expirationDate';
 
 export const donationsColumns: Column[] = [
+    {
+        label: "N° Control",
+        column: "controlNumber",
+        visible: true,
+        isIcon: false,
+        element: (data: IDonations) => data.controlNumber ? String(data.controlNumber) : '-',
+        className: () => 'w-32 max-w-32 text-ellipsis overflow-hidden'
+    },
     {
         label: "Proveedor / Institución",
         column: "provider.name",

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +41,9 @@ export const DonationDownloadMenu = ({ donationId }: DonationDownloadMenuProps) 
   }
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <>
+      {downloading !== null && <ScreenLoader />}
+      <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="border border-[#0250b0] text-[#0250b0]">
           <Download size={16} />
@@ -55,6 +58,7 @@ export const DonationDownloadMenu = ({ donationId }: DonationDownloadMenuProps) 
           {downloading === 'nota' ? 'Descargando...' : 'Nota de entrega'}
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownMenu>
+    </>
   )
 }
