@@ -194,11 +194,11 @@ export const Medicine = () => {
                 </Button>
               </div>
 
-              <div className="flex items-center ">
+              <div className="flex items-center gap-2">
                 <input
                   type="search"
                   placeholder="Buscar medicamentos..."
-                  className="w-40 lg:w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+                  className="w-40 lg:w-60 focus:outline-0 shadow-2xl border border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
                   value={searchMedicine}
                   onChange={(e) => {
                     setSearchMedicine(e.target.value)

@@ -4,6 +4,7 @@ export interface MedicineBody {
     name: string;
     description: string;
     code: string;
+    provider: string;
     category: string;
     medicine: boolean;
     form: string;
@@ -54,6 +55,7 @@ export interface IMedicine {
     manufacturer: string;
     activeIngredient: string;
     countryOfOrigin: string;
+    provider: string;
     formId: number;
     category: Category;
     form: Form;

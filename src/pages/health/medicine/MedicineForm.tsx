@@ -40,6 +40,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
         manufacturer: medicineData.manufacturer ?? "",
         activeIngredient: medicineData.activeIngredient ?? "",
         countryOfOrigin: medicineData.countryOfOrigin ?? "",
+        provider: medicineData.provider ?? "",
         form: medicineData.form?.forms ?? "",
       });
 
@@ -121,6 +122,12 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
           {currentTab === "medicamento" && (
             <TabsContent value="medicamento" className={`col-span-3 grid ${ignoreHeader ? 'grid-cols-2' : 'grid-cols-3'}  mt-0 gap-2 `}>
               <FormInput
+                label="Código"
+                id="codigo"
+                placeholder="Código del medicamento"
+                {...register("code")}
+              />
+              <FormInput
                 label="Nombre"
                 id="nombre"
                 autoFocus
@@ -142,15 +149,6 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
                       : false,
                 })}
                 error={errors.presentation?.message}
-              />
-              <FormAutocompleteV2
-                data={categories.map(ca => ({ label: ca.category, value: ca.category }))}
-                label="Categoría"
-                freeText
-                appendTo='body'
-                valueDefault={watch('category')}
-                placeholder="Seleccionar o escribir una categoría"
-                onChange={(value) => setValue('category', value)}
               />
               <FormInput
                 label="Manufactura"
@@ -183,6 +181,15 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
                 {...register("countryOfOrigin")}
               />
               <FormAutocompleteV2
+                data={categories.map(ca => ({ label: ca.category, value: ca.category }))}
+                label="Categoría"
+                freeText
+                appendTo='body'
+                valueDefault={watch('category')}
+                placeholder="Seleccionar o escribir una categoría"
+                onChange={(value) => setValue('category', value)}
+              />
+              <FormAutocompleteV2
                 data={forms.map(f => ({ label: f.forms, value: f.forms }))}
                 label="Forma"
                 freeText
@@ -211,6 +218,12 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
                   required: "La descripción es obligatoria",
                 })}
                 error={errors.description?.message}
+              />
+              <FormInput
+                label="Proveedor"
+                id="proveedor"
+                placeholder="Nombre del proveedor"
+                {...register("provider")}
               />
             </TabsContent>
           )}

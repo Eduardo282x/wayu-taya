@@ -5,12 +5,26 @@ import { MdEdit } from "react-icons/md";
 
 export const medicineColumns: Column[] = [
   {
+    label: "Código",
+    column: "code",
+    element: (data: IMedicine) => data.code ? data.code : '-',
+    visible: true,
+    isIcon: false,
+  },
+  {
     label: "Nombre",
     column: "name",
     element: (data: IMedicine) => `${data.name} ${data.presentation}`,
     visible: true,
     isIcon: false,
     className: () => 'max-w-160 w-160 overflow-hidden text-ellipsis'
+  },
+  {
+    label: "Forma",
+    column: "form.forms",
+    element: (data: IMedicine) => data.form?.forms ? data.form.forms : '-',
+    visible: true,
+    isIcon: false,
   },
   {
     label: "Categoría",
@@ -27,6 +41,27 @@ export const medicineColumns: Column[] = [
     isIcon: false,
   },
   {
+    label: "País de Origen",
+    column: "countryOfOrigin",
+    element: (data: IMedicine) => data.countryOfOrigin ? data.countryOfOrigin : '-',
+    visible: true,
+    isIcon: false,
+  },
+  {
+    label: "Principio Activo",
+    column: "activeIngredient",
+    element: (data: IMedicine) => data.activeIngredient ? data.activeIngredient : '-',
+    visible: true,
+    isIcon: false,
+  },
+  {
+    label: "Proveedor",
+    column: "provider",
+    element: (data: IMedicine) => data.provider ? data.provider : '-',
+    visible: false,
+    isIcon: false,
+  },
+  {
     label: "Temperatura",
     column: "temperate",
     element: (data: IMedicine) => data.temperate ? data.temperate : '-',
@@ -37,13 +72,6 @@ export const medicineColumns: Column[] = [
     label: "Manufactura",
     column: "manufacturer",
     element: (data: IMedicine) => data.manufacturer ? data.manufacturer : '-',
-    visible: false,
-    isIcon: false,
-  },
-  {
-    label: "Principio Activo",
-    column: "activeIngredient",
-    element: (data: IMedicine) => data.activeIngredient ? data.activeIngredient : '-',
     visible: false,
     isIcon: false,
   },
@@ -92,6 +120,7 @@ export const baseMedicine: MedicineBody = {
   manufacturer: "",
   activeIngredient: "",
   countryOfOrigin: '',
+  provider: '',
   form: '',
   code: ''
 }
