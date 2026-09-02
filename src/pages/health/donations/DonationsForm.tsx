@@ -25,6 +25,8 @@ import {
   StyledDialogDescription,
 } from "@/components/StyledDialog/StyledDialog"
 import { MedicineForm } from "../medicine/MedicineForm"
+import { DonationUploadDialog } from "./DonationUploadDialog"
+import { FaFileExcel } from "react-icons/fa";
 export interface SaveDonationResult {
   success: boolean;
   message?: string;
@@ -51,6 +53,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const [medicineFormOpen, setMedicineFormOpen] = useState<boolean>(false);
   const [medicineFormIndex, setMedicineFormIndex] = useState<number | null>(null);
   const [createdMedicines, setCreatedMedicines] = useState<IMedicine[]>([]);
+  const [uploadOpen, setUploadOpen] = useState<boolean>(false);
   // const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
 
   const { data: categoriesData } = useCategoriesQuery();
@@ -181,6 +184,20 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const setMedicineIdOnRow = (index: number, medicineId: number) => {
     setMedicineDetails((prev) =>
       prev.map((detail, i) => (i === index ? { ...detail, medicineId } : detail))
+    );
+  }
+
+  const handleApplyUpload = (uploaded: DonationMedicine[]) => {
+    const defaultStorageId = getDefaultStorageId();
+    setMedicineDetails(
+      uploaded.map((item, index) => ({
+        ...item,
+        id: index + 1,
+        details: item.details.map((det) => ({
+          ...det,
+          storageId: defaultStorageId,
+        })),
+      }))
     );
   }
 
@@ -462,9 +479,22 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
               <h3 className="text-base font-semibold bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">
                 Detalles de Donación
               </h3>
-              <span className="text-sm font-medium text-gray-600">
-                {totalMedicines} medicinas - {totalUnits} unidades
-              </span>
+              <div className="flex items-center gap-3">
+                {typeDonation == 'Entrada' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setUploadOpen(true)}
+                    className="border-[#0250b0] text-[#0250b0]"
+                  >
+                    <FaFileExcel className="w-4 h-4 mr-1" /> Cargar por Excel
+                  </Button>
+                )}
+                <span className="text-sm font-medium text-gray-600">
+                  {totalMedicines} medicinas - {totalUnits} unidades
+                </span>
+              </div>
             </div>
 
             {typeDonation == 'Entrada'
@@ -556,6 +586,17 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           />
         </StyledDialogContent>
       </StyledDialog>
+
+      <DonationUploadDialog
+        open={uploadOpen}
+        onOpenChange={setUploadOpen}
+        medicines={medicines}
+        createdMedicines={createdMedicines}
+        categories={categoriesData?.categories ?? []}
+        forms={formsData?.forms ?? []}
+        onCreateMedicine={(formData) => createMedicine.mutateAsync(formData)}
+        onApply={handleApplyUpload}
+      />
     </div>
   )
 }
