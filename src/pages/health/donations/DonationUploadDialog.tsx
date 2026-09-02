@@ -361,6 +361,94 @@ export const DonationUploadDialog = ({
   const warningCount = rows.filter((row) => row.newMedicine).length
   const includedCount = rows.filter(isApplicable).length
 
+  const rowBg = (row: ValidatedRow): string => {
+    if (row.status === "error") return "bg-red-50"
+    if (row.newMedicine) return "bg-yellow-50"
+    return ""
+  }
+
+  const previewColumns: Column[] = [
+    {
+      label: "Medicina",
+      column: "medicina",
+      visible: true,
+      className: (row: ValidatedRow) => rowBg(row),
+      element: (row: ValidatedRow) => <span>{row.medicina || "-"}</span>,
+    },
+    {
+      label: "Cantidad",
+      column: "cantidad",
+      visible: true,
+      className: (row: ValidatedRow) => rowBg(row),
+      element: (row: ValidatedRow) => <span>{row.cantidad || "-"}</span>,
+    },
+    {
+      label: "Lote",
+      column: "lote",
+      visible: true,
+      className: (row: ValidatedRow) => rowBg(row),
+      element: (row: ValidatedRow) => <span>{row.lote || "-"}</span>,
+    },
+    {
+      label: "Fecha Expiración",
+      column: "fechaExpiracion",
+      visible: true,
+      className: (row: ValidatedRow) => rowBg(row),
+      element: (row: ValidatedRow) => <span>{row.fechaExpiracion || "-"}</span>,
+    },
+    {
+      label: "Estado",
+      column: "estado",
+      visible: true,
+      className: (row: ValidatedRow) => rowBg(row),
+      element: (row: ValidatedRow) => (
+        <div>
+          {row.status === "error" ? (
+            <span className="text-xs font-semibold text-red-600">Error</span>
+          ) : row.newMedicine ? (
+            <span className="text-xs font-semibold text-yellow-600">Nueva medicina</span>
+          ) : (
+            <span className="text-xs font-semibold text-green-600">Válida</span>
+          )}
+          {row.errors.length > 0 && (
+            <div className="text-xs text-gray-600 mt-0.5">
+              {row.errors.map((err, i) => (
+                <div key={i}>• {err}</div>
+              ))}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      label: "",
+      column: "accion",
+      visible: true,
+      className: (row: ValidatedRow) => rowBg(row),
+      element: (row: ValidatedRow) =>
+        row.newMedicine ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="border-[#0250b0] text-[#0250b0]"
+            onClick={() => openCreateMedicine(row)}
+          >
+            <Plus className="w-4 h-4 mr-1" /> Crear
+          </Button>
+        ) : null,
+    },
+  ]
+
+  const guideItems = [
+    'Completa una fila por cada medicina en la hoja "Donacion".',
+    'En la columna "Medicina" se muestran las medicinas registradas como sugerencia, pero puedes escribir cualquier nombre.',
+    'La columna "Cantidad" debe ser un número entero mayor a 0.',
+    'El formato de "Fecha de Expiración" es AAAA-MM-DD (ej: 2027-12-31).',
+    'Si escribes una medicina que no existe, deberás completar sus datos con el botón "Crear" para poder incluirla.',
+    'Revisa la vista previa antes de aplicar los cambios al formulario.',
+  ]
+
   return (
     <>
       <StyledDialog open={open} onOpenChange={onOpenChange}>
@@ -386,6 +474,23 @@ export const DonationUploadDialog = ({
             </Button>
           </div>
         </StyledDialogHeader>
+
+        <Accordion type="single" collapsible className="rounded-md border border-gray-300 px-3">
+          <AccordionItem value="guia" className="border-b-0">
+            <AccordionTrigger className="py-2.5 text-sm font-medium text-[#0250b0]">
+              <span className="flex items-center gap-2">
+                <Info className="w-4 h-4" /> Guía de uso
+              </span>
+            </AccordionTrigger>
+            <AccordionContent>
+              <ul className="space-y-1.5 text-sm text-gray-700 list-disc pl-5">
+                {guideItems.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <div className="space-y-4 p-1">
           <div className="flex gap-2">
@@ -476,71 +581,11 @@ export const DonationUploadDialog = ({
               </div>
 
               <div className="border rounded-lg overflow-hidden">
-                <div className="overflow-y-auto max-h-72">
-                  <table className="w-full text-sm">
-                    <thead className="bg-blue-800 text-white sticky top-0">
-                      <tr>
-                        <th className="px-3 py-2 text-left w-10">Incluye</th>
-                        <th className="px-3 py-2 text-left">Medicina</th>
-                        <th className="px-3 py-2 text-left w-20">Cantidad</th>
-                        <th className="px-3 py-2 text-left">Lote</th>
-                        <th className="px-3 py-2 text-left">Expira</th>
-                        <th className="px-3 py-2 text-left">Estado</th>
-                        <th className="px-3 py-2 text-left w-10"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((row) => (
-                        <tr
-                          key={row.rowNumber}
-                          className={`border-t border-gray-200 ${row.status === "error" ? "bg-red-50" : row.newMedicine ? "bg-yellow-50" : "bg-white"}`}
-                        >
-                          <td className="px-3 py-2">
-                            <input
-                              type="checkbox"
-                              checked={row.included}
-                              disabled={row.newMedicine || row.status === "error"}
-                              onChange={(e) => toggleRow(row, e.target.checked)}
-                            />
-                          </td>
-                          <td className="px-3 py-2">{row.medicina || "-"}</td>
-                          <td className="px-3 py-2">{row.cantidad || "-"}</td>
-                          <td className="px-3 py-2">{row.lote || "-"}</td>
-                          <td className="px-3 py-2">{row.fechaExpiracion || "-"}</td>
-                          <td className="px-3 py-2">
-                            {row.status === "error" ? (
-                              <span className="text-xs font-semibold text-red-600">Error</span>
-                            ) : row.newMedicine ? (
-                              <span className="text-xs font-semibold text-yellow-600">Nueva medicina</span>
-                            ) : (
-                              <span className="text-xs font-semibold text-green-600">Válida</span>
-                            )}
-                            {row.errors.length > 0 && (
-                              <div className="text-xs text-gray-600 mt-0.5">
-                                {row.errors.map((err, i) => (
-                                  <div key={i}>• {err}</div>
-                                ))}
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-3 py-2">
-                            {row.newMedicine && (
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                className="border-[#0250b0] text-[#0250b0]"
-                                onClick={() => openCreateMedicine(row)}
-                              >
-                                <Plus className="w-4 h-4 mr-1" /> Crear
-                              </Button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <TableComponents
+                  column={previewColumns}
+                  data={rows}
+                  actionTable={() => {}}
+                />
               </div>
             </>
           )}
