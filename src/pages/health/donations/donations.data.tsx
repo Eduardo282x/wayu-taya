@@ -3,6 +3,7 @@ import { DetDonation, IDonations } from "@/services/donations/donations.interfac
 import { formatDate } from "@/utils/formatters";
 import { MdEdit } from "react-icons/md";
 import { DonationDownloadMenu } from "./DonationDownloadMenu";
+import { formatNumberWithDots } from "@/hooks/formaters";
 
 export interface IDonationsFilters {
     type: 'all' | 'Entrada' | 'Salida';
@@ -107,8 +108,12 @@ export const detDonationsColumns: Column[] = [
         column: "amount",
         visible: true,
         isIcon: false,
-        element: (data: DetDonation) => data.amount.toString(),
-        className: () => 'bg-[#193db9] text-white ',
+        element: (data: DetDonation) => (
+            <div className="text-right">
+                <p>{formatNumberWithDots(data.amount)}</p>
+            </div>
+        ),
+        className: () => 'bg-[#193db9] text-white !text-right',
         disabledClassName: true,
     },
     {

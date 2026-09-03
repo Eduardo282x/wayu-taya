@@ -2,7 +2,7 @@ import { IStore, StoreBody } from "@/services/store/store.interface";
 import { TableComponents } from "@/components/table/TableComponents";
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { HeaderPages } from "@/layout/header/Header";
-import { storeColumns } from "./store.data";
+import { storeColumns } from "./store.data.tsx";
 import { Button } from "@/components/ui/button";
 import { FaWarehouse } from "react-icons/fa";
 import { useEffect, useMemo, useState } from "react";

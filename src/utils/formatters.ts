@@ -52,4 +52,5 @@ export const days = [
     'Jueves',
     'Viernes',
     'Sábado'
-]
+];
+

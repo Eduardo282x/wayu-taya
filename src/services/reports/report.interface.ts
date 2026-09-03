@@ -23,6 +23,10 @@ export interface IReports {
 export interface ProductByStorage {
     storage: string;
     totalProducts: number;
+    capacity: number;
+    usedCapacity: number;
+    availableCapacity: number;
+    capacityPercentage: number;
 }
 
 export interface GraphicStorage {

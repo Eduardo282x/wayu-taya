@@ -48,7 +48,7 @@ export const formatNumberWithDots = (number: number | string, prefix?: string, s
         `${number.toString().slice(0, 1)}-${number.toString().slice(1).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
         :
         number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-    return `${prefix}${text}${suffix}`;
+    return `${prefix ?? ''}${text}${suffix ?? ''}`;
 }
 
 export const formatOnlyNumberWithDots = (number: number | string, digits?: number): string => {

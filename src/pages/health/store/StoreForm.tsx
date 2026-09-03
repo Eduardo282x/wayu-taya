@@ -19,6 +19,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubm
     defaultValues: {
       name: "",
       address: "",
+      capacity: 1,
     },
   });
 
@@ -27,6 +28,13 @@ export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubm
       reset({
         name: store.name,
         address: store.address,
+        capacity: store.capacity ?? 1,
+      });
+    } else {
+      reset({
+        name: "",
+        address: "",
+        capacity: 1,
       });
     }
   }, [open, reset, store]);
@@ -73,6 +81,23 @@ export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubm
               minLength: { value: 5, message: "Mínimo 5 caracteres" },
             })}
             error={errors.address?.message}
+          />
+
+          <FormInput
+            label="Capacidad"
+            id="capacity"
+            placeholder="Ej. 500"
+            type="number"
+            min={0}
+            required={true}
+            {...register("capacity", {
+              valueAsNumber: true,
+              validate: (value) =>
+                value == null || Number.isNaN(value) || value >= 0
+                  ? true
+                  : "La capacidad debe ser mayor o igual a 0",
+            })}
+            error={errors.capacity?.message}
           />
 
           <div className="flex justify-end space-x-2 pt-4">

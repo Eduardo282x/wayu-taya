@@ -410,12 +410,18 @@ export const Reports = () => {
                                         </PieChart>
                                     </ChartContainer>
                                     <div className="flex flex-wrap gap-2 mt-4">
-                                        {warehouseData.map((item, index) => (
-                                            <div key={index} className="flex items-center space-x-2">
-                                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                                                <span className="text-sm text-gray-600">{item.name}</span>
-                                            </div>
-                                        ))}
+                                        {warehouseData.map((item, index) => {
+                                            const capacityInfo = report?.productByStorage.find((p) => p.storage === item.name);
+                                            return (
+                                                <div key={index} className="flex items-center space-x-2">
+                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
+                                                    <span className="text-sm text-gray-600">
+                                                        {item.name}
+                                                        {capacityInfo ? ` (${capacityInfo.usedCapacity}/${capacityInfo.capacity})` : ''}
+                                                    </span>
+                                                </div>
+                                            )
+                                        })}
                                     </div>
                                 </CardContent>
                             </Card>
