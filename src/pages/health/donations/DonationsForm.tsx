@@ -637,14 +637,16 @@ const DonationDetailFormEntry = ({
 
       <div className="grid grid-cols-6 gap-4">
         <div className="col-span-3 flex items-end justify-between gap-2">
-          <FormAutocompleteV2
-            label="Medicina"
-            appendTo='body'
-            placeholder="Nombre de la medicina"
-            data={filteredOptions(detail, index)}
-            valueDefault={detail.medicineId}
-            onChange={(value) => handleMedicineDetailChange(index, "medicineId", Number(value))}
-          />
+          <div className="w-[92%]">
+            <FormAutocompleteV2
+              label="Medicina"
+              appendTo='body'
+              placeholder="Nombre de la medicina"
+              data={filteredOptions(detail, index)}
+              valueDefault={detail.medicineId}
+              onChange={(value) => handleMedicineDetailChange(index, "medicineId", Number(value))}
+            />
+          </div>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button

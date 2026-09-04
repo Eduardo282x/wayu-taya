@@ -19,6 +19,8 @@ export interface IInstitution {
     name: string;
     rif: string;
     address: string;
+    phone: string;
+    responsible: string;
     country: string;
     email: string;
     type: string;
@@ -67,14 +69,12 @@ export interface State {
     name: string;
 }
 
-
-
-
-
 export interface InstitutionsBody {
     name: string;
     rif: string;
     address: string;
+    responsible: string;
+    phone: string;
     country: string;
     email: string;
     type: string;

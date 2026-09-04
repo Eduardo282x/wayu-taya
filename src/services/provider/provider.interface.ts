@@ -17,6 +17,8 @@ export type ProvidersQueryParams = PaginationQuery;
 export interface IProviders {
     id: number;
     name: string;
+    responsible: string;
+    phone: string;
     rif: string;
     address: string;
     country: string;

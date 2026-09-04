@@ -24,6 +24,8 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
             rif: '',
             address: '',
             country: '',
+            responsible: '',
+            phone: '',
             email: '',
             type: '',
             parishId: 0,
@@ -38,6 +40,8 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 address: institution.address,
                 country: institution.country,
                 email: institution.email,
+                responsible: institution.responsible,
+                phone: institution.phone,
                 type: institution.type,
                 parishId: institution.parishId,
             }
@@ -49,6 +53,8 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 address: '',
                 country: '',
                 email: '',
+                responsable: '',
+                phone: '',
                 type: '',
                 parishId: 0,
             }
@@ -81,7 +87,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
             <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-3 gap-4 p-4 overflow-y-auto">
                 <div>
                     <FormInputCustom
-                        label="Nombre"
+                        label="Nombre de la Institución"
                         id="nombre"
                         {...register("name", {
                             required: "El nombre es obligatorio",
@@ -92,11 +98,32 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
 
                 <div>
                     <FormInputCustom
+                        label="Persona Responsable"
+                        id="responsible"
+                        {...register("responsible", {
+                            required: "La persona responsable es obligatoria",
+                        })}
+                        error={errors.responsible?.message}
+                    />
+                </div>
+
+                <div>
+                    <FormInputCustom
                         label="Rif"
                         id="rif"
                         required={false}
                         {...register("rif")}
                         error={errors.rif?.message}
+                    />
+                </div>
+
+                <div>
+                    <FormInputCustom
+                        label="Teléfono"
+                        id="phone"
+                        required={true}
+                        {...register("phone")}
+                        error={errors.phone?.message}
                     />
                 </div>
 

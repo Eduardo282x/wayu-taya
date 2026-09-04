@@ -19,6 +19,13 @@ export const institutionColumns: Column[] = [
         element: (data: IInstitution) => data.rif,
     },
     {
+        label: "Responsable",
+        column: "responsible",
+        visible: true,
+        isIcon: false,
+        element: (data: IInstitution) => data.responsible,
+    },
+    {
         label: "Tipo",
         column: "type",
         visible: true,
@@ -31,6 +38,13 @@ export const institutionColumns: Column[] = [
         visible: true,
         isIcon: false,
         element: (data: IInstitution) => data.address,
+    },
+    {
+        label: "Teléfono",
+        column: "phone",
+        visible: true,
+        isIcon: false,
+        element: (data: IInstitution) => data.phone,
     },
     {
         label: "Correo",
@@ -83,6 +97,13 @@ export const providerColumns: Column[] = [
         element: (data: IProviders) => data.name,
     },
     {
+        label: "Persona Responsable",
+        column: "responsible",
+        visible: true,
+        isIcon: false,
+        element: (data: IProviders) => data.responsible,
+    },
+    {
         label: "Rif",
         column: "rif",
         visible: true,
@@ -102,6 +123,13 @@ export const providerColumns: Column[] = [
         visible: false,
         isIcon: false,
         element: (data: IProviders) => data.country,
+    },
+    {
+        label: "Teléfono",
+        column: "phone",
+        visible: false,
+        isIcon: false,
+        element: (data: IProviders) => data.phone,
     },
     {
         label: "Correo",
