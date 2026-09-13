@@ -32,15 +32,18 @@ export const getProvidersPage = async (params: ProvidersQueryParams): Promise<Pa
 
 export const postProviders = async (data: ProviderBody): Promise<IProviders | null> => {
     const response = await postDataApi<ProviderBody, IProviders>(providersUrl, data);
+    if (!response.success) throw new Error(response.message);
     return response.data;
 }
 
 export const putProviders = async (id: number, data: ProviderBody): Promise<IProviders | null> => {
     const response = await putDataApi<ProviderBody, IProviders>(`${providersUrl}/${id}`, data);
+    if (!response.success) throw new Error(response.message);
     return response.data;
 }
 
 export const deleteProviders = async (id: number): Promise<IProviders | null> => {
     const response = await deleteDataApi<IProviders>(`${providersUrl}/${id}`);
+    if (!response.success) throw new Error(response.message);
     return response.data;
 }

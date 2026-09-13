@@ -98,12 +98,11 @@ export const ProvidersInstitutions = () => {
 				if (currentView == 'provider') await createProvider.mutateAsync(data as ProviderBody)
 				if (currentView == 'institution') await createInstitution.mutateAsync(data as InstitutionsBody)
 			}
+			setOpenInstitution(false);
+			setOpenProvider(false);
 		} catch (err) {
 			console.log(err);
 		}
-
-		setOpenInstitution(false);
-		setOpenProvider(false);
 	};
 
 	const getActionTable = (action: string, data: IProviders | IInstitution) => {
@@ -120,12 +119,17 @@ export const ProvidersInstitutions = () => {
 		try {
 			if (currentView == 'provider') await deleteProvider.mutateAsync(Number(providerSelected?.id))
 			if (currentView == 'institution') await deleteInstitution.mutateAsync(Number(institutionSelected?.id))
+			setOpenDialogDelete(false);
 		} catch (err) {
 			console.log(err);
 		}
-
-		setOpenDialogDelete(false);
 	};
+
+	const isSaving = currentView == 'provider'
+		? (providerSelected ? updateProvider.isPending : createProvider.isPending)
+		: (institutionSelected ? updateInstitution.isPending : createInstitution.isPending);
+
+	const isDeleting = deleteProvider.isPending || deleteInstitution.isPending;
 
 	return (
 		<div className='px-3 lg:p-0 h-full flex flex-col'>
@@ -211,6 +215,7 @@ export const ProvidersInstitutions = () => {
 						onOpenChange={setOpenDialogDelete}
 						onConfirm={confirmDelete}
 						name={currentView == 'provider' ? providerSelected?.name : institutionSelected?.name}
+						isLoading={isDeleting}
 					/>
 				</div>
 
@@ -221,6 +226,7 @@ export const ProvidersInstitutions = () => {
 							onOpenChange={setOpenProvider}
 							provider={providerSelected}
 							onSubmit={getActionForm}
+							isSubmitting={isSaving}
 						/>
 					</div>
 					<div className={openProvider ? "hidden" : "h-full"}>
@@ -230,6 +236,7 @@ export const ProvidersInstitutions = () => {
 							institution={institutionSelected}
 							onSubmit={getActionForm}
 							parish={parishData?.parishes ?? []}
+							isSubmitting={isSaving}
 						/>
 					</div>
 				</div>

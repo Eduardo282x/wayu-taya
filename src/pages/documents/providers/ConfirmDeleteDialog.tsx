@@ -8,12 +8,14 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { FaSpinner } from "react-icons/fa";
 
 interface ConfirmDeleteDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: () => void;
     name?: string;
+    isLoading?: boolean;
 }
 
 const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
@@ -21,9 +23,10 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
     onOpenChange,
     onConfirm,
     name,
+    isLoading = false,
 }) => {
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={(value) => { if (!isLoading) onOpenChange(value); }}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Confirmar eliminación</DialogTitle>
@@ -33,13 +36,24 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
                 </DialogHeader>
                 <DialogFooter className="flex justify-end space-x-2">
                     <Button
-                        variant="destructive"
-                        onClick={() => {
-                            onConfirm();
-                            onOpenChange(false);
-                        }}
+                        variant="outline"
+                        onClick={() => onOpenChange(false)}
+                        disabled={isLoading}
                     >
-                        Eliminar
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="destructive"
+                        onClick={() => onConfirm()}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <FaSpinner className="size-4 animate-spin" /> Eliminando...
+                            </>
+                        ) : (
+                            "Eliminar"
+                        )}
                     </Button>
                 </DialogFooter>
             </DialogContent>

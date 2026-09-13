@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { IInstitution, InstitutionsBody, IParish } from "@/services/institution/institution.interface"
 import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { FaRegSave, FaArrowLeft } from "react-icons/fa"
+import { FaRegSave, FaArrowLeft, FaSpinner } from "react-icons/fa"
 import { TiUserAddOutline } from "react-icons/ti"
 
 interface InstitutionFormProps {
@@ -14,8 +14,9 @@ interface InstitutionFormProps {
     onSubmit: (institution: InstitutionsBody) => void
     institution: IInstitution | null;
     parish: IParish[]
+    isSubmitting?: boolean
 }
-export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, parish }: InstitutionFormProps) => {
+export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, parish, isSubmitting = false }: InstitutionFormProps) => {
     const isEdit = !!institution;
 
     const { register, handleSubmit, reset, watch, setValue, formState: { errors }, control } = useForm<InstitutionsBody>({
@@ -33,6 +34,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
     })
 
     useEffect(() => {
+        if (!open) return;
         if (institution && isEdit) {
             const institutionData = {
                 name: institution.name,
@@ -203,8 +205,13 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                         variant="animated"
                         className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
                         type="submit"
+                        disabled={isSubmitting}
                     >
-                        {isEdit ? (
+                        {isSubmitting ? (
+                            <>
+                                <FaSpinner className="self-center size-5 animate-spin" /> Guardando...
+                            </>
+                        ) : isEdit ? (
                             <>
                                 <FaRegSave className="self-center size-5" /> Guardar
                             </>

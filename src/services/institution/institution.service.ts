@@ -41,15 +41,18 @@ export const getParish = async (): Promise<ParishContent> => {
 
 export const postInstitutions = async (data: InstitutionsBody): Promise<IInstitution | null> => {
     const response = await postDataApi<InstitutionsBody, IInstitution>(institutionsUrl, data);
+    if (!response.success) throw new Error(response.message);
     return response.data;
 }
 
 export const putInstitutions = async (id: number, data: InstitutionsBody): Promise<IInstitution | null> => {
     const response = await putDataApi<InstitutionsBody, IInstitution>(`${institutionsUrl}/${id}`, data);
+    if (!response.success) throw new Error(response.message);
     return response.data;
 }
 
 export const deleteInstitutions = async (id: number): Promise<IInstitution | null> => {
     const response = await deleteDataApi<IInstitution>(`${institutionsUrl}/${id}`);
+    if (!response.success) throw new Error(response.message);
     return response.data;
 }

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { IProviders, ProviderBody } from "@/services/provider/provider.interface"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { FaRegSave, FaArrowLeft } from "react-icons/fa"
+import { FaRegSave, FaArrowLeft, FaSpinner } from "react-icons/fa"
 import { TiUserAddOutline } from "react-icons/ti"
 
 interface ProviderFormProps {
@@ -11,8 +11,9 @@ interface ProviderFormProps {
     onOpenChange: (open: boolean) => void
     onSubmit: (provider: ProviderBody) => void
     provider: IProviders | null
+    isSubmitting?: boolean
 }
-export const ProviderForm = ({ open, onOpenChange, onSubmit, provider }: ProviderFormProps) => {
+export const ProviderForm = ({ open, onOpenChange, onSubmit, provider, isSubmitting = false }: ProviderFormProps) => {
     const isEdit = !!provider;
 
     const { register, handleSubmit, reset, formState: { errors }, } = useForm<ProviderBody>({
@@ -28,6 +29,7 @@ export const ProviderForm = ({ open, onOpenChange, onSubmit, provider }: Provide
     })
 
     useEffect(() => {
+        if (!open) return;
         if (provider && isEdit) {
             const providerData = {
                 name: provider.name,
@@ -156,8 +158,13 @@ export const ProviderForm = ({ open, onOpenChange, onSubmit, provider }: Provide
                         variant="animated"
                         className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
                         type="submit"
+                        disabled={isSubmitting}
                     >
-                        {isEdit ? (
+                        {isSubmitting ? (
+                            <>
+                                <FaSpinner className="self-center size-5 animate-spin" /> Guardando...
+                            </>
+                        ) : isEdit ? (
                             <>
                                 <FaRegSave className="self-center size-5" /> Guardar
                             </>

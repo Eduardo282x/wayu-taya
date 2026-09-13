@@ -25,7 +25,7 @@ export const useAxiosInterceptor = () => {
                     const message: BaseResponse<any> = response.data;
                     if (isValidMessage(message?.message)) {
                         toast.success(message.message, {
-                            duration: 3000,
+                            duration: 4000,
                             position: 'top-right'
                         });
                     }
