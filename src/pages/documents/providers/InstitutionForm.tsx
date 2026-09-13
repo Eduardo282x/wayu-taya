@@ -53,7 +53,6 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 address: '',
                 country: '',
                 email: '',
-                responsable: '',
                 phone: '',
                 type: '',
                 parishId: 0,
