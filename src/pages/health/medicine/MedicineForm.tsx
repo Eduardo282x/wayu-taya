@@ -73,7 +73,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
       {!ignoreHeader && (
         <div className=" flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
           <div>
-            <h2 className="bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
+            <h2 className="bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
               {medicineData ? "Editar Elemento" : "Agregar Nuevo Elemento"}
             </h2>
             <p className="manrope text-sm text-gray-600">
@@ -101,13 +101,13 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
         <TabsList className="w-full flex gap-1 bg-gray-200 rounded-lg p-1">
           <TabsTrigger
             value="medicamento"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
+            className="data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
           >
             Medicamento
           </TabsTrigger>
           <TabsTrigger
             value="producto"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
+            className="data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-800 data-[state=active]:to-[#58c0e9] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:transition-all data-[state=active]:duration-300 data-[state=active]:ease-in-out text-gray-700 hover:bg-gray-300 hover:text-gray-900"
           >
             Producto
           </TabsTrigger>
@@ -265,7 +265,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
           <div className="col-span-3 flex items-center justify-center pt-4">
             <Button
               variant="animated"
-              className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
+              className="p-3 w-[25%] h-[90%] bg-linear-to-r from-blue-800 to-[#58c0e9]"
               type="submit"
             >
               <BiCartAdd className="self-center size-5" /> {medicineData ? "Guardar" : "Agregar"}

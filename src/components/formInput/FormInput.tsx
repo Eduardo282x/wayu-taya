@@ -21,7 +21,7 @@ export const FormInput: React.FC<FormInputProps> = ({
     <div className="w-full">
       <label
         htmlFor={id}
-        className="block text-sm font-medium mb-1 bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent"
+        className="block text-sm font-medium mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent"
       >
         {label}
         {required ? (

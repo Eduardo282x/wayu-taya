@@ -345,7 +345,7 @@ export const Documents = () => {
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-xl overflow-hidden shadow-lg h-auto">
       {loading && <ScreenLoader />}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+      <div className="flex items-center justify-between p-4 bg-linear-to-r from-blue-600 to-blue-500 text-white">
         <div className="flex items-center gap-2">
           <FileIcon size={24} />
           <h1 className="text-xl font-medium">Documentos</h1>

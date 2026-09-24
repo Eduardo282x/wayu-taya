@@ -449,7 +449,7 @@ export const Reports = () => {
                                                     <div className="text-lg font-bold text-[#024dae]">{item.percentage}%</div>
                                                     <div className="text-xs text-gray-500">Impacto</div>
                                                 </div>
-                                                <Badge variant="secondary" className="bg-gradient-to-r from-[#024dae] to-[#3089FD] text-white">
+                                                <Badge variant="secondary" className="bg-linear-to-r from-[#024dae] to-[#3089FD] text-white">
                                                     #{index + 1}
                                                 </Badge>
                                             </div>

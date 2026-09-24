@@ -48,7 +48,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubm
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg manrope max-h-[95vh] overflow-y-auto bg-gray-300">
         <DialogHeader>
-          <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
+          <DialogTitle className="bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
             {store ? "Editar Almacén" : "Registrar Nuevo Almacén"}{" "}
           </DialogTitle>
           <DialogDescription className="manrope">
@@ -103,7 +103,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubm
           <div className="flex justify-end space-x-2 pt-4">
             <Button
               variant="animated"
-              className="p-3 min-w-[150px] w-auto h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
+              className="p-3 min-w-[150px] w-auto h-[90%] bg-linear-to-r from-blue-800 to-[#58c0e9]"
               type="submit"
             >
               <MdDomainAdd className="self-center size-5" />{" "}

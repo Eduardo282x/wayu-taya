@@ -310,7 +310,7 @@ const renderDocumentContent = (document: IDocument) => {
                             <BsFiletypePng size={64} className="text-green-500 mx-auto mb-4" />
                             <h3 className="text-lg font-semibold mb-2">Imagen PNG</h3>
                             <p className="text-gray-600 mb-4">{document.name}.png</p>
-                            <div className="bg-gradient-to-br from-blue-100 to-green-100 w-48 h-32 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                            <div className="bg-linear-to-br from-blue-100 to-green-100 w-48 h-32 rounded-lg mx-auto mb-4 flex items-center justify-center">
                                 <div className="text-center">
                                     <div className="text-2xl mb-2">🖼️</div>
                                     <p className="text-sm text-gray-600">Vista previa de imagen</p>

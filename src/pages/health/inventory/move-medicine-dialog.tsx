@@ -166,7 +166,7 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
                 <div className="flex items-start justify-around gap-4 w-full">
                   {/* Selección de Medicina */}
                   <div className="space-y-2 w-1/4">
-                    <Label className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium">
+                    <Label className="flex items-center gap-2 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium">
                       <FaPills className="text-green-600" />
                       Medicina
                     </Label>
@@ -210,7 +210,7 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
 
                   {/* Almacén Origen */}
                   <div className="space-y-2 w-1/4">
-                    <Label className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium">
+                    <Label className="flex items-center gap-2 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium">
                       <FaWarehouse className="text-orange-600" />
                       Almacén Origen
                     </Label>
@@ -277,7 +277,7 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
 
                   {/* Almacén Destino */}
                   <div className="space-y-2 w-1/4">
-                    <Label className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium">
+                    <Label className="flex items-center gap-2 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium">
                       <FaWarehouse className="text-purple-600" />
                       Almacén Destino
                     </Label>

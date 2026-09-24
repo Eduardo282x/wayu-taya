@@ -123,7 +123,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-xl leading-none font-bold bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope", className)}
+      className={cn("text-xl leading-none font-bold bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope", className)}
       {...props}
     />
   )

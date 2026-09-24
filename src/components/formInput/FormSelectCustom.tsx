@@ -66,7 +66,7 @@ const FormSelectCustom: React.FC<FormSelectProps> = ({
     <div className={cn("w-full", className)}>
       <label
         htmlFor={id}
-        className="block text-sm font-medium mb-1 bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent"
+        className="block text-sm font-medium mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent"
       >
         {label}
       </label>

@@ -113,7 +113,7 @@ export const Profile = () => {
                 <div className="relative">
                   <Avatar className="h-20 w-20">
                     <AvatarImage src={"/placeholder.svg"} alt="Foto de perfil" />
-                    <AvatarFallback className="bg-gradient-to-r from-[#024dae] to-[#3089FD] text-white text-xl">
+                    <AvatarFallback className="bg-linear-to-r from-[#024dae] to-[#3089FD] text-white text-xl">
                       {storeUser && getInitials(storeUser.name, storeUser.lastName)}
                     </AvatarFallback>
                   </Avatar>
@@ -132,7 +132,7 @@ export const Profile = () => {
                 {!isEditing ? (
                   <Button
                     onClick={handleEdit}
-                    className="bg-gradient-to-r from-[#024dae] to-[#3089FD] hover:from-[#023a8a] hover:to-[#4bc5cc]"
+                    className="bg-linear-to-r from-[#024dae] to-[#3089FD] hover:from-[#023a8a] hover:to-[#4bc5cc]"
                   >
                     <Edit3 className="h-4 w-4 mr-2" />
                     Editar Perfil
@@ -141,7 +141,7 @@ export const Profile = () => {
                   <div className="flex space-x-2">
                     <Button
                       onClick={updateUser}
-                      className="bg-gradient-to-r from-[#024dae] to-[#3089FD] hover:from-[#023a8a] hover:to-[#4bc5cc]"
+                      className="bg-linear-to-r from-[#024dae] to-[#3089FD] hover:from-[#023a8a] hover:to-[#4bc5cc]"
                     >
                       <Save className="h-4 w-4 mr-2" />
                       Guardar
@@ -290,7 +290,7 @@ export const Profile = () => {
 
 
       <StyledDialog open={open} onOpenChange={closeDialog}>
-        <StyledDialogContent className="w-[30rem] ">
+        <StyledDialogContent className="w-120">
           <StyledDialogHeader>
             <StyledDialogTitle>Actualizar contraseña</StyledDialogTitle>
             <StyledDialogDescription>

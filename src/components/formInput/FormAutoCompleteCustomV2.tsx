@@ -166,7 +166,7 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
     <div className="relative w-full" ref={ref}>
       <div ref={triggerRef}>
         <label
-          className="pl-1 block text-sm font-medium mb-1 bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent"
+          className="pl-1 block text-sm font-medium mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent"
         >
           {label}
         </label>

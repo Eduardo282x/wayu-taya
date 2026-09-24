@@ -139,7 +139,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ open, onOpenChange, onSub
           <div className="flex justify-end space-x-2 pt-4">
             <Button
               variant="animated"
-              className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
+              className="p-3 w-[25%] h-[90%] bg-linear-to-r from-blue-800 to-[#58c0e9]"
               type="submit"
             >
               {isEdit ? (

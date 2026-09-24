@@ -69,7 +69,7 @@ export const ProvidersInstitutions = () => {
 
 	const tabSelected = (tab: view): string => {
 		if (tab == currentView) {
-			return 'w-40 bg-gradient-to-r from-blue-800 to-[#58c0e9] text-white'
+			return 'w-40 bg-linear-to-r from-blue-800 to-[#58c0e9] text-white'
 		}
 		return 'w-40 bg-white text-gray-700'
 	}

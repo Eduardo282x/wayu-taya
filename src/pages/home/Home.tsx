@@ -16,7 +16,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen w-screen overflow-x-hidden bg-gradient-to-b from-blue-900 to-[#91d5ff] relative">
+    <div className="h-screen w-screen overflow-x-hidden bg-linear-to-b from-blue-900 to-[#91d5ff] relative">
       {/* Header with logo */}
       <header className="w-full p-2">
         <div className="p-8 text-center flex items-center justify-center gap-8">

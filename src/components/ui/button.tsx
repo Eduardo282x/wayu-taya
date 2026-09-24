@@ -27,7 +27,7 @@ const buttonVariants = cva(
         link:
           "text-primary underline-offset-4 hover:underline",
         edit:
-          "transition-all bg-blue-800 cursor-pointer text-white hover:bg-gradient-to-r from-blue-800 to-[#3089FD] flex rounded-xl",
+          "transition-all bg-blue-800 cursor-pointer text-white hover:bg-linear-to-r from-blue-800 to-[#3089FD] flex rounded-xl",
         delete:
           "flex justify-center items-center gap-2 bg-[#f44336] text-white hover:bg-red-600 cursor-pointer",
         animated:

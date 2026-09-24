@@ -27,7 +27,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, onOpenChange, title
         </DialogHeader>
         <DialogFooter className="flex justify-end">
           <DialogClose asChild>
-            <Button variant="animated" className="p-3 w-20 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-400">
+            <Button variant="animated" className="p-3 w-20 rounded-2xl bg-linear-to-r from-blue-600 to-blue-400">
               OK
             </Button>
           </DialogClose>
