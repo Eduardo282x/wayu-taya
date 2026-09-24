@@ -48,7 +48,7 @@ interface HeaderPageProps {
 
 export const HeaderPages: FC<HeaderPageProps> = ({ title, Icon }) => {
     return (
-        <div className='mb-2 bg-linear-to-r from-[#024dae] to-[#3089FD] rounded-xl w-full flex items-center justify-start px-4 py-2 text-2xl gap-2 text-white manrope'>
+        <div className='mt-3 lg:mt-0 mb-2 bg-linear-to-r from-[#024dae] to-[#3089FD] rounded-xl w-[99%] mx-auto flex items-center justify-start px-3 lg:px-4 py-2 text-2xl gap-2 text-white manrope'>
             <Icon className='text-2xl' /> {title}
         </div>
     )

@@ -73,7 +73,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
       {!ignoreHeader && (
         <div className=" flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
           <div>
-            <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+            <h2 className="bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
               {medicineData ? "Editar Elemento" : "Agregar Nuevo Elemento"}
             </h2>
             <p className="manrope text-sm text-gray-600">

@@ -87,7 +87,7 @@ export const Users = () => {
   }
 
   return (
-    <div className='px-3 lg:p-0 h-full flex flex-col'>
+    <div className='px-2 lg:p-0 h-full flex flex-col'>
       <PageTransitionComponent toggle={open}>
         <div className="h-full flex flex-col min-h-0">
           <HeaderPages title="Usuarios" Icon={PiUsersThree} />
@@ -111,7 +111,7 @@ export const Users = () => {
             </div>
           </div>
 
-          <div className="mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
+          <div className="lg:mx-4 mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
             <TableComponents
               data={users.users}
               column={usersColumns}

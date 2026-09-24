@@ -38,7 +38,7 @@ function StyledDialogTitle({ className, ...props }: StyledDialogTitleProps) {
   return (
     <DialogTitle
       className={cn(
-        "bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl",
+        "bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl",
         className,
       )}
       {...props}

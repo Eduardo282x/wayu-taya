@@ -1,7 +1,7 @@
 import { Column } from "@/components/table/table.interface";
 import { IUsers } from "@/services/users/user.interface";
 import { FiTrash2 } from "react-icons/fi";
-import { MdEdit } from "react-icons/md";
+import { FiEdit2 } from "react-icons/fi";
 
 export const usersColumns: Column[] = [
     {
@@ -44,7 +44,7 @@ export const usersColumns: Column[] = [
         column: 'edit',
         element: () => '',
         icon: {
-            icon: MdEdit,
+            icon: FiEdit2 ,
             label: 'Editar usuario',
             className: 'text-blue-800 font-bold',
             variant: 'edit'

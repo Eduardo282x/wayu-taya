@@ -58,9 +58,9 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
+      <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-4 lg:pt-0 border-b-2 border-gray-300 relative">
         <div>
-          <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+          <h2 className="bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
             {isEdit ? "Editar Usuario" : "Crear Usuario"}
           </h2>
           <p className="manrope text-sm text-gray-600">
@@ -72,13 +72,13 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
         <Button
           variant="outline"
           onClick={() => onOpenChange(false)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 absolute right-2 top-7 -translate-y-1/2"
         >
           <FaArrowLeft /> Volver
         </Button>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4 p-4 overflow-y-auto">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 lg:space-y-0 lg:grid grid-cols-2 gap-4 py-4 lg:px-4 overflow-y-auto">
         <div>
           <FormInputCustom
             label="Nombre"
@@ -135,7 +135,7 @@ const UsersForm: React.FC<UsersFormProps> = ({ open, onOpenChange, onSubmit, use
         <div className="col-span-2 flex items-center justify-center mt-5">
           <Button
             variant="animated"
-            className="w-1/2 h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
+            className="w-full lg:w-1/2 h-[90%] bg-linear-to-r from-blue-800 to-[#58c0e9]"
             type="submit"
           >
             {isEdit ? (

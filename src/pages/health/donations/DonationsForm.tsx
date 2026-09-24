@@ -370,7 +370,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
         <div>
-          <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+          <h2 className="bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
             {donation ? "Editar Donación" : "Registrar Nueva Donación"}
           </h2>
           <p className="manrope text-sm text-gray-600">
@@ -391,7 +391,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
         <div className="space-y-4 p-2">
           <div className="space-y-1">
-            <h3 className="text-base font-semibold bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">
+            <h3 className="text-base font-semibold bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
               Información General
             </h3>
 
@@ -476,7 +476,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           {/* Detalles  */}
           <div className="space-y-2 h-100 max-h-100 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent">
+              <h3 className="text-base font-semibold bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
                 Detalles de Donación
               </h3>
               <div className="flex items-center gap-3">
@@ -810,6 +810,8 @@ const DonationDetailFormExit = ({
         />
         <FormInputCustom
           label="Expira"
+          disabled={true}
+          className="bg-gray-300 text-gray-600"
           id={`fecha-${index}`}
           value={medicineSelected ? formatDate(medicineSelected.datesMedicine[0].expirationDate.toString()) : ''}
           readOnly

@@ -1,7 +1,8 @@
 import { Column } from "@/components/table/table.interface";
 import { IInstitution } from "@/services/institution/institution.interface";
 import { IProviders } from "@/services/provider/provider.interface";
-import { FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { FiEdit2 } from "react-icons/fi";
 
 export const institutionColumns: Column[] = [
     {
@@ -68,7 +69,7 @@ export const institutionColumns: Column[] = [
         element: () => "",
         icon: {
             label: "Editar institución",
-            icon: FaRegEdit,
+            icon: FiEdit2,
             className: "text-blue-600",
             variant: "ghost",
         },
@@ -146,7 +147,7 @@ export const providerColumns: Column[] = [
         element: () => "",
         icon: {
             label: "Editar proveedor",
-            icon: FaRegEdit,
+            icon: FiEdit2,
             className: "text-blue-600",
             variant: "ghost",
         },

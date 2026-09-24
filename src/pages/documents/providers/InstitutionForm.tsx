@@ -67,7 +67,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
                 <div>
-                    <h2 className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+                    <h2 className="bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
                         {isEdit ? "Editar Institución" : "Crear Institución"}
                     </h2>
                     <p className="manrope text-sm text-gray-600">
@@ -85,7 +85,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 </Button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-3 gap-4 p-4 overflow-y-auto">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 lg:space-y-0 lg:grid grid-cols-3 gap-4 py-4 lg:px-4 overflow-y-auto">
                 <div>
                     <FormInputCustom
                         label="Nombre de la Institución"
@@ -203,7 +203,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 <div className="col-span-3 flex items-center justify-center pt-4">
                     <Button
                         variant="animated"
-                        className="p-3 w-[25%] h-[90%] bg-gradient-to-r from-blue-800 to-[#58c0e9]"
+                        className="p-3 w-full lg:w-[25%] h-[90%] bg-linear-to-r from-blue-800 to-[#58c0e9]"
                         type="submit"
                         disabled={isSubmitting}
                     >

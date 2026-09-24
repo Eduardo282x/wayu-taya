@@ -62,7 +62,7 @@ export const LoginForm = ({ onForgotPassword, setLoading, loading }: LoginFormPr
   return (
     <form className="space-y-6 lg:px-6 h-full" onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col relative justify-center w-full mx-auto h-20">
-        <Label className="ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent">Usuario</Label>
+        <Label className="ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent">Usuario</Label>
         <Input
           type="text"
           placeholder="Usuario"
@@ -77,7 +77,7 @@ export const LoginForm = ({ onForgotPassword, setLoading, loading }: LoginFormPr
       </div>
 
       <div className="flex flex-col justify-center relative w-full mx-auto h-15">
-        <Label className="ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent">Contraseña</Label>
+        <Label className="ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent">Contraseña</Label>
         <div className="relative w-full">
           <Input
             type={showPassword ? "text" : "password"}

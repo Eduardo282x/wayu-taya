@@ -2,7 +2,7 @@ import { Column } from "@/components/table/table.interface";
 import { formatNumberWithDots } from "@/hooks/formaters";
 import { IStore } from "@/services/store/store.interface";
 import { FiTrash2 } from "react-icons/fi";
-import { MdEdit } from "react-icons/md";
+import { FiEdit2 } from "react-icons/fi";
 
 export const storeColumns: Column[] = [
   {
@@ -64,7 +64,7 @@ export const storeColumns: Column[] = [
     column: 'edit',
     element: () => '',
     icon: {
-      icon: MdEdit,
+      icon: FiEdit2 ,
       label: 'Editar almacén',
       className: 'text-blue-800 font-bold',
       variant: 'edit'

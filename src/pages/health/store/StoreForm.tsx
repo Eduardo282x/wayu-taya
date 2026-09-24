@@ -48,7 +48,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ open, onOpenChange, onSubm
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg manrope max-h-[95vh] overflow-y-auto bg-gray-300">
         <DialogHeader>
-          <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope text-2xl">
+          <DialogTitle className="bg-gradient-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
             {store ? "Editar Almacén" : "Registrar Nuevo Almacén"}{" "}
           </DialogTitle>
           <DialogDescription className="manrope">

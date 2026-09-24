@@ -1,7 +1,7 @@
 import { Column } from "@/components/table/table.interface";
 import { DetDonation, IDonations } from "@/services/donations/donations.interface";
 import { formatDate } from "@/utils/formatters";
-import { MdEdit } from "react-icons/md";
+import { FiEdit2 } from "react-icons/fi";
 import { DonationDownloadMenu } from "./DonationDownloadMenu";
 import { formatNumberWithDots } from "@/hooks/formaters";
 
@@ -73,7 +73,7 @@ export const donationsColumns: Column[] = [
         element: () => "",
         icon: {
             label: "Editar donación",
-            icon: MdEdit,
+            icon: FiEdit2 ,
             className: "text-blue-800  font-bold",
             variant: "ghost",
         },

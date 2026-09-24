@@ -77,7 +77,7 @@ export const Inventory = () => {
   }
 
   return (
-    <div className="lg:min-h-[90vh] max-h-[77vh] w-[79.5vw] pl-2 lg:pl-0 overflow-auto ">
+    <div className="px-2 lg:p-0 h-full flex flex-col min-h-0">
       <HeaderPages title="Inventario" Icon={MdOutlineProductionQuantityLimits} />
 
       {/* Barra de herramientas con filtros */}
@@ -140,7 +140,7 @@ export const Inventory = () => {
         </div>
       </div>
 
-      <div className="mt-3">
+      <div className="lg:mx-2 mt-3 flex-1 min-h-0 flex flex-col">
         {currentView === "inventory" ? (
           <TableComponents
             key="inventory"

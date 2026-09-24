@@ -1,7 +1,7 @@
 import { Column } from "@/components/table/table.interface";
 import { IPeople } from "@/services/people/people.interface";
 import { formatDate } from "@/utils/formatters";
-import { MdEdit } from "react-icons/md";
+import { FiEdit2 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
 export const columnPeople: Column[] = [
@@ -66,7 +66,7 @@ export const columnPeople: Column[] = [
     column: 'edit',
     element: (data: IPeople) => formatDate(data.birthdate),
     icon: {
-      icon: MdEdit,
+      icon: FiEdit2 ,
       label: 'Editar persona',
       className: '',
       variant: 'edit'

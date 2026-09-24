@@ -173,7 +173,7 @@ export const Medicine = () => {
   }
 
   return (
-    <div className='px-3 lg:p-0 h-full flex flex-col'>
+    <div className='px-2 lg:p-0 h-full flex flex-col'>
       {loading && (
         <ScreenLoader />
       )}
@@ -212,7 +212,7 @@ export const Medicine = () => {
               </div>
             </div>
 
-            <div className="mt-4 flex-1 min-h-0 flex flex-col">
+            <div className="lg:mx-2 mt-4 flex-1 min-h-0 flex flex-col">
               <TableComponents
                 column={columns.filter((item) => item.visible === true)}
                 data={currentMedicines}

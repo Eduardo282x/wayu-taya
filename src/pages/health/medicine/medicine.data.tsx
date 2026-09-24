@@ -1,7 +1,7 @@
 import { Column } from "@/components/table/table.interface";
 import { IMedicine, MedicineBody } from "@/services/medicine/medicine.interface";
 import { FiTrash2 } from "react-icons/fi";
-import { MdEdit } from "react-icons/md";
+import { FiEdit2 } from "react-icons/fi";
 
 export const medicineColumns: Column[] = [
   {
@@ -87,7 +87,7 @@ export const medicineColumns: Column[] = [
     column: 'edit',
     element: () => '',
     icon: {
-      icon: MdEdit,
+      icon: FiEdit2 ,
       label: 'Editar medicina',
       className: 'text-blue-800 font-bold',
       variant: 'edit'

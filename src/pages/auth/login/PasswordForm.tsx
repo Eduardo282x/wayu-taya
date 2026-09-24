@@ -48,7 +48,7 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
   return (
     <form className="space-y-2 lg:px-2 h-full w-full flex flex-col lg:items-center" onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col relative justify-center w-full">
-        <Label className="ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium lg:text-lg selection:bg-transparent">Correo Electrónico</Label>
+        <Label className="ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium lg:text-lg selection:bg-transparent">Correo Electrónico</Label>
         <Input
           type="email"
           placeholder="Correo Electrónico"
@@ -95,7 +95,7 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       </div>
 
       <div className='lg:self-center w-full'>
-        <Label className='ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium lg:text-lg selection:bg-transparent'>Confirmar Contraseña</Label>
+        <Label className='ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium lg:text-lg selection:bg-transparent'>Confirmar Contraseña</Label>
         <div className='relative w-full'>
           <Input
             type={showPasswordConfirm ? 'text' : 'password'}

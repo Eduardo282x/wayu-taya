@@ -20,7 +20,6 @@ import { useAllProvidersQuery, useAllInstitutionsQuery } from "@/pages/documents
 export const Donations = () => {
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
-
   const { page, size, setPage, setSize, filters, setFilter } = useDonationStore()
   const { data: donationsData, isFetching } = useDonationsQuery()
   const { data: lotesData } = useLotesQuery()
@@ -85,7 +84,7 @@ export const Donations = () => {
   }
 
   return (
-    <div className='px-3 lg:p-0 h-full flex flex-col'>
+    <div className='px-2 lg:p-0 h-full flex flex-col'>
       <PageTransitionComponent toggle={openDialog}>
         <div className="h-full flex flex-col min-h-0">
           <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
@@ -115,10 +114,10 @@ export const Donations = () => {
             </div>
           </div>
 
-          <div className="mt-3 flex-1 min-h-0 flex flex-col">
+          <div className="lg:mx-2 mt-3 flex-1 min-h-0 flex flex-col">
             <TableComponents
               data={currentDonations}
-              column={donationsColumns}
+              column={donationsColumns.filter(type => filters.type == 'Entrada' ? !type.column.includes('download') : type)}
               actionTable={getActionTable}
               colSpanColumns={true}
               isExpansible={true}

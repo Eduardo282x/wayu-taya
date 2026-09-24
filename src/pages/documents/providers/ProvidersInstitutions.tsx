@@ -132,12 +132,12 @@ export const ProvidersInstitutions = () => {
 	const isDeleting = deleteProvider.isPending || deleteInstitution.isPending;
 
 	return (
-		<div className='px-3 lg:p-0 h-full flex flex-col'>
+		<div className='px-2 lg:p-0 h-full flex flex-col'>
 			<PageTransitionComponent toggle={openProvider || openInstitution}>
 				<div className="h-full flex flex-col min-h-0">
 					<HeaderPages title={currentView === "provider" ? "Proveedores" : "Instituciones"} Icon={FaUserTie} />
 
-					<div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
+					<div className="flex flex-wrap justify-between items-center px-2 pb-2 pt-1 h-fit gap-2 border-b-2 border-gray-300">
 						<div className="flex items-center gap-2">
 							<Button
 								variant={currentView === "provider" ? "animated" : "outline"}
@@ -155,7 +155,7 @@ export const ProvidersInstitutions = () => {
 							</Button>
 						</div>
 
-						<div className="flex items-center ">
+						<div className="flex flex-wrap gap-2 lg:gap-0 items-center ">
 							{currentView == 'provider' && (
 								<DropdownColumnFilter columns={columnsProviders} setColumns={setColumnsProviders} />
 							)}
@@ -180,7 +180,7 @@ export const ProvidersInstitutions = () => {
 						</div>
 					</div>
 
-					<div className="mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
+					<div className="lg:mx-4 mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
 						{currentView == 'provider' && (
 							<TableComponents
 								data={filteredProviders}
