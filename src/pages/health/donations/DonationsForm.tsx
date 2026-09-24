@@ -736,8 +736,17 @@ const DonationDetailFormExit = ({
       handleMedicineDetailChange(index, "medicineId", Number(value))
       handleMedicineDetailChange(index, "storageId", storageId, 0)
       handleMedicineDetailChange(index, "lote", lote?.name ?? '', 0)
+      handleMedicineDetailChange(index, "expirationDate", lote?.expirationDate ? formatDateForInput(lote.expirationDate) : '')
     }
 
+  }
+
+  const changeLote = (loteName: string) => {
+    handleMedicineDetailChange(index, "lote", loteName, 0);
+    const lote = medicineSelected?.lotes.find(
+      lo => lo.name === loteName && (!rowStoreId || lo.storeId === rowStoreId)
+    );
+    handleMedicineDetailChange(index, "expirationDate", lote?.expirationDate ? formatDateForInput(lote.expirationDate) : '');
   }
 
   return (
@@ -794,8 +803,8 @@ const DonationDetailFormExit = ({
               value: lo.name.toString(),
             })) : []}
           value={detail.details?.[0]?.lote}
-          onChange={(value) =>
-            handleMedicineDetailChange(index, "lote", value.target.value, 0)
+          onChange={(e) =>
+            changeLote(e.target.value)
           }
         />
         <FormInputCustom
@@ -813,7 +822,7 @@ const DonationDetailFormExit = ({
           disabled={true}
           className="bg-gray-300 text-gray-600"
           id={`fecha-${index}`}
-          value={medicineSelected ? formatDate(medicineSelected.datesMedicine[0].expirationDate.toString()) : ''}
+          value={medicineSelected && detail.expirationDate ? formatDate(detail.expirationDate) : ''}
           readOnly
         />
       </div>
