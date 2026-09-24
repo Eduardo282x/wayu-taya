@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import logo from "@/assets/img/logo.png"
+import logoNuevo from "@/assets/img/FWT_logo_blanco.png"
 import { LoginForm } from "./LoginForm"
 import { PasswordForm } from "./PasswordForm"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
@@ -58,34 +58,21 @@ export const Login = () => {
   // }, [showLoginForm, isMobile])
 
   return (
-    <div className="bg-gradient-to-b from-blue-900 to-[#91d5ff] h-screen flex items-center justify-center font-sans">
+    <div className="bg-linear-to-tr from-blue-900 to-[#3089FD] h-screen flex items-center justify-center font-sans">
 
       {loading && (
         <ScreenLoader />
       )}
-      <div className="bg-white rounded-2xl shadow-2xl lg:w-full lg:max-w-4xl w-65 h-[23rem] lg:h-[32rem] flex overflow-hidden relative ">
+      <div className="bg-gray-100 rounded-2xl shadow-2xl lg:w-4xl w-[90%] h-1/2 lg:h-128 flex overflow-hidden relative ">
         {/* Contenedor para el formulario de login (siempre presente en desktop) */}
-        <div className="lg:w-1/2 w-full bg-gray-100 p-4">
+        <div className="lg:w-1/2 w-full  p-4 my-auto">
           {/* Solo mostrar en móvil o en desktop cuando showLoginForm es true */}
           {(isMobile && showLoginForm) || !isMobile ? (
-            <div className={`${!isMobile && !showLoginForm ? "invisible" : "visible"}`}>
-              <div className="flex items-center w-full cursor-default lg:mb-14">
-              </div>
+            <div className={`${!isMobile && !showLoginForm ? "" : "visible"}`}>
 
-              <div className="flex items-center w-full cursor-default lg:hidden">
-                <img
-                  src={logo || "/placeholder.svg"}
-                  alt="logo"
-                  className="w-12 mx-2  drop-shadow-gray-500 drop-shadow-lg"
-                />
-                <div className="julius-sans-one-regular text-[#34A8D5] text-shadow2">
-                  WAYUU TAYA
-                </div>
-              </div>
-
-              <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
-                <div className="bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent manrope lg:text-xl mb-1">¡Bienvenido!</div>
-                <div className="text-gray-500 manrope lg:text-lg opacity-70 ml-1">Sistema de Gestión de Procesos Wayu Taya</div>
+              <div className="text-center cursor-default mb-4 space-y-3 text-[0.78rem]">
+                <div className="bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl font-bold mb-1">¡Bienvenido!</div>
+                <div className="text-gray-600 manrope text-lg ml-1">Sistema de Gestión de Procesos Wayu Taya</div>
               </div>
 
               <LoginForm onForgotPassword={handleForgotPassword} setLoading={setLoading} loading={loading} />
@@ -94,20 +81,10 @@ export const Login = () => {
 
           {/* Mostrar formulario de recuperación solo en móvil cuando showLoginForm es false */}
           {isMobile && !showLoginForm ? (
-            <div>
-              <div className="flex items-center w-full ml-4 cursor-default lg:hidden">
-                <img
-                  src={logo || "/placeholder.svg"}
-                  alt="logo"
-                  className="w-12 mx-2 drop-shadow-gray-500 drop-shadow-lg"
-                />
-                <div className="text-[1rem] julius-sans-one-regular text-[#34A8D5] text-shadow2">
-                  WAYUU TAYA
-                </div>
-              </div>
+            <div className="my-auto">
 
-              <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
-                <div className="text-gray-500 manrope lg:text-xl opacity-70 ml-1 mb-2">Recupera tu contraseña....</div>
+              <div className="text-center cursor-default mb-4 space-y-3 text-[0.78rem]">
+                <div className="text-gray-800 manrope text-xl ml-1 mb-2">Recupera tu contraseña....</div>
               </div>
 
               <PasswordForm onBackToLogin={handleBackToLogin} />
@@ -119,41 +96,31 @@ export const Login = () => {
         {!isMobile && (
           <div
             className={`
-              w-1/2 p-8 bg-gradient-to-tr from-[#024dae] to-[#5cdee5] rounded-xl flex flex-wrap items-center justify-start text-white
+              w-1/2 p-8 bg-linear-to-br from-[#024dae] to-[#3089FD] rounded-xl flex flex-wrap items-center justify-start text-white
               absolute h-full z-10 transition-all duration-600 ease-in-out  
               ${showLoginForm ? 'right-0 animate-slide-left' : 'right-0 animate-slide-right'}
             `}
           >
             <img
-              src={logo || "/placeholder.svg"}
+              src={logoNuevo || "/placeholder.svg"}
               alt=""
-              className="w-80 h-80 absolute top-12 left-0 right-0 bottom-0 m-auto opacity-20"
+              className=""
             />
-            <div className="flex flex-col text-center cursor-default w-full ">
+            {/* <div className="flex flex-col text-center cursor-default w-full ">
               <span className="oswald font-normal text-4xl">FUNDACIÓN</span>
               <span className="julius-sans-one-regular text-[2.5rem] border-y-2 border-white">WAYUU TAYA</span>
-            </div>
+            </div> */}
           </div>
         )}
 
 
         {/* En desktop: Contenedor para el formulario de recuperación (siempre presente) */}
         {!isMobile && (
-          <div className="w-1/2 ml-auto bg-gray-100 p-4">
-            <div className={`${!isMobile && showLoginForm ? "invisible" : "visible"}`}>
-              <div className="flex items-center w-full cursor-default mt-14">
-                {/* <img
-                  src={logo || "/placeholder.svg"}
-                  alt="logo"
-                  className="w-12 m-2 lg:w-20 lg:h-20 drop-shadow-gray-500 drop-shadow-lg"
-                />
-                <div className="lg:ml-2 text-[1rem] mr-2 julius-sans-one-regular lg:text-[2.5rem] text-[#34A8D5] text-shadow2">
-                  WAYUU TAYA
-                </div> */}
-              </div>
+          <div className="w-1/2 ml-auto my-auto bg-gray-100 p-4">
+            <div className={`${!isMobile && showLoginForm ? "" : "visible"}`}>
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
-                <div className="text-gray-500 manrope lg:text-xl opacity-70 ml-1">Recupera tu contraseña....</div>
+                <div className="text-slate-800 manrope lg:text-xl ml-1">Recupera tu contraseña....</div>
               </div>
 
               <PasswordForm onBackToLogin={handleBackToLogin} />

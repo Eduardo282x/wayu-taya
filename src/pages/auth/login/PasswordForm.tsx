@@ -46,33 +46,31 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
   }
 
   return (
-    <form className="lg:space-y-6 lg:px-6 h-full w-full flex flex-col lg:items-center" onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-2 lg:px-2 h-full w-full flex flex-col lg:items-center" onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col relative justify-center w-full">
-        <Label className="ml-1 mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent">Correo Electrónico</Label>
+        <Label className="ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium lg:text-lg selection:bg-transparent">Correo Electrónico</Label>
         <Input
           type="email"
           placeholder="Correo Electrónico"
           className="bg-white h-11 rounded-lg pr-10"
           {...register("email")} />
 
-        <div className='h-[0.6rem] text-nowrap mb-2 lg:mb-0 lg:h-[0.5rem]'>
+        <div className='h-[0.6rem] text-nowrap mb-2 lg:mb-0 lg:h-2'>
           {errors.email && (
             <span className="text-[0.54rem] text-center text-red-500 manrope lg:text-[0.7rem] lg:text-nowrap">
               {errors.email?.message || "\u00A0"}
             </span>
           )}
         </div>
-
       </div>
 
-
       <div className='lg:self-center w-full'>
-        <Label className='ml-1 mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent'>Contraseña</Label>
+        <Label className='ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent font-medium lg:text-lg selection:bg-transparent'>Contraseña</Label>
         <div className='relative w-full'>
           <Input
             type={showPassword ? 'text' : 'password'}
             placeholder="Contraseña"
-            className="bg-white h-11 rounded-lg pr-10 pr-10"
+            className="bg-white h-11 rounded-lg pr-10"
             {...register('password')}
           />
 
@@ -87,7 +85,7 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
             }
           </button>
         </div>
-        <div className='h-[1rem] text-center  w-55 '>
+        <div className='h-4 text-center  w-55 '>
           {errors.password && (
             <span className="text-[0.54rem] text-red-500 manrope h-[5%] lg:text-[0.7rem] lg:text-nowrap  text-nowrap ">
               {errors.password?.message || "\u00A0"}
@@ -97,12 +95,12 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       </div>
 
       <div className='lg:self-center w-full'>
-        <Label className='ml-1 mb-1 bg-gradient-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium text-lg selection:bg-transparent'>Confirmar Contraseña</Label>
+        <Label className='ml-1 mb-1 bg-linear-to-r from-blue-800 to-[#34A8D5] bg-clip-text text-transparent font-medium lg:text-lg selection:bg-transparent'>Confirmar Contraseña</Label>
         <div className='relative w-full'>
           <Input
             type={showPasswordConfirm ? 'text' : 'password'}
             placeholder="Contraseña"
-            className="bg-white h-11 rounded-lg pr-10 pr-10"
+            className="bg-white h-11 rounded-lg pr-10"
             {...register('confirmPassword')}
           />
 
@@ -118,10 +116,10 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
           </button>
         </div>
 
-        <div className='h-[1rem] text-center text-nowrap mb-2 lg:mb-[0] lg:h-[0.5rem] w-[55]'>
+        <div className='h-4 text-center text-nowrap mb-2 lg:mb-0 lg:h-2 w-[55]'>
 
           {errors.confirmPassword && (
-            <span className="text-[0.54rem] text-center text-red-500 manrope h-[5%] lg:text-[0.7rem] lg:text-nowrap w-[100%]">
+            <span className="text-[0.54rem] text-center text-red-500 manrope h-[5%] lg:text-[0.7rem] lg:text-nowrap w-full">
               {errors.confirmPassword?.message || "\u00A0"}
             </span>
           )}
@@ -131,12 +129,12 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
       </div>
 
 
-      <div className='flex items-center justify-between w-full gap-4'>
+      <div className='flex lg:flex-row flex-col-reverse items-center justify-between w-full gap-4'>
         <Button
           type="submit"
           variant="animated"
           disabled={loading}
-          className="w-[50%] shadow-xl">
+          className="w-full lg:w-1/2 shadow-xl">
           Confirmar
         </Button>
 
@@ -145,7 +143,7 @@ export const PasswordForm = ({ onBackToLogin }: PasswordFormProps) => {
           onClick={onBackToLogin}
           variant="outline"
           disabled={loading}
-          className="text-blue-800">
+          className=" w-full lg:w-auto text-blue-800 border-gray-400">
           Volver al inicio de sesión
         </Button>
 
