@@ -99,18 +99,18 @@ export const Sidebar = () => {
     }
 
     return (
-        <div className='w-full h-full bg-[#024dae] lg:bg-transparent py-4 px-4 lg:px-0'>
-            <div className='flex items-center justify-center cursor-pointer w-full' onClick={() => navigate('/')}>
+        <div className='flex flex-col w-full h-full bg-[#024dae] lg:bg-transparent py-4 px-4 lg:px-1'>
+            <div className='flex items-center justify-center cursor-pointer w-full shrink-0' onClick={() => navigate('/')}>
                 <img src={logo} alt="" className='w-16' />
                 <h2 className='text-lg text-white font-medium julius-sans-one-regular'>WAYUU TAYA</h2>
             </div>
 
-            <div className='flex flex-col items-start justify-between h-[90%] w-full'>
-                <div className='flex flex-col items-start justify-start gap-1 w-full'>
+            <div className='flex flex-col items-start justify-between gap-4 w-full flex-1 min-h-0'>
+                <div className='flex flex-col items-start justify-start gap-1 w-full flex-1 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
                     <DropdownMenu>
                         <DropdownMenuTrigger className='flex items-center justify-between gap-3 cursor-pointer bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg w-full p-2 manrope transition-all'>
                             <span className='flex items-center justify-start gap-3'>
-                                <LayoutGrid className='text-2xl' /> {currentModule}
+                                <LayoutGrid className='text-sm' /> {currentModule}
                             </span>
                             <IoIosArrowDown />
                         </DropdownMenuTrigger>
@@ -151,7 +151,7 @@ export const Sidebar = () => {
                                 <div
                                     key={i}
                                     onClick={() => navigate(me.url)}
-                                    className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent  hover:border-white ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
+                                    className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent text-sm hover:border-white ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
                                 >
                                     <me.icon className='text-3xl' /> {me.label}
                                 </div>

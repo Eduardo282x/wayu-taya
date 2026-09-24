@@ -6,13 +6,13 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 export const Layout = () => {
 
     return (
-        <div className=' w-screen h-screen overflow-hidden bg-linear-to-r from-[#024dae] to-[#3089FD] flex flex-col lg:flex-row lg:items-center lg:justify-around'>
+        <div className='w-screen h-screen overflow-hidden bg-linear-to-r from-[#024dae] to-[#3089FD] flex flex-col lg:flex-row lg:items-center lg:justify-around'>
             <TooltipProvider>
-                <div className='hidden lg:block w-[15%] mr-2 h-screen'>
+                <div className='hidden lg:block w-[15%] h-screen'>
                     <Sidebar />
                 </div>
 
-                <div className='w-full lg:w-[82.5%] px-2 pb-3 lg:px-4 lg:pb-0 flex flex-col flex-1 min-h-0 lg:flex-none lg:my-auto lg:h-[95%]'>
+                <div className='w-full lg:w-[85%] px-2 pb-3 lg:px-4 lg:pb-0 flex flex-col flex-1 min-h-0 lg:flex-none lg:my-auto lg:h-[95%]'>
                     {/* <Header /> */}
                     <div className='block lg:hidden shrink-0'>
                         <HeaderMobile />

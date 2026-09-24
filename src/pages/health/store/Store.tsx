@@ -98,7 +98,7 @@ export const Store = () => {
         </div>
       </div>
 
-      <div className="lg:mx-4 mx-2 mt-4">
+      <div className="mx-2 mt-4">
         <TableComponents
           column={storeColumns}
           data={filteredStores}

@@ -111,7 +111,7 @@ export const Users = () => {
             </div>
           </div>
 
-          <div className="lg:mx-4 mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
+          <div className="lg:mx-2 mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
             <TableComponents
               data={users.users}
               column={usersColumns}

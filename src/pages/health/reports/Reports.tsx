@@ -233,7 +233,7 @@ export const Reports = () => {
     return (
         <div className="h-full overflow-x-hidden">
             {/* Header */}
-            <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#3089FD] rounded-xl w-full flex items-center justify-start px-4 py-2 gap-4 text-white manrope">
+            <div className="mb-2 w-[98%] mx-auto bg-linear-to-r from-[#024dae] to-[#3089FD] rounded-xl flex items-center justify-start px-4 py-2 gap-4 text-white manrope">
                 <LuChartNoAxesCombined size={60} />
                 <div className="">
                     <h1 className="text-2xl font-bold">Centro de Reportes</h1>
@@ -242,7 +242,7 @@ export const Reports = () => {
             </div>
 
             {loading ? <ReportsSkeleton /> : (
-                <div className="max-w-7xl mx-auto p-6 space-y-8">
+                <div className="max-w-7xl mx-auto p-4 space-y-8">
                     {/* Selección de Reportes */}
                     <section>
                         <div className="flex items-center justify-between mb-6">
