@@ -46,7 +46,7 @@ export const Sidebar = () => {
                     break;
             }
         }
-    }, [])
+    }, [location.pathname]);
 
     useEffect(() => {
         setMenuData((prev) => prev.map(section => {
@@ -78,7 +78,7 @@ export const Sidebar = () => {
     }
 
     return (
-        <div className='w-full h-full bg-transparent py-4'>
+        <div className='w-full h-full bg-[#024dae] lg:bg-transparent py-4 px-4 lg:px-0'>
             <div className='flex items-center justify-center cursor-pointer w-full' onClick={() => navigate('/')}>
                 <img src={logo} alt="" className='w-16' />
                 <h2 className='text-lg text-white font-medium julius-sans-one-regular'>WAYUU TAYA</h2>

@@ -33,24 +33,12 @@ export const menu: IMenu[] = [
         url: '/documentos/personas',
         icon: PiUserList,
     },
-    // {
-    //     label: 'Comunidades',
-    //     active: false,
-    //     url: '/documentos/comunidades',
-    //     icon: FaBuilding  
-    // },
     {
         label: 'Eventos',
         active: false,
         url: '/documentos/eventos',
         icon: FaRegCalendarAlt,
     },
-    // {
-    //     label: 'Actividades',
-    //     active: false,
-    //     url: '/documentos/actividades',
-    //     icon: MdAccessTime   
-    // },
     {
         label: 'Documentos',
         active: false,
