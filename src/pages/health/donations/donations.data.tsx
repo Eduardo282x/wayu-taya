@@ -84,7 +84,7 @@ export const donationsColumns: Column[] = [
         column: "download",
         visible: true,
         element: (data: IDonations) =>
-            data.type === 'Entrada' ? null : <DonationDownloadMenu donationId={data.id} />,
+            data.type === 'Entrada' ? null : <DonationDownloadMenu donationId={data.id} controlNumber={data.controlNumber} />,
         className: () => 'w-48 max-w-48 text-ellipsis overflow-hidden',
     },
 ];

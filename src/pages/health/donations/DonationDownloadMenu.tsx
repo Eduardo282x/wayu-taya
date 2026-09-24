@@ -8,28 +8,44 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getDonationsNormalDownloadReport, getDonationsNoteDeliveryDownload } from "@/services/donations/donations.service"
+import { getDonationsCertificateDownload, getDonationsNormalDownloadReport, getDonationsNoteDeliveryDownload } from "@/services/donations/donations.service"
 
 interface DonationDownloadMenuProps {
   donationId: number;
+  controlNumber: string | number | undefined;
 }
 
-type DownloadType = 'factura' | 'nota';
+type DownloadType = 'factura' | 'nota' | 'certificado';
 
-export const DonationDownloadMenu = ({ donationId }: DonationDownloadMenuProps) => {
+export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDownloadMenuProps) => {
   const [downloading, setDownloading] = useState<DownloadType | null>(null);
   const [open, setOpen] = useState<boolean>(false);
+
+  const labels: Record<DownloadType, string> = {
+    factura: 'Factura no comercial',
+    nota: 'Nota de entrega',
+    certificado: 'Certificado de donación',
+  };
 
   const downloadFile = async (type: DownloadType) => {
     setDownloading(type);
     try {
-      const response = type === 'factura'
-        ? await getDonationsNormalDownloadReport(donationId)
-        : await getDonationsNoteDeliveryDownload(donationId);
+      let response;
+      switch (type) {
+        case 'factura':
+          response = await getDonationsNormalDownloadReport(donationId);
+          break;
+        case 'nota':
+          response = await getDonationsNoteDeliveryDownload(donationId);
+          break;
+        case 'certificado':
+          response = await getDonationsCertificateDownload(donationId);
+          break;
+      };
       const url = URL.createObjectURL(response);
       const link = window.document.createElement("a");
       link.href = url;
-      link.download = type === 'factura' ? 'Factura no comercial.pdf' : 'Nota de entrega.pdf';
+      link.download = `${labels[type]} - ${controlNumber}`;
       window.document.body.appendChild(link);
       link.click();
       window.document.body.removeChild(link);
@@ -56,6 +72,9 @@ export const DonationDownloadMenu = ({ donationId }: DonationDownloadMenuProps) 
         </DropdownMenuItem>
         <DropdownMenuItem disabled={downloading !== null} onClick={() => downloadFile('nota')}>
           {downloading === 'nota' ? 'Descargando...' : 'Nota de entrega'}
+        </DropdownMenuItem>
+        <DropdownMenuItem disabled={downloading !== null} onClick={() => downloadFile('certificado')}>
+          {downloading === 'certificado' ? 'Descargando...' : 'Certificado de donación'}
         </DropdownMenuItem>
       </DropdownMenuContent>
       </DropdownMenu>

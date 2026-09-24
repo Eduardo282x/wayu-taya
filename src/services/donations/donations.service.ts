@@ -45,6 +45,9 @@ export const getDonationsNormalDownloadReport = (id: number) => {
 export const getDonationsNoteDeliveryDownload = (id: number) => {
     return getDataFileApi(`${donationsUrl}/note-delivery/${id}`);
 }
+export const getDonationsCertificateDownload = (id: number) => {
+    return getDataFileApi(`${donationsUrl}/certificate/${id}`);
+}
 export const getDonationsExcelTemplate = () => {
     return getDataFileApi(`${donationsUrl}/template`);
 }
