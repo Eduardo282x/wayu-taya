@@ -95,10 +95,9 @@ export const TableComponents: FC<TableProps> = ({
   }
 
   return (
-    <div className="w-full ">
-      <div>
-        <Table>
-          <TableHeader>
+    <div className="w-full flex flex-col flex-1 min-h-0">
+      <Table>
+        <TableHeader>
             <TableRow>
               {columns.map((col: Column, index: number) => (
                 <TableHead className={`${col.className && col.className(col)}`} key={index}>{col.label}</TableHead>
@@ -138,7 +137,6 @@ export const TableComponents: FC<TableProps> = ({
             )}
           </TableBody>
         </Table>
-      </div>
 
       {!loading && (totalElements >= 100 || isServerSide && totalElements > 0) ? (
         <PaginationTable

@@ -32,7 +32,7 @@ const MenuMobile = () => {
                         <IoMdMenu />
                     </Button>
                 </SheetTrigger>
-                <SheetContent side='right' className='bg-linear-to-r from-[#024dae] to-[#5cdee5]' onClick={() => setOpen(false)}>
+                <SheetContent side='right' className='bg-linear-to-r from-[#024dae] to-[#3089FD]' onClick={() => setOpen(false)}>
                     <Sidebar />
                 </SheetContent>
             </Sheet>

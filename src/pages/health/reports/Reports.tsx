@@ -174,7 +174,7 @@ export const Reports = () => {
     }
 
     function getRandomColorCode(): string {
-        const colorCodes = ["#024dae", "#1e5bb8", "#3a6bc2", "#5cdee5"];
+        const colorCodes = ["#024dae", "#1e5bb8", "#3a6bc2", "#3089FD"];
         const randomIndex = Math.floor(Math.random() * colorCodes.length);
         return colorCodes[randomIndex];
     }
@@ -233,7 +233,7 @@ export const Reports = () => {
     return (
         <div className="h-full overflow-x-hidden">
             {/* Header */}
-            <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#5cdee5] rounded-xl w-full flex items-center justify-start px-4 py-2 gap-4 text-white manrope">
+            <div className="mb-2 bg-linear-to-r from-[#024dae] to-[#3089FD] rounded-xl w-full flex items-center justify-start px-4 py-2 gap-4 text-white manrope">
                 <LuChartNoAxesCombined size={60} />
                 <div className="">
                     <h1 className="text-2xl font-bold">Centro de Reportes</h1>
@@ -367,7 +367,7 @@ export const Reports = () => {
                                                 dataKey="amount"
                                                 stroke="#024dae"
                                                 strokeWidth={3}
-                                                dot={{ fill: "#5cdee5", strokeWidth: 2, r: 4 }}
+                                                dot={{ fill: "#3089FD", strokeWidth: 2, r: 4 }}
                                             />
                                         </LineChart>
                                     </ChartContainer>
@@ -449,7 +449,7 @@ export const Reports = () => {
                                                     <div className="text-lg font-bold text-[#024dae]">{item.percentage}%</div>
                                                     <div className="text-xs text-gray-500">Impacto</div>
                                                 </div>
-                                                <Badge variant="secondary" className="bg-gradient-to-r from-[#024dae] to-[#5cdee5] text-white">
+                                                <Badge variant="secondary" className="bg-gradient-to-r from-[#024dae] to-[#3089FD] text-white">
                                                     #{index + 1}
                                                 </Badge>
                                             </div>

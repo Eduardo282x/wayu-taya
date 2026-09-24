@@ -10,7 +10,6 @@ import { UsersContent, IUsers, UsersBody, RolesContent } from "@/services/users/
 import { FilterComponent } from "@/components/table/FilterComponent";
 import { usersColumns } from "./user.data";
 import { deleteUsers, getRoles, getUsers, postUsers, putUsers } from "@/services/users/user.service";
-import { ScreenLoader } from "@/components/loaders/ScreenLoader";
 import PageTransitionComponent from "@/components/PageTransition";
 
 export const Users = () => {
@@ -89,11 +88,8 @@ export const Users = () => {
 
   return (
     <div className='px-3 lg:p-0 h-full flex flex-col'>
-      {loading && (
-        <ScreenLoader />
-      )}
       <PageTransitionComponent toggle={open}>
-        <div className="h-full overflow-auto">
+        <div className="h-full flex flex-col min-h-0">
           <HeaderPages title="Usuarios" Icon={PiUsersThree} />
 
           <div className="flex justify-end items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
@@ -115,11 +111,12 @@ export const Users = () => {
             </div>
           </div>
 
-          <div className="mt-1 lg:mt-4 ">
+          <div className="mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
             <TableComponents
               data={users.users}
               column={usersColumns}
               actionTable={getActionTable}
+              loading={loading}
             />
           </div>
 

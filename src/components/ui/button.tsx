@@ -13,7 +13,7 @@ const buttonVariants = cva(
         noDefault:
           "cursor-pointer text-primary-foreground shadow-xs",
         default:
-          "bg-linear-to-r from-[#024dae] to-[#5cdee5] cursor-pointer text-primary-foreground shadow-xs",
+          "bg-linear-to-r from-[#024dae] to-[#3089FD] cursor-pointer text-primary-foreground shadow-xs",
         destructive:
           "bg-destructive/85 text-white shadow-xs hover:bg-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 cursor-pointer",
         outline:
@@ -31,11 +31,11 @@ const buttonVariants = cva(
         delete:
           "flex justify-center items-center gap-2 bg-[#f44336] text-white hover:bg-red-600 cursor-pointer",
         animated:
-          'bg-linear-to-r from-blue-800 to-[#5cdee5] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200',
+          'bg-linear-to-r from-blue-800 to-[#3089FD] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200',
         animatedNormal:
           'cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200',
         animated_old:
-          'bg-linear-to-r from-blue-800 to-[#5cdee5] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] '
+          'bg-linear-to-r from-blue-800 to-[#3089FD] cursor-pointer text-primary-foreground text-[1rem] hover:-translate-y-[0.2rem] transition-transform duration-200 drop-shadow-xl drop-shadow-[#a5b4c2] '
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

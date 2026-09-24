@@ -6,7 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 export const Layout = () => {
 
     return (
-        <div className=' w-screen h-screen overflow-hidden bg-linear-to-r from-[#024dae] to-[#5cdee5] flex items-center justify-around'>
+        <div className=' w-screen h-screen overflow-hidden bg-linear-to-r from-[#024dae] to-[#3089FD] flex items-center justify-around'>
             <TooltipProvider>
                 <div className='hidden lg:block w-[15%] mr-2 h-screen'>
                     <Sidebar />

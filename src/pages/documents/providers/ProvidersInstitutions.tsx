@@ -134,7 +134,7 @@ export const ProvidersInstitutions = () => {
 	return (
 		<div className='px-3 lg:p-0 h-full flex flex-col'>
 			<PageTransitionComponent toggle={openProvider || openInstitution}>
-				<div className="h-full overflow-auto">
+				<div className="h-full flex flex-col min-h-0">
 					<HeaderPages title={currentView === "provider" ? "Proveedores" : "Instituciones"} Icon={FaUserTie} />
 
 					<div className="flex justify-between items-center px-2 pb-2 pt-1 h-fit border-b-2 border-gray-300">
@@ -180,7 +180,7 @@ export const ProvidersInstitutions = () => {
 						</div>
 					</div>
 
-					<div className="mt-1 lg:mt-4 ">
+					<div className="mt-1 lg:mt-4 flex-1 min-h-0 flex flex-col">
 						{currentView == 'provider' && (
 							<TableComponents
 								data={filteredProviders}
