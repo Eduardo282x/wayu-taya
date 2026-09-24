@@ -16,6 +16,14 @@ import { Column } from "@/components/table/table.interface"
 import { DialogUploadFile, DialogViewFile } from "./documentDialogs"
 import { ContentType } from "./documents.data"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import {
+  StyledDialog,
+  StyledDialogContent,
+  StyledDialogHeader,
+  StyledDialogTitle,
+  StyledDialogDescription,
+  StyledDialogFooter,
+} from "../../../components/StyledDialog/StyledDialog"
 
 type ViewMode = "list" | "grid"
 type FilterType = "png" | "doc" | "pdf" | null
@@ -343,7 +351,7 @@ export const Documents = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto bg-white rounded-xl overflow-hidden shadow-lg h-auto">
+    <div className="w-[98%] mx-auto bg-white rounded-xl overflow-hidden shadow-lg h-auto">
       {loading && <ScreenLoader />}
       <div className="flex items-center justify-between p-4 bg-linear-to-r from-blue-600 to-blue-500 text-white">
         <div className="flex items-center gap-2">
@@ -533,47 +541,101 @@ export const Documents = () => {
 
 type DocumentDownload = 'adult' | 'legalRepresentative';
 
+interface Preview {
+  url: string;
+  label: string;
+}
+
 const DropdownMenuDownload = () => {
+  const [downloading, setDownloading] = useState<DocumentDownload | null>(null);
+  const [preview, setPreview] = useState<Preview | null>(null);
 
   const downloadFilePDF = async (type: DocumentDownload) => {
-    let response;
-    if (type == 'adult') {
-      response = await getDocumentAdult();
+    setDownloading(type);
+    try {
+      let response;
+      if (type == 'adult') {
+        response = await getDocumentAdult();
+      }
+
+      if (type == 'legalRepresentative') {
+        response = await getDocumentLegalRepresentative();
+      }
+
+      const parseName = type === 'adult' ? 'Formato Adulto' : 'Formato Representante Legal';
+
+      if (preview) {
+        URL.revokeObjectURL(preview.url);
+      }
+      const url = URL.createObjectURL(response)
+      setPreview({ url, label: `Documento de uso de imagen ${parseName}.pdf` });
+    } finally {
+      setDownloading(null);
     }
+  }
 
-    if (type == 'legalRepresentative') {
-      response = await getDocumentLegalRepresentative();
-    }
-
-    const parseName = type === 'adult' ? 'Formato Adulto' : 'Formato Representante Legal';
-
-    const url = URL.createObjectURL(response)
+  const handleDownload = () => {
+    if (!preview) return;
     const link = window.document.createElement("a")
-    link.href = url
-    link.download = `Documento de uso de imagen ${parseName}.pdf`;
+    link.href = preview.url
+    link.download = preview.label;
     window.document.body.appendChild(link)
     link.click()
     window.document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+  }
+
+  const handleClosePreview = () => {
+    if (preview) {
+      URL.revokeObjectURL(preview.url);
+      setPreview(null);
+    }
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="border">
-          <Download size={16} />
-          Descargar formato
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => downloadFilePDF('adult')}>
-          Formato Adulto
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => downloadFilePDF('legalRepresentative')}>
-          Formato Representante Legal
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      {downloading !== null && <ScreenLoader />}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="border" disabled={downloading !== null}>
+            <Download size={16} />
+            Descargar formato
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem disabled={downloading !== null} onClick={() => downloadFilePDF('adult')}>
+            {downloading === 'adult' ? 'Descargando...' : 'Formato Adulto'}
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={downloading !== null} onClick={() => downloadFilePDF('legalRepresentative')}>
+            {downloading === 'legalRepresentative' ? 'Descargando...' : 'Formato Representante Legal'}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <StyledDialog open={preview !== null} onOpenChange={(openDialog) => { if (!openDialog) handleClosePreview(); }}>
+        <StyledDialogContent className="sm:max-w-4xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-hidden bg-gray-100">
+          <StyledDialogHeader>
+            <StyledDialogTitle>Vista previa del documento</StyledDialogTitle>
+            <StyledDialogDescription>{preview?.label}</StyledDialogDescription>
+          </StyledDialogHeader>
+          <div className="flex-1 min-h-0 bg-white rounded-md border overflow-hidden">
+            <iframe
+              src={preview?.url}
+              title={preview?.label}
+              className="w-full h-[65vh]"
+            />
+          </div>
+          <StyledDialogFooter>
+            <Button variant="outline" className="border-[#0250b0] text-[#0250b0]" onClick={handleClosePreview}>
+              Cerrar
+            </Button>
+            <Button className="bg-[#0250b0] hover:bg-[#0250b0]" onClick={handleDownload}>
+              <Download size={16} />
+              Descargar
+            </Button>
+          </StyledDialogFooter>
+        </StyledDialogContent>
+      </StyledDialog>
+    </>
   )
 }
 

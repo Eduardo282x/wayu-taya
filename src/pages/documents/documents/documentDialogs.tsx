@@ -63,7 +63,7 @@ export const DialogUploadFile = ({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-2xl bg-gray-200">
                 <DialogHeader>
                     <DialogTitle>Subir nuevo documento</DialogTitle>
                     <DialogDescription>Arrastra y suelta un archivo o haz clic para seleccionar</DialogDescription>

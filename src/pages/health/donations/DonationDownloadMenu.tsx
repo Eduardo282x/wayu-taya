@@ -8,6 +8,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  StyledDialog,
+  StyledDialogContent,
+  StyledDialogHeader,
+  StyledDialogTitle,
+  StyledDialogDescription,
+  StyledDialogFooter,
+} from "@/components/StyledDialog/StyledDialog"
 import { getDonationsCertificateDownload, getDonationsNormalDownloadReport, getDonationsNoteDeliveryDownload } from "@/services/donations/donations.service"
 
 interface DonationDownloadMenuProps {
@@ -17,9 +25,15 @@ interface DonationDownloadMenuProps {
 
 type DownloadType = 'factura' | 'nota' | 'certificado';
 
+interface Preview {
+  url: string;
+  label: string;
+}
+
 export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDownloadMenuProps) => {
   const [downloading, setDownloading] = useState<DownloadType | null>(null);
   const [open, setOpen] = useState<boolean>(false);
+  const [preview, setPreview] = useState<Preview | null>(null);
 
   const labels: Record<DownloadType, string> = {
     factura: 'Factura no comercial',
@@ -27,7 +41,7 @@ export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDown
     certificado: 'Certificado de donación',
   };
 
-  const downloadFile = async (type: DownloadType) => {
+  const fetchFile = async (type: DownloadType) => {
     setDownloading(type);
     try {
       let response;
@@ -42,17 +56,31 @@ export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDown
           response = await getDonationsCertificateDownload(donationId);
           break;
       };
+      if (preview) {
+        URL.revokeObjectURL(preview.url);
+      }
       const url = URL.createObjectURL(response);
-      const link = window.document.createElement("a");
-      link.href = url;
-      link.download = `${labels[type]} - ${controlNumber}`;
-      window.document.body.appendChild(link);
-      link.click();
-      window.document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      setPreview({ url, label: `${labels[type]} - ${controlNumber}` });
     } finally {
       setDownloading(null);
       setOpen(false);
+    }
+  }
+
+  const handleDownload = () => {
+    if (!preview) return;
+    const link = window.document.createElement("a");
+    link.href = preview.url;
+    link.download = preview.label;
+    window.document.body.appendChild(link);
+    link.click();
+    window.document.body.removeChild(link);
+  }
+
+  const handleClosePreview = () => {
+    if (preview) {
+      URL.revokeObjectURL(preview.url);
+      setPreview(null);
     }
   }
 
@@ -67,17 +95,42 @@ export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDown
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem disabled={downloading !== null} onClick={() => downloadFile('factura')}>
+        <DropdownMenuItem disabled={downloading !== null} onClick={() => fetchFile('factura')}>
           {downloading === 'factura' ? 'Descargando...' : 'Factura no comercial'}
         </DropdownMenuItem>
-        <DropdownMenuItem disabled={downloading !== null} onClick={() => downloadFile('nota')}>
+        <DropdownMenuItem disabled={downloading !== null} onClick={() => fetchFile('nota')}>
           {downloading === 'nota' ? 'Descargando...' : 'Nota de entrega'}
         </DropdownMenuItem>
-        <DropdownMenuItem disabled={downloading !== null} onClick={() => downloadFile('certificado')}>
+        <DropdownMenuItem disabled={downloading !== null} onClick={() => fetchFile('certificado')}>
           {downloading === 'certificado' ? 'Descargando...' : 'Certificado de donación'}
         </DropdownMenuItem>
       </DropdownMenuContent>
       </DropdownMenu>
+
+      <StyledDialog open={preview !== null} onOpenChange={(openDialog) => { if (!openDialog) handleClosePreview(); }}>
+        <StyledDialogContent className="sm:max-w-4xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-hidden bg-gray-100">
+          <StyledDialogHeader>
+            <StyledDialogTitle>Vista previa del documento</StyledDialogTitle>
+            <StyledDialogDescription>{preview?.label}</StyledDialogDescription>
+          </StyledDialogHeader>
+          <div className="flex-1 min-h-0 bg-white rounded-md border overflow-hidden">
+            <iframe
+              src={preview?.url}
+              title={preview?.label}
+              className="w-full h-[65vh]"
+            />
+          </div>
+          <StyledDialogFooter>
+            <Button variant="outline" className="border-[#0250b0] text-[#0250b0]" onClick={handleClosePreview}>
+              Cerrar
+            </Button>
+            <Button className="bg-[#0250b0] hover:bg-[#0250b0]" onClick={handleDownload}>
+              <Download size={16} />
+              Descargar
+            </Button>
+          </StyledDialogFooter>
+        </StyledDialogContent>
+      </StyledDialog>
     </>
   )
 }
