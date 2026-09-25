@@ -1,9 +1,11 @@
+import { createPortal } from "react-dom"
 import { Loading } from "./Loading"
 
 export const ScreenLoader = () => {
-    return (
-        <div className=' bg-gray-800 opacity-80 absolute top-0 left-0 z-50 w-screen h-screen overflow-hidden flex items-center justify-center'>
+    return createPortal(
+        <div className='fixed inset-0 z-[100] bg-gray-800 opacity-80 overflow-hidden flex items-center justify-center'>
             <Loading></Loading>
-        </div>
+        </div>,
+        document.body
     )
 }

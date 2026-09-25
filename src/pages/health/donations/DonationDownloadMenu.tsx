@@ -1,4 +1,5 @@
 import { useState } from "react"
+import toast from "react-hot-toast"
 import { Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
@@ -56,11 +57,23 @@ export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDown
           response = await getDonationsCertificateDownload(donationId);
           break;
       };
+      if (!response || response.size === 0) {
+        toast.error(`No se pudo generar ${labels[type]}. Intenta de nuevo.`, {
+          duration: 4000,
+          position: 'top-right'
+        });
+        return;
+      }
       if (preview) {
         URL.revokeObjectURL(preview.url);
       }
       const url = URL.createObjectURL(response);
       setPreview({ url, label: `${labels[type]} - ${controlNumber}` });
+    } catch {
+      toast.error(`No se pudo generar ${labels[type]}. Intenta de nuevo.`, {
+        duration: 4000,
+        position: 'top-right'
+      });
     } finally {
       setDownloading(null);
       setOpen(false);
@@ -87,6 +100,7 @@ export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDown
   return (
     <>
       {downloading !== null && <ScreenLoader />}
+      <div onClick={(event) => event.stopPropagation()}>
       <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="border border-[#0250b0] text-[#0250b0]">
@@ -106,6 +120,7 @@ export const DonationDownloadMenu = ({ donationId, controlNumber }: DonationDown
         </DropdownMenuItem>
       </DropdownMenuContent>
       </DropdownMenu>
+      </div>
 
       <StyledDialog open={preview !== null} onOpenChange={(openDialog) => { if (!openDialog) handleClosePreview(); }}>
         <StyledDialogContent className="sm:max-w-4xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-hidden bg-gray-100">
