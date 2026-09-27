@@ -1,6 +1,7 @@
 import { Check, ChevronsUpDown, Plus, SearchIcon } from "lucide-react"
 import { FC, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
 interface AutoCompleteProps {
@@ -15,9 +16,21 @@ interface AutoCompleteProps {
   dataSelected?: string[]
   appendTo?: "body" | HTMLElement | null
   freeText?: boolean
+  disabled?: boolean
+  /**
+   * Dibuja el desplegable ENCIMA del contenido en vez de empujarlo.
+   *
+   * Es la alternativa a `appendTo` cuando el autocomplete vive dentro de un
+   * dialogo modal: alli no se puede portalizar a `body`, porque Radix le pone
+   * `pointer-events: none` al body y solo se lo reactiva al DialogContent, y
+   * porque ademas un clic fuera de la capa cerraria el modal. Posicionandolo
+   * en `absolute` dentro de su propio contenedor `relative` se consigue el
+   * mismo efecto visual sin portalizar.
+   */
+  overlay?: boolean
 }
 
-export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo, freeText }) => {
+export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo, freeText, disabled, overlay }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string | number>(valueDefault ? valueDefault : "");
   const [inputValue, setInputValue] = useState<string>("");
@@ -107,7 +120,10 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
   const dropdownContent = (
     <div
       ref={menuRef}
-      className="border rounded-lg overflow-hidden animationOpacity !z-[100000000] bg-white"
+      className={cn(
+        "border rounded-lg overflow-hidden animationOpacity !z-[100000000] bg-white",
+        overlay && "absolute left-0 top-full"
+      )}
       style={appendTo ? {
         position: "fixed",
         top: menuPosition.top,
@@ -175,6 +191,7 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
           type="button"
           className="w-full justify-between overflow-hidden"
           onClick={() => setOpen(!open)}
+          disabled={disabled}
         >
           <span className="-ml-2">
             {value

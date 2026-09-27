@@ -54,12 +54,17 @@ export const institutionColumns: Column[] = [
         isIcon: false,
         element: (data: IInstitution) => data.email,
     },
+    // Descomentar cuando se quiera la parroquia en la tabla. Antes apuntaba a
+    // `parish.name`, que dejo de existir al migrar a `location`.
+    // Ojo: el `FilterComponent` resuelve rutas planas, asi que una columna con
+    // punto se veria pero no se filtraria. Para que filtre habria que aplanar
+    // `location` en la respuesta o adaptar el filtrado.
     {
         label: "Parroquia",
-        column: "parish.name",
+        column: "location.parish",
         visible: true,
         isIcon: false,
-        element: (data: IInstitution) => data.parish.name,
+        element: (data: IInstitution) => data.location?.parish ?? "",
     },
     {
         label: "Editar",

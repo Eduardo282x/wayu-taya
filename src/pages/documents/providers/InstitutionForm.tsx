@@ -1,23 +1,26 @@
-import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { IInstitution, InstitutionsBody, IParish } from "@/services/institution/institution.interface"
-import { useEffect } from "react"
+import { DialogLocation } from "@/components/dialog-location/Dialog-Location"
+import { formatLocation } from "@/components/dialog-location/location.data"
+import { IInstitution, InstitutionsBody, Location } from "@/services/institution/institution.interface"
+import { useEffect, useMemo, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { FaRegSave, FaArrowLeft, FaSpinner } from "react-icons/fa"
+import { FaMapMarkerAlt, FaRegSave, FaArrowLeft, FaSpinner } from "react-icons/fa"
 import { TiUserAddOutline } from "react-icons/ti"
+
+const EMPTY_LOCATION: Location = { state: "", town: "", parish: "" };
 
 interface InstitutionFormProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onSubmit: (institution: InstitutionsBody) => void
     institution: IInstitution | null;
-    parish: IParish[]
     isSubmitting?: boolean
 }
-export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, parish, isSubmitting = false }: InstitutionFormProps) => {
+export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, isSubmitting = false }: InstitutionFormProps) => {
     const isEdit = !!institution;
+    const [isLocationOpen, setIsLocationOpen] = useState<boolean>(false);
 
     const { register, handleSubmit, reset, watch, setValue, formState: { errors }, control } = useForm<InstitutionsBody>({
         defaultValues: {
@@ -29,7 +32,7 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
             phone: '',
             email: '',
             type: '',
-            parishId: 0,
+            location: { ...EMPTY_LOCATION },
         }
     })
 
@@ -45,7 +48,11 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 responsible: institution.responsible,
                 phone: institution.phone,
                 type: institution.type,
-                parishId: institution.parishId,
+                // `location` es una columna Json: las filas anteriores a la
+                // migracion pueden traerla nula o incompleta, y el backend la
+                // exige con los tres niveles. En ese caso se deja vacia para
+                // que el usuario la elija antes de guardar.
+                location: institution.location ?? { ...EMPTY_LOCATION },
             }
             reset(institutionData)
         } else {
@@ -57,13 +64,47 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 email: '',
                 phone: '',
                 type: '',
-                parishId: 0,
+                location: { ...EMPTY_LOCATION },
             }
             reset(baseData)
         }
     }, [open, institution, reset])
 
+    const watchedLocation = watch("location");
+
+    // Identidad estable: el dialogo reinicia su cascada cada vez que cambia la
+    // referencia de `value`, y `watch` puede devolver un objeto nuevo en cada
+    // render.
+    const dialogLocation = useMemo<Location>(
+        () => ({
+            state: watchedLocation?.state ?? "",
+            town: watchedLocation?.town ?? "",
+            parish: watchedLocation?.parish ?? "",
+        }),
+        [watchedLocation?.state, watchedLocation?.town, watchedLocation?.parish]
+    );
+
+    /**
+     * El dialogo aporta los tres niveles de la ubicacion. Se escriben hoja por
+     * hoja porque son las rutas que estan registradas con `required`: asi el
+     * submit se bloquea aqui y no con un 400 del backend.
+     */
+    const handleLocationConfirm = (value: Location) => {
+        setValue("location.state", value.state, { shouldValidate: true, shouldDirty: true });
+        setValue("location.town", value.town, { shouldValidate: true, shouldDirty: true });
+        setValue("location.parish", value.parish, { shouldValidate: true, shouldDirty: true });
+        setIsLocationOpen(false);
+    };
+
+    const locationCompleta = !!dialogLocation.state && !!dialogLocation.town && !!dialogLocation.parish;
+
+    const locationError =
+        errors.location?.state?.message
+        ?? errors.location?.town?.message
+        ?? errors.location?.parish?.message;
+
     return (
+        <>
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
                 <div>
@@ -130,17 +171,6 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
 
                 <div>
                     <FormInputCustom
-                        label="Dirección"
-                        id="address"
-                        {...register("address", {
-                            required: "La dirección es obligatoria",
-                        })}
-                        error={errors.address?.message}
-                    />
-                </div>
-
-                <div>
-                    <FormInputCustom
                         label="Correo"
                         id="correo"
                         type="email"
@@ -191,14 +221,49 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                     )}
                 />
 
-                <FormAutocompleteV2
-                    // data={parish.map(ca => ({ label: `${ca.name} - ${ca.town.name} - Edo. ${ca.town.city.state.name}`, value: ca.id.toString() }))}
-                    data={parish.map(ca => ({ label: `${ca.name}`, value: ca.id.toString() }))}
-                    label={"Parroquia"}
-                    valueDefault={watch('parishId')}
-                    placeholder={"Seleccionar una parroquia"}
-                    onChange={(value) => setValue('parishId', Number(value))}
-                />
+                {/* La ubicacion no tiene un control visible propio: la elige el
+                    dialogo. Estos tres campos ocultos existen para que RHF
+                    registre cada nivel con `required`, que es lo que bloquea el
+                    submit cuando falta alguno. */}
+                <input type="hidden" {...register("location.state", { required: "Selecciona el estado" })} />
+                <input type="hidden" {...register("location.town", { required: "Selecciona el municipio" })} />
+                <input type="hidden" {...register("location.parish", { required: "Selecciona la parroquia" })} />
+
+                <div className="col-span-3">
+                    <FormInputCustom
+                        label="Dirección"
+                        id="address"
+                        multiline
+                        rows={3}
+                        placeholder="urb buena vista, calle #21"
+                        {...register("address", {
+                            required: "La dirección es obligatoria",
+                        })}
+                        error={errors.address?.message}
+                    />
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setIsLocationOpen(true)}
+                            className="gap-2 text-[0.8rem]"
+                        >
+                            <FaMapMarkerAlt /> Seleccionar parroquia
+                        </Button>
+                        {locationCompleta ? (
+                            <p className="text-xs text-gray-500 manrope">
+                                {formatLocation(dialogLocation)}
+                            </p>
+                        ) : (
+                            <p className="text-xs text-gray-500 manrope">
+                                Añade el estado, el municipio y la parroquia de la institución.
+                            </p>
+                        )}
+                    </div>
+                    {locationError && (
+                        <p className="text-red-500 text-xs mt-1">{locationError}</p>
+                    )}
+                </div>
 
                 <div className="col-span-3 flex items-center justify-center pt-4">
                     <Button
@@ -224,5 +289,13 @@ export const InstitutionForm = ({ open, onOpenChange, onSubmit, institution, par
                 </div>
             </form>
         </div>
+
+        <DialogLocation
+            open={isLocationOpen}
+            onOpenChange={setIsLocationOpen}
+            onConfirm={handleLocationConfirm}
+            value={dialogLocation}
+        />
+        </>
     )
 }

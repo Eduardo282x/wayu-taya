@@ -1,8 +1,8 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ProviderBody, ProvidersQueryParams, PaginatedProvidersContent, ProvidersContent } from "@/services/provider/provider.interface"
 import { deleteProviders, getProviders, getProvidersPage, postProviders, putProviders } from "@/services/provider/provider.service"
-import { InstitutionsBody, InstitutionsQueryParams, PaginatedInstitutionsContent, ParishContent, InstitutionContent } from "@/services/institution/institution.interface"
-import { deleteInstitutions, getInstitutions, getInstitutionsPage, getParish, postInstitutions, putInstitutions } from "@/services/institution/institution.service"
+import { InstitutionsBody, InstitutionsQueryParams, PaginatedInstitutionsContent, InstitutionContent } from "@/services/institution/institution.interface"
+import { deleteInstitutions, getInstitutions, getInstitutionsPage, postInstitutions, putInstitutions } from "@/services/institution/institution.service"
 import { useProvidersStore } from "./providersStore"
 import { useIsAuthenticated } from "@/store/auth.store"
 
@@ -16,10 +16,6 @@ export const institutionsKeys = {
     all: ["institutions"] as const,
     allList: ["institutions", "all"] as const,
     list: (params: InstitutionsQueryParams) => ["institutions", "list", params] as const,
-}
-
-export const parishKeys = {
-    all: ["parish"] as const,
 }
 
 export const useProvidersQuery = () => {
@@ -47,19 +43,6 @@ export const useInstitutionsQuery = () => {
         enabled: isAuthenticated,
         placeholderData: keepPreviousData,
         select: (data: PaginatedInstitutionsContent) => data,
-    })
-}
-
-export const useParishQuery = () => {
-    const isAuthenticated = useIsAuthenticated()
-
-    return useQuery({
-        queryKey: parishKeys.all,
-        queryFn: getParish,
-        enabled: isAuthenticated,
-        select: (data: ParishContent) => data,
-        staleTime: Infinity,
-        gcTime: Infinity,
     })
 }
 

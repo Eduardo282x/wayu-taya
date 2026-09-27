@@ -15,6 +15,9 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   error?: string;
   required?: boolean;
+  /** Renderiza un `textarea` en vez de un `input`. Para direcciones o notas largas. */
+  multiline?: boolean;
+  rows?: number;
 }
 
 const FormInputCustom: React.FC<FormInputProps> = ({
@@ -27,6 +30,8 @@ const FormInputCustom: React.FC<FormInputProps> = ({
   type,
   className,
   required = true,
+  multiline = false,
+  rows = 3,
   ...inputProps
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -51,6 +56,14 @@ const FormInputCustom: React.FC<FormInputProps> = ({
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(event);
     (inputProps as { onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void }).onChange?.(event);
+  };
+
+  // El cast es seguro: RHF y los handlers de este componente solo leen
+  // `event.target` (name, value, type), igual en un input que en un textarea.
+  const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const compatible = event as unknown as React.ChangeEvent<HTMLInputElement>;
+    onChange?.(compatible);
+    (inputProps as { onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void }).onChange?.(compatible);
   };
 
   const handleDateSelect = (date?: Date) => {
@@ -137,6 +150,18 @@ const FormInputCustom: React.FC<FormInputProps> = ({
             {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
           </button>
         </div>
+      ) : multiline ? (
+        <textarea
+          id={id}
+          className={cn(
+            "w-full rounded-md focus:outline-1 focus:outline-blue-800 px-3 py-1 bg-white border resize-y",
+            className
+          )}
+          {...(inputProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+          rows={rows}
+          value={typeof value === "string" || typeof value === "number" ? value : (inputProps as { value?: string }).value}
+          onChange={handleTextareaChange}
+        />
       ) : (
         <input
           id={id}

@@ -14,10 +14,9 @@ import { institutionColumns, providerColumns } from "./providerInstitution.data"
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import PageTransitionComponent from "@/components/PageTransition";
 import {
-  useProvidersQuery,
-  useInstitutionsQuery,
-  useParishQuery,
-  useCreateProviderMutation,
+	useProvidersQuery,
+	useInstitutionsQuery,
+	useCreateProviderMutation,
   useUpdateProviderMutation,
   useDeleteProviderMutation,
   useCreateInstitutionMutation,
@@ -46,7 +45,6 @@ export const ProvidersInstitutions = () => {
 	} = useProvidersStore();
 	const { data: providersData, isFetching: providersIsFetching } = useProvidersQuery();
 	const { data: institutionsData, isFetching: institutionsIsFetching } = useInstitutionsQuery();
-	const { data: parishData } = useParishQuery();
 	const createProvider = useCreateProviderMutation();
 	const updateProvider = useUpdateProviderMutation();
 	const deleteProvider = useDeleteProviderMutation();
@@ -235,7 +233,6 @@ export const ProvidersInstitutions = () => {
 							onOpenChange={setOpenInstitution}
 							institution={institutionSelected}
 							onSubmit={getActionForm}
-							parish={parishData?.parishes ?? []}
 							isSubmitting={isSaving}
 						/>
 					</div>
