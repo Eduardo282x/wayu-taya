@@ -16,6 +16,8 @@ import { Column } from "@/components/table/table.interface"
 import { DialogUploadFile, DialogViewFile } from "./documentDialogs"
 import { ContentType } from "./documents.data"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
+import { apiMessage } from "@/services/api-error"
+import { getFileExtension, validateUploadFile } from "@/lib/upload"
 import {
   StyledDialog,
   StyledDialogContent,
@@ -45,6 +47,8 @@ export const Documents = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [selectedContent, setSelectedContent] = useState<ContentType>("personas")
   const [selectedDescription, setSelectedDescription] = useState("")
+  /** Error de la validacion local del archivo o del upload. */
+  const [uploadError, setUploadError] = useState("")
 
   const [isViewOpen, setIsViewOpen] = useState(false)
   // const [isEditOpen, setIsEditOpen] = useState(false)
@@ -242,22 +246,58 @@ export const Documents = () => {
     }
   }
 
+  /**
+   * Un solo archivo por documento (lo que espera el endpoint) y solo si pasa
+   * los limites del backend. Antes se aceptaba lo que fuera y el rechazo
+   * llegaba tras subir el binario entero.
+   */
+  const selectFile = (file: File) => {
+    const error = validateUploadFile(file);
+
+    if (error) {
+      setUploadedFile(null);
+      setUploadError(error);
+      return;
+    }
+
+    setUploadError("");
+    setUploadedFile(file);
+  }
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0]
-      setUploadedFile(file)
+    const files = e.dataTransfer.files;
+
+    if (!files || files.length === 0) return;
+
+    if (files.length > 1) {
+      setUploadedFile(null);
+      setUploadError("Solo se puede subir un archivo por documento.");
+      return;
     }
+
+    selectFile(files[0])
   }
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      setUploadedFile(file)
+    const files = e.target.files;
+
+    if (!files || files.length === 0) return;
+
+    if (files.length > 1) {
+      setUploadedFile(null);
+      setUploadError("Solo se puede subir un archivo por documento.");
+      return;
     }
+
+    selectFile(files[0])
+
+    // Se limpia el input para que elegir el MISMO archivo otra vez vuelve a
+    // disparar el change.
+    e.target.value = "";
   }
 
   const openEditModal = (document: IDocument) => {
@@ -310,14 +350,19 @@ export const Documents = () => {
     console.log(data);
   }
 
-  const getFileExtension = (fileName: string): string => {
-    return fileName.split('.').pop()?.toLowerCase() || '';
-  };
-
-
   const handleSaveFile = async () => {
     if (!uploadedFile) return;
+
+    // Se revalida en el envio: el archivo pudo haber cambiado entre la
+    // seleccion y el guardado.
+    const invalid = validateUploadFile(uploadedFile);
+    if (invalid) {
+      setUploadError(invalid);
+      return;
+    }
+
     setLoading(true);
+    setUploadError("");
 
     const extension = getFileExtension(uploadedFile.name);
 
@@ -337,17 +382,28 @@ export const Documents = () => {
     formData.append('description', newDocument.description);
     formData.append('content', newDocument.content);
 
-    await uploadFileDocument(formData);
+    const response = await uploadFileDocument(formData);
+
+    // El servicio devuelve el sobre en vez de lanzar: sin esta comprobacion el
+    // dialogo se cerraba aunque la API hubiera rechazado el archivo.
+    if (!response.success) {
+      setUploadError(apiMessage(response, "No se pudo subir el archivo"));
+      setLoading(false);
+      return;
+    }
 
     setUploadedFile(null)
     setSelectedContent("personas")
     setSelectedDescription("")
+    setUploadError("")
     setIsUploadOpen(false);
+    setLoading(false);
     await getDocumentApi();
   }
 
   const removeUploadedFile = () => {
     setUploadedFile(null)
+    setUploadError("")
   }
 
   return (
@@ -533,6 +589,7 @@ export const Documents = () => {
         setSelectedContent={setSelectedContent}
         removeUploadedFile={removeUploadedFile}
         handleSaveFile={handleSaveFile}
+        uploadError={uploadError}
       />
 
     </div>

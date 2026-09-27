@@ -8,6 +8,10 @@ import { formatDate } from "@/utils/formatters"
 import { Download, Eye, FileIcon, Upload, X } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { ContentType } from "./documents.data"
+import { ALLOWED_EXTENSIONS } from "@/lib/upload"
+
+/** `accept` del input: misma lista que valida el `fileFilter` del backend. */
+const ALLOWED_ACCEPT = [...ALLOWED_EXTENSIONS].join(",")
 
 interface DialogProps {
     open: boolean;
@@ -43,6 +47,8 @@ interface DialogUploadFileProps extends DialogProps {
     setSelectedContent: (description: ContentType) => void;
     removeUploadedFile: () => void;
     handleSaveFile: () => void;
+    /** Error de la validacion local del archivo o del rechazo de la API. */
+    uploadError?: string;
 }
 
 export const DialogUploadFile = ({
@@ -59,6 +65,7 @@ export const DialogUploadFile = ({
     dragActive,
     removeUploadedFile,
     handleSaveFile,
+    uploadError = "",
 }: DialogUploadFileProps) => {
 
     return (
@@ -85,7 +92,7 @@ export const DialogUploadFile = ({
                             type="file"
                             className="hidden"
                             id="file-upload"
-                            accept=".pdf,.png,.jpg,.jpeg,.docx,.doc"
+                            accept={ALLOWED_ACCEPT}
                             onChange={handleFileInput}
                         />
                         <Label
@@ -95,6 +102,17 @@ export const DialogUploadFile = ({
                             Seleccionar archivo
                         </Label>
                     </div>
+
+                    {/* Mismo conjunto de extensiones que valida el backend. */}
+                    <p className="text-xs text-gray-600 manrope -mt-2">
+                        Un archivo por documento. Se aceptan PDF, PNG, JPG, WEBP, DOC, DOCX y XLSX, hasta 10 MB.
+                    </p>
+
+                    {uploadError && (
+                        <p className="text-sm text-red-600 manrope" role="alert">
+                            {uploadError}
+                        </p>
+                    )}
 
                     <div className="space-y-2">
                         <Label className="text-sm font-medium text-gray-700">Tipo de contenido</Label>

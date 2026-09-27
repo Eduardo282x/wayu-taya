@@ -18,16 +18,24 @@ import { IoBuildOutline } from 'react-icons/io5';
 import { ArrowUpRight, LayoutGrid } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Snackbar } from '@/components/snackbar/Snackbar';
-import { useAuthStore } from '@/store/auth.store';
+import { useAuthStore, useRol, useUser } from '@/store/auth.store';
+import { canManageUsers } from '@/lib/roles';
 import { CategoryCardProps, optionsMenu } from '@/pages/home/menu.data';
 
 export const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const user = useAuthStore((state) => state.user);
+    const user = useUser();
+    const rol = useRol();
     const logoutStore = useAuthStore((state) => state.logout);
     const [menuData, setMenuData] = useState<IMenuSection[]>([{ items: menu }]);
     const [currentModule, setCurrentModule] = useState<string>('Aplicaciones');
+
+    /** /usuarios solo existe para Super Admin y Administrador. */
+    const isVisibleMenuItem = (item: IMenu): boolean => {
+        if (item.url === '/usuarios') return canManageUsers(rol);
+        return true;
+    };
 
     useEffect(() => {
         const getMenuLocalStorage: Sections = localStorage.getItem('menu') as Sections;
@@ -73,7 +81,7 @@ export const Sidebar = () => {
 
     const nameUser = (): string => {
         if (!user) {
-            return 'Administrador';
+            return 'Cuenta';
         }
         return `${user.name} ${user.lastName}`;
     }
@@ -81,9 +89,9 @@ export const Sidebar = () => {
     const goProfile = () => {
         navigate('/perfil')
     }
-    const logout = () => {
-        logoutStore();
-        navigate('/login')
+    const logout = async () => {
+        await logoutStore();
+        navigate('/login', { replace: true })
     }
 
     const handleModuleSelect = (item: CategoryCardProps) => {
@@ -147,7 +155,7 @@ export const Sidebar = () => {
                                     {section.title}
                                 </p>
                             )}
-                            {section.items.map((me: IMenu, i: number) => (
+                            {section.items.filter(isVisibleMenuItem).map((me: IMenu, i: number) => (
                                 <div
                                     key={i}
                                     onClick={() => navigate(me.url)}

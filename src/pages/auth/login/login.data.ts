@@ -1,19 +1,19 @@
-import { z } from 'zod'
+import { z } from "zod";
 
+import { loginPasswordSchema, usernameSchema } from "@/lib/validation";
 
 export interface Login {
     username: string;
     password: string;
 }
 
+/**
+ * En el login solo se comprueba que el usuario tenga forma valida y que la
+ * contrasena no este vacia: la complejidad NO se exige aqui porque puede haber
+ * cuentas anteriores a las reglas actuales, y rechazarlas en cliente seria
+ * dejar a alguien sin poder entrar.
+ */
 export const userSchema = z.object({
-    username: z.string().min(3, {
-        message: "El usuario debe tener minimo 3 caracteres de longitud"
-    })
-        .max(30, { message: "El usuario debe tener maximo 30 caracteres de longitud" }),
-
-    password: z.string().min(4, {
-        message: "La contraseña debe tener minimo 4 caracteres de longitud"
-    })
-        .max(30, { message: "La contraseña debe tener maximo 30 caracteres de longitud" })   
+    username: usernameSchema,
+    password: loginPasswordSchema,
 });

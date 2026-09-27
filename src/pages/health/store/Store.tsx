@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MdOutlineStore } from "react-icons/md";
 import ConfirmDeleteStoreDialog from "./ConfirmDeleteStoreDialog";
 import { StoreForm } from "./StoreForm";
+import { apiMessage } from "@/services/api-error";
 import {
   useStoresQuery,
   useCreateStoreMutation,
@@ -21,6 +22,8 @@ export const Store = () => {
   const [storeSelected, setStoreSelected] = useState<IStore | null>(null);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  /** Mensaje real de la API cuando la escritura o el borrado fallan. */
+  const [actionError, setActionError] = useState("");
 
   const { data: storesData, isFetching } = useStoresQuery();
   const createStore = useCreateStoreMutation();
@@ -39,27 +42,38 @@ export const Store = () => {
   };
 
   const handleAddOrEditStoreSubmit = async (formData: StoreBody) => {
-    try {
-      if (storeSelected) {
-        await updateStore.mutateAsync({ id: storeSelected.id, data: formData });
-      } else {
-        await createStore.mutateAsync(formData);
-      }
-      setIsAddFormOpen(false);
-    } catch (error) {
-      console.error("Error al guardar el almacén:", error);
+    let response;
+
+    if (storeSelected) {
+      response = await updateStore.mutateAsync({ id: storeSelected.id, data: formData });
+    } else {
+      response = await createStore.mutateAsync(formData);
     }
+
+    // El servicio devuelve el sobre en vez de lanzar, asi que un fallo NUNCA
+    // llega al catch: sin esta comprobacion el formulario se cerraba y el
+    // usuario creia que habia guardado cuando la API lo habia rechazado.
+    if (!response.success) {
+      setActionError(apiMessage(response, "No se pudo guardar el almacén"));
+      return;
+    }
+
+    setActionError("");
+    setIsAddFormOpen(false);
   };
 
   const handleConfirmDeleteStore = async () => {
     if (storeSelected) {
-      try {
-        await deleteStore.mutateAsync(storeSelected.id);
-        setIsDeleteDialogOpen(false);
-        setStoreSelected(null);
-      } catch (error) {
-        console.error("Error al eliminar el almacén:", error);
+      const response = await deleteStore.mutateAsync(storeSelected.id);
+
+      if (!response.success) {
+        setActionError(apiMessage(response, "No se pudo eliminar el almacén"));
+        return;
       }
+
+      setActionError("");
+      setIsDeleteDialogOpen(false);
+      setStoreSelected(null);
     }
   };
 
@@ -99,6 +113,12 @@ export const Store = () => {
       </div>
 
       <div className="mx-2 mt-4">
+        {actionError && (
+          <p className="mb-2 text-sm text-red-600 manrope" role="alert">
+            {actionError}
+          </p>
+        )}
+
         <TableComponents
           column={storeColumns}
           data={filteredStores}

@@ -1,16 +1,28 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-// import { Separator } from "@/components/ui/separator"
 import { User, Mail, Edit3, Save, X, Lock } from "lucide-react"
-import { FaRegSave, FaRegUser } from "react-icons/fa"
-import { User as UserType } from "@/services/auth/auth.interfaces"
-import { baseUser } from "./profile.data"
-import { putPassword, putProfile } from "@/services/users/user.service"
+import { FaRegSave, FaRegUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa"
+import { useNavigate } from "react-router"
+import { z } from "zod"
+
+import { apiMessage, getFieldErrors } from "@/services/api-error"
+import { authChangePassword } from "@/services/auth/auth.service"
+import { clearSessionSilently } from "@/services/auth/session"
+import {
+  PASSWORD_RULES,
+  confirmPasswordSchema,
+  lastNameSchema,
+  nameSchema,
+  passwordSchema,
+  usernameSchema,
+} from "@/lib/validation"
+import { getMe, putProfile } from "@/services/users/user.service"
+import type { ProfileBody } from "@/services/users/user.interface"
 import { useAuthStore } from "@/store/auth.store"
 import {
   StyledDialog,
@@ -20,79 +32,202 @@ import {
   StyledDialogDescription,
 } from "@/components/StyledDialog/StyledDialog"
 
+type ProfileForm = ProfileBody;
+
+const emptyProfile: ProfileForm = { username: "", name: "", lastName: "" };
+
+/** Mismas reglas que el DTO del backend, aplicadas antes de gastar la peticion. */
+const profileSchema = z.object({
+  username: usernameSchema,
+  name: nameSchema,
+  lastName: lastNameSchema,
+});
+
+const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, { message: "La contraseña actual es requerida" }),
+    newPassword: passwordSchema,
+    confirmPassword: confirmPasswordSchema(),
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
+/** Convierte los issues de zod en `{ campo: mensaje }` para pintarlos bajo el input. */
+const issuesToFieldErrors = (error: z.ZodError): Record<string, string> => {
+  const result: Record<string, string> = {};
+  for (const issue of error.issues) {
+    const key = String(issue.path[0] ?? "");
+    if (key && !result[key]) result[key] = issue.message;
+  }
+  return result;
+};
+
 export const Profile = () => {
+  const navigate = useNavigate();
   const storeUser = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
-  const setToken = useAuthStore((state) => state.setToken);
-  const [editUserData, setEditUserData] = useState<UserType>(baseUser);
+
+  const [form, setForm] = useState<ProfileForm>(emptyProfile);
+  const [correo, setCorreo] = useState<string>("");
+  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string>("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   const [open, setOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [messageAlert, setMessageAlert] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({});
+  const [savingPassword, setSavingPassword] = useState(false);
 
+  /**
+   * `GET /api/users/me` no lleva id: lo toma del JWT. Asi que no puede haber
+   * bucles por pasar parametros, y tampoco se puede consultar el perfil de
+   * otra cuenta.
+   */
   useEffect(() => {
-    if (storeUser) {
-      setEditUserData(storeUser);
-    }
-  }, [storeUser])
+    let active = true;
 
-  const handleEdit = () => {
-    setIsEditing(true)
-    setNewPassword("")
-    setConfirmPassword("")
-  }
+    const loadProfile = async () => {
+      setLoading(true);
+      const response = await getMe();
+      const data = response.data;
+
+      if (active && response.success && data) {
+        setForm({ username: data.username, name: data.name, lastName: data.lastName });
+        setCorreo(data.correo);
+      }
+
+      if (active) setLoading(false);
+    };
+
+    void loadProfile();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleCancel = () => {
-    setIsEditing(false)
-    setNewPassword("")
-    setConfirmPassword("")
-  }
-
-  const updateUser = async () => {
-    const data = await putProfile(Number(storeUser?.id), editUserData);
-    if (data?.user && data.token) {
-      setUser(data.user);
-      setToken(data.token);
-    }
     setIsEditing(false);
+    setFormError("");
+    setFieldErrors({});
+    if (storeUser) {
+      setForm({ username: storeUser.username, name: storeUser.name, lastName: storeUser.lastName });
+    }
   }
 
-  const savePassword = () => {
-    if (newPassword == '' || confirmPassword == '') {
-      setShowAlert(true)
-      setMessageAlert('Las contraseña no pueden estar vacias.')
+  const handleInputChange = (field: keyof ProfileForm, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  /**
+   * `PUT /api/users/me` acepta SOLO username, name y lastName. Se manda un
+   * objeto construido campo a campo y no el usuario completo, precisamente
+   * para no colar el `correo` (o el `rol`, o el `id`), que la API rechaza con
+   * 400 al estar `forbidNonWhitelisted` activo.
+   */
+  const updateUser = async () => {
+    setFormError("");
+    setFieldErrors({});
+
+    // Validacion en cliente: sin esto el error llega del servidor y el usuario
+    // ya pulso Guardar. El backend sigue validando igual.
+    const parsed = profileSchema.safeParse(form);
+    if (!parsed.success) {
+      setFieldErrors(issuesToFieldErrors(parsed.error));
+      return;
     }
-    if (newPassword === confirmPassword) {
-      updatePassword();
+
+    setSaving(true);
+
+    const payload: ProfileBody = {
+      username: parsed.data.username,
+      name: parsed.data.name,
+      lastName: parsed.data.lastName,
+    };
+
+    const response = await putProfile(payload);
+
+    if (response.success && response.data?.user) {
+      const updated = response.data.user;
+      setForm({ username: updated.username, name: updated.name, lastName: updated.lastName });
+      setUser({
+        id: updated.id,
+        name: updated.name,
+        lastName: updated.lastName,
+        correo: updated.correo,
+        username: updated.username,
+        rol: updated.rol.rol,
+      });
+      setIsEditing(false);
     } else {
-      setShowAlert(true)
-      setMessageAlert('Las contraseña no coinciden.')
+      setFormError(apiMessage(response, "No se pudo actualizar el perfil"));
+      setFieldErrors(getFieldErrors(response));
     }
+
+    setSaving(false);
   }
 
   const closeDialog = (value: boolean) => {
     setOpen(value);
-    setShowAlert(false)
-    setMessageAlert('')
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordError("");
+    setPasswordErrors({});
   }
 
-  const updatePassword = async () => {
-    await putPassword(Number(storeUser?.id), { newPassword });
-    closeDialog(false);
+  /**
+   * Cambio de contraseña del propio usuario: `POST /api/auth/change-password`,
+   * que exige la contraseña ACTUAL.
+   *
+   * Este 401 ("La contrasena actual es incorrecta") NO es un problema de token,
+   * asi que el interceptor no intenta refrescar nada y el error se muestra
+   * aqui, en este formulario.
+   */
+  const savePassword = async () => {
+    setPasswordError("");
+    setPasswordErrors({});
+
+    const parsed = changePasswordSchema.safeParse({ currentPassword, newPassword, confirmPassword });
+    if (!parsed.success) {
+      setPasswordErrors(issuesToFieldErrors(parsed.error));
+      return;
+    }
+
+    setSavingPassword(true);
+    const response = await authChangePassword({
+      currentPassword: parsed.data.currentPassword,
+      newPassword: parsed.data.newPassword,
+    });
+
+    if (response.success) {
+      closeDialog(false);
+
+      // Tras el 200 se revocan TODAS las sesiones, incluida la actual, y el
+      // refreshToken tambien quedo revocado: no se puede refrescar, se limpia
+      // el store y la cache, y se vuelve al login.
+      clearSessionSilently();
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    setPasswordError(apiMessage(response, "No se pudo actualizar la contraseña"));
+    setPasswordErrors(getFieldErrors(response));
+    setSavingPassword(false);
   }
 
-  const handleInputChange = (field: keyof UserType, value: string) => {
-    setEditUserData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-  }
+  const getInitials = (firstName: string, lastName: string) =>
+    `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 
   return (
     <div className="min-h-screen">
@@ -124,14 +259,15 @@ export const Profile = () => {
                   </CardTitle>
                   <CardDescription className="text-base mt-1">{storeUser && storeUser.username}</CardDescription>
                   <Badge variant="secondary" className="mt-2 bg-blue-100 text-blue-800">
-                    {storeUser && storeUser.rol.rol}
+                    {storeUser && storeUser.rol}
                   </Badge>
                 </div>
               </div>
               <div className="flex space-x-2">
                 {!isEditing ? (
                   <Button
-                    onClick={handleEdit}
+                    onClick={() => setIsEditing(true)}
+                    disabled={loading}
                     className="bg-linear-to-r from-[#024dae] to-[#3089FD] hover:from-[#023a8a] hover:to-[#4bc5cc]"
                   >
                     <Edit3 className="h-4 w-4 mr-2" />
@@ -141,6 +277,7 @@ export const Profile = () => {
                   <div className="flex space-x-2">
                     <Button
                       onClick={updateUser}
+                      disabled={saving}
                       className="bg-linear-to-r from-[#024dae] to-[#3089FD] hover:from-[#023a8a] hover:to-[#4bc5cc]"
                     >
                       <Save className="h-4 w-4 mr-2" />
@@ -178,13 +315,14 @@ export const Profile = () => {
                     {isEditing ? (
                       <Input
                         id="firstName"
-                        value={editUserData ? editUserData.name : ''}
+                        value={form.name}
                         onChange={(e) => handleInputChange("name", e.target.value)}
                         placeholder="Ingresa tu nombre"
                       />
                     ) : (
-                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{storeUser && storeUser.name}</div>
+                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{form.name}</div>
                     )}
+                    {fieldErrors.name && <p className="text-sm text-red-600">{fieldErrors.name}</p>}
                   </div>
 
                   {/* Apellido */}
@@ -193,13 +331,14 @@ export const Profile = () => {
                     {isEditing ? (
                       <Input
                         id="lastName"
-                        value={editUserData ? editUserData.lastName : ''}
+                        value={form.lastName}
                         onChange={(e) => handleInputChange("lastName", e.target.value)}
                         placeholder="Ingresa tu apellido"
                       />
                     ) : (
-                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{storeUser && storeUser.lastName}</div>
+                      <div className="p-3 bg-gray-50 rounded-md text-gray-800">{form.lastName}</div>
                     )}
+                    {fieldErrors.lastName && <p className="text-sm text-red-600">{fieldErrors.lastName}</p>}
                   </div>
                 </div>
 
@@ -207,70 +346,46 @@ export const Profile = () => {
                 <div className="space-y-2">
                   <Label htmlFor="username">Nombre de Usuario *</Label>
                   {isEditing ? (
-                    <Input
-                      id="username"
-                      value={editUserData ? editUserData.username : ''}
-                      onChange={(e) => handleInputChange("username", e.target.value)}
-                      placeholder="Ingresa tu nombre de usuario"
-                    />
+                    <>
+                      <Input
+                        id="username"
+                        value={form.username}
+                        onChange={(e) => handleInputChange("username", e.target.value)}
+                        placeholder="Ingresa tu nombre de usuario"
+                      />
+                      <p className="text-xs text-amber-700 manrope">
+                        El usuario es con el que inicias sesión. Si lo cambias, tendrás que entrar con el nuevo.
+                      </p>
+                    </>
                   ) : (
-                    <div className="p-3 bg-gray-50 rounded-md text-gray-800">{storeUser && storeUser.username}</div>
+                    <div className="p-3 bg-gray-50 rounded-md text-gray-800">{form.username}</div>
                   )}
+                  {fieldErrors.username && <p className="text-sm text-red-600">{fieldErrors.username}</p>}
                 </div>
 
-                {/* Correo Electrónico */}
+                {/* Correo Electrónico: solo lectura */}
                 <div className="space-y-2">
-                  <Label htmlFor="email">Correo Electrónico *</Label>
-                  {isEditing ? (
-                    <Input
-                      id="email"
-                      type="email"
-                      value={editUserData ? editUserData.correo : ''}
-                      onChange={(e) => handleInputChange("correo", e.target.value)}
-                      placeholder="Ingresa tu correo electrónico"
-                    />
-                  ) : (
-                    <div className="p-3 bg-gray-50 rounded-md text-gray-800 flex items-center">
-                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                      {storeUser && storeUser.correo}
-                    </div>
-                  )}
+                  <Label htmlFor="email">Correo Electrónico</Label>
+                  <div className="p-3 bg-gray-50 rounded-md text-gray-800 flex items-center">
+                    <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                    {correo || storeUser?.correo}
+                  </div>
+                  <p className="text-xs text-gray-500 manrope">
+                    El correo no se puede cambiar desde aquí: la API de perfil solo acepta nombre, apellido y usuario.
+                  </p>
                 </div>
+
+                {formError && (
+                  <p className="text-sm text-red-600 manrope" role="alert">
+                    {formError}
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
 
           {/* Información Adicional */}
           <div className="space-y-6">
-            {/* Estadísticas de Cuenta */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5 text-[#024dae]" />
-                  <span>Información de Cuenta</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <p className="text-sm font-medium">Miembro desde</p>
-                    <p className="text-sm text-gray-600">{storeUser.joinDate}</p>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center space-x-3">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <p className="text-sm font-medium">Ubicación</p>
-                    <p className="text-sm text-gray-600">{storeUser.location}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
-
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -294,48 +409,99 @@ export const Profile = () => {
           <StyledDialogHeader>
             <StyledDialogTitle>Actualizar contraseña</StyledDialogTitle>
             <StyledDialogDescription>
-              Actualiza tu nueva contraseña
+              Al cambiarla se cerrarán todas las sesiones abiertas de tu cuenta, incluida esta.
             </StyledDialogDescription>
           </StyledDialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col items-start justify-start gap-2">
-              <Label>
-                Nueva contraseña
-              </Label>
-              <Input
-                id="password"
-                type="text"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Nueva contraseña"
-                className="bg-white"
-              />
+              <Label htmlFor="currentPassword">Contraseña actual *</Label>
+              <div className="relative w-full">
+                <Input
+                  id="currentPassword"
+                  type={showCurrent ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Tu contraseña actual"
+                  className="bg-white pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrent(!showCurrent)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-800 cursor-pointer"
+                >
+                  {showCurrent ? <FaRegEye /> : <FaRegEyeSlash />}
+                </button>
+              </div>
+              {passwordErrors.currentPassword && (
+                <p className="text-sm text-red-600">{passwordErrors.currentPassword}</p>
+              )}
             </div>
 
             <div className="flex flex-col items-start justify-start gap-2">
-              <Label>
-                Confirmar contraseña
-              </Label>
-              <Input
-                id="confirmPassword"
-                type="text"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirmar contraseña"
-                className="bg-white"
-              />
+              <Label htmlFor="password">Nueva contraseña *</Label>
+              <div className="relative w-full">
+                <Input
+                  id="password"
+                  type={showNew ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Nueva contraseña"
+                  className="bg-white pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-800 cursor-pointer"
+                >
+                  {showNew ? <FaRegEye /> : <FaRegEyeSlash />}
+                </button>
+              </div>
+              {passwordErrors.newPassword && (
+                <p className="text-sm text-red-600">{passwordErrors.newPassword}</p>
+              )}
             </div>
 
-            {showAlert && (
-              <p className="text-red-500">{messageAlert}</p>
+            <div className="flex flex-col items-start justify-start gap-2">
+              <Label htmlFor="confirmPassword">Confirmar contraseña *</Label>
+              <div className="relative w-full">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirm ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repite la nueva contraseña"
+                  className="bg-white pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-800 cursor-pointer"
+                >
+                  {showConfirm ? <FaRegEye /> : <FaRegEyeSlash />}
+                </button>
+              </div>
+              {passwordErrors.confirmPassword && (
+                <p className="text-sm text-red-600">{passwordErrors.confirmPassword}</p>
+              )}
+            </div>
+
+            <ul className="text-[0.7rem] text-gray-600 manrope">
+              {PASSWORD_RULES.map((rule) => (
+                <li key={rule}>• {rule}</li>
+              ))}
+            </ul>
+
+            {passwordError && (
+              <p className="text-red-500" role="alert">
+                {passwordError}
+              </p>
             )}
 
             <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                onClick={savePassword}
-                variant="animated"
-                type="submit"
-              >
+              <Button onClick={savePassword} variant="animated" type="submit" disabled={savingPassword}>
                 <FaRegSave className="self-center size-5" /> Actualizar contraseña
               </Button>
             </div>

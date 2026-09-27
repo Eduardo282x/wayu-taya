@@ -4,6 +4,7 @@ import { deleteProviders, getProviders, getProvidersPage, postProviders, putProv
 import { InstitutionsBody, InstitutionsQueryParams, PaginatedInstitutionsContent, ParishContent, InstitutionContent } from "@/services/institution/institution.interface"
 import { deleteInstitutions, getInstitutions, getInstitutionsPage, getParish, postInstitutions, putInstitutions } from "@/services/institution/institution.service"
 import { useProvidersStore } from "./providersStore"
+import { useIsAuthenticated } from "@/store/auth.store"
 
 export const providersKeys = {
     all: ["providers"] as const,
@@ -23,11 +24,13 @@ export const parishKeys = {
 
 export const useProvidersQuery = () => {
     const { providersPage, providersSize } = useProvidersStore()
+    const isAuthenticated = useIsAuthenticated()
     const params: ProvidersQueryParams = { page: providersPage + 1, size: providersSize }
 
     return useQuery({
         queryKey: providersKeys.list(params),
         queryFn: () => getProvidersPage(params),
+        enabled: isAuthenticated,
         placeholderData: keepPreviousData,
         select: (data: PaginatedProvidersContent) => data,
     })
@@ -35,20 +38,25 @@ export const useProvidersQuery = () => {
 
 export const useInstitutionsQuery = () => {
     const { institutionsPage, institutionsSize } = useProvidersStore()
+    const isAuthenticated = useIsAuthenticated()
     const params: InstitutionsQueryParams = { page: institutionsPage + 1, size: institutionsSize }
 
     return useQuery({
         queryKey: institutionsKeys.list(params),
         queryFn: () => getInstitutionsPage(params),
+        enabled: isAuthenticated,
         placeholderData: keepPreviousData,
         select: (data: PaginatedInstitutionsContent) => data,
     })
 }
 
 export const useParishQuery = () => {
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: parishKeys.all,
         queryFn: getParish,
+        enabled: isAuthenticated,
         select: (data: ParishContent) => data,
         staleTime: Infinity,
         gcTime: Infinity,
@@ -56,9 +64,12 @@ export const useParishQuery = () => {
 }
 
 export const useAllProvidersQuery = () => {
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: providersKeys.allList,
         queryFn: getProviders,
+        enabled: isAuthenticated,
         select: (data: ProvidersContent) => data,
         staleTime: Infinity,
         gcTime: Infinity,
@@ -66,9 +77,12 @@ export const useAllProvidersQuery = () => {
 }
 
 export const useAllInstitutionsQuery = () => {
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: institutionsKeys.allList,
         queryFn: getInstitutions,
+        enabled: isAuthenticated,
         select: (data: InstitutionContent) => data,
         staleTime: Infinity,
         gcTime: Infinity,

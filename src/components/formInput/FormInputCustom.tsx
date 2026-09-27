@@ -2,6 +2,7 @@ import React from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -29,8 +30,10 @@ const FormInputCustom: React.FC<FormInputProps> = ({
   ...inputProps
 }) => {
   const [open, setOpen] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const isDateInput = type === "date";
+  const isPasswordInput = type === "password";
 
   const selectedDate = React.useMemo(() => {
     if (!value) return undefined;
@@ -110,6 +113,30 @@ const FormInputCustom: React.FC<FormInputProps> = ({
             />
           </PopoverContent>
         </Popover>
+      ) : isPasswordInput ? (
+        <div className="relative w-full">
+          <input
+            id={id}
+            className={cn(
+              "w-full rounded-md focus:outline-1 focus:outline-blue-800 px-3 py-1 bg-white border",
+              className,
+              "pr-9"
+            )}
+            {...inputProps}
+            type={showPassword ? "text" : "password"}
+            value={typeof value === "string" || typeof value === "number" ? value : (inputProps as { value?: string }).value}
+            onChange={handleInputChange}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((visible) => !visible)}
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-blue-800 cursor-pointer"
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-pressed={showPassword}
+          >
+            {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+          </button>
+        </div>
       ) : (
         <input
           id={id}

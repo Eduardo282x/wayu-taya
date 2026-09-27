@@ -1,9 +1,11 @@
 import { Column } from "@/components/table/table.interface";
 import { IUsers } from "@/services/users/user.interface";
-import { FiTrash2 } from "react-icons/fi";
-import { FiEdit2 } from "react-icons/fi";
+import { FiTrash2, FiEdit2, FiKey } from "react-icons/fi";
 
-export const usersColumns: Column[] = [
+/**
+ * El listado no trae `rolId`, solo el nombre del rol anidado.
+ */
+export const getUsersColumns = (currentUserId?: number): Column[] => [
     {
         label: 'Nombre',
         column: 'name',
@@ -35,7 +37,7 @@ export const usersColumns: Column[] = [
     {
         label: 'Rol',
         column: 'rol.rol',
-        element: (data: IUsers) => data.rol.rol,
+        element: (data: IUsers) => data.rol?.rol ?? '',
         isIcon: false,
         visible: true
     },
@@ -44,11 +46,29 @@ export const usersColumns: Column[] = [
         column: 'edit',
         element: () => '',
         icon: {
-            icon: FiEdit2 ,
+            icon: FiEdit2,
             label: 'Editar usuario',
             className: 'text-blue-800 font-bold',
             variant: 'edit'
         },
+        isIcon: true,
+        visible: true
+    },
+    {
+        // Cambiar la contrasena de OTRO usuario va por
+        // `PUT /users/password/:id`, no por la edicion: mandar la contrasena en
+        // el PUT de edicion devuelve 400 por campo desconocido.
+        label: 'Contraseña',
+        column: 'password',
+        element: () => '',
+        icon: {
+            icon: FiKey,
+            label: 'Restablecer contraseña',
+            className: 'text-amber-600 font-bold',
+            variant: 'edit'
+        },
+        // La propia contraseña se cambia en /perfil, donde se pide la actual.
+        hiddenIcon: (data: IUsers) => data.id === currentUserId,
         isIcon: true,
         visible: true
     },

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import logoNuevo from "@/assets/img/FWT_logo_blanco.png"
 import { LoginForm } from "./LoginForm"
-import { PasswordForm } from "./PasswordForm"
+import { RecoverForm } from "./RecoverForm"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 
 export const Login = () => {
@@ -47,16 +47,6 @@ export const Login = () => {
     setShowLoginForm(true)
   }
 
-  // Cuando la animación termina y volvemos al login, resetear el estado
-  // useEffect(() => {
-  //   if (showLoginForm && !isMobile) {
-  //     const timer = setTimeout(() => {
-  //       setIsAnimating(false)
-  //     }, 600)
-  //     return () => clearTimeout(timer)
-  //   }
-  // }, [showLoginForm, isMobile])
-
   return (
     <div className="bg-linear-to-tr from-blue-900 to-[#3089FD] h-screen flex items-center justify-center font-sans">
 
@@ -79,7 +69,7 @@ export const Login = () => {
             </div>
           ) : null}
 
-          {/* Mostrar formulario de recuperación solo en móvil cuando showLoginForm es false */}
+          {/* Paso 1 de la recuperación: pedir el enlace. */}
           {isMobile && !showLoginForm ? (
             <div className="my-auto">
 
@@ -87,7 +77,7 @@ export const Login = () => {
                 <div className="text-gray-800 manrope text-xl ml-1 mb-2">Recupera tu contraseña....</div>
               </div>
 
-              <PasswordForm onBackToLogin={handleBackToLogin} />
+              <RecoverForm onBackToLogin={handleBackToLogin} />
             </div>
           ) : null}
         </div>
@@ -106,10 +96,6 @@ export const Login = () => {
               alt=""
               className=""
             />
-            {/* <div className="flex flex-col text-center cursor-default w-full ">
-              <span className="oswald font-normal text-4xl">FUNDACIÓN</span>
-              <span className="julius-sans-one-regular text-[2.5rem] border-y-2 border-white">WAYUU TAYA</span>
-            </div> */}
           </div>
         )}
 
@@ -120,10 +106,10 @@ export const Login = () => {
             <div className={`${!isMobile && showLoginForm ? "" : "visible"}`}>
 
               <div className="text-center cursor-default lg:mb-4 space-y-3 text-[0.78rem]">
-                <div className="text-slate-800 manrope lg:text-xl ml-1">Recupera tu contraseña....</div>
+                <div className="text-slate-800 manrope lg:text-xl ml-1 mb-2">Recupera tu contraseña....</div>
               </div>
 
-              <PasswordForm onBackToLogin={handleBackToLogin} />
+              <RecoverForm onBackToLogin={handleBackToLogin} />
             </div>
           </div>
         )}

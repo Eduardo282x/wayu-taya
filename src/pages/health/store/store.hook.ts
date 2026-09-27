@@ -1,16 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { StoreBody } from "@/services/store/store.interface"
 import { getStore, postStore, putStore, deleteStore } from "@/services/store/store.service"
+import { useIsAuthenticated } from "@/store/auth.store"
 
 export const storeKeys = {
     all: ["stores"] as const,
 }
 
 export const useStoresQuery = (enabled = true) => {
+    // Sin sesion no hay cabecera Authorization: la peticion solo puede
+    // producir un 401 y, con el, un refresh inútil.
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: storeKeys.all,
         queryFn: getStore,
-        enabled,
+        enabled: enabled && isAuthenticated,
         staleTime: Infinity,
         gcTime: Infinity,
     })
@@ -21,8 +26,13 @@ export const useCreateStoreMutation = () => {
 
     return useMutation({
         mutationFn: (data: StoreBody) => postStore(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: storeKeys.all })
+        onSuccess: (response) => {
+            // El servicio NO lanza en error: devuelve el sobre con
+            // `success: false`. Invalidar la cache cuando la escritura fallo
+            // dispara un refetch que no arregla nada.
+            if (response.success) {
+                queryClient.invalidateQueries({ queryKey: storeKeys.all })
+            }
         },
     })
 }
@@ -32,8 +42,10 @@ export const useUpdateStoreMutation = () => {
 
     return useMutation({
         mutationFn: ({ id, data }: { id: number; data: StoreBody }) => putStore(id, data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: storeKeys.all })
+        onSuccess: (response) => {
+            if (response.success) {
+                queryClient.invalidateQueries({ queryKey: storeKeys.all })
+            }
         },
     })
 }
@@ -43,8 +55,10 @@ export const useDeleteStoreMutation = () => {
 
     return useMutation({
         mutationFn: (id: number) => deleteStore(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: storeKeys.all })
+        onSuccess: (response) => {
+            if (response.success) {
+                queryClient.invalidateQueries({ queryKey: storeKeys.all })
+            }
         },
     })
 }

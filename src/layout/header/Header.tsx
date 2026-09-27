@@ -10,8 +10,14 @@ import { FaRegUser } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FC } from 'react';
+import { useRol, useUser } from "@/store/auth.store";
 
 export const Header = () => {
+    // El rol viene del store, nunca de un texto fijo: antes decia siempre
+    // "Administrador", tambien a un usuario sin ese rol.
+    const user = useUser();
+    const rol = useRol();
+
     return (
         <div className='flex items-center justify-between w-full bg-[#4498b8] text-white p-4'>
             <p className='text-3xl'>Wayuu Taya</p>
@@ -20,7 +26,7 @@ export const Header = () => {
                 <DropdownMenuTrigger asChild>
                     <div className='flex items-center justify-center gap-3 text-xl cursor-pointer border py-1 px-4 rounded-lg'>
                         <FaRegUserCircle />
-                        <span>Administrador</span>
+                        <span>{rol || (user ? user.username : "Cuenta")}</span>
                     </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48">

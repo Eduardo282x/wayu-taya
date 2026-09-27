@@ -10,9 +10,9 @@ export default function Home() {
   const navigate = useNavigate();
   const logoutStore = useAuthStore((state) => state.logout);
 
-  const logout = () => {
-    logoutStore();
-    navigate('/login')
+  const logout = async () => {
+    await logoutStore();
+    navigate('/login', { replace: true })
   }
 
   return (

@@ -2,6 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { MedicineBody, MedicineQueryParams } from "@/services/medicine/medicine.interface"
 import { getCategories, getForms, getMedicine, getMedicinesPage, postMedicine, putMedicine, deleteMedicine } from "@/services/medicine/medicine.service"
 import { useMedicineStore } from "./medicineStore"
+import { useIsAuthenticated } from "@/store/auth.store"
 
 export const medicineKeys = {
     all: ["medicines"] as const,
@@ -13,38 +14,48 @@ export const medicineKeys = {
 
 export const useMedicinesQuery = () => {
     const { page, size, name } = useMedicineStore()
+    const isAuthenticated = useIsAuthenticated()
     const params: MedicineQueryParams = { page: page + 1, size, name }
 
     return useQuery({
         queryKey: medicineKeys.list(params),
         queryFn: () => getMedicinesPage(params),
+        enabled: isAuthenticated,
         placeholderData: keepPreviousData,
     })
 }
 
 export const useAllMedicinesQuery = (enabled = true) => {
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: medicineKeys.allList,
         queryFn: getMedicine,
-        enabled,
+        enabled: enabled && isAuthenticated,
         staleTime: Infinity,
         gcTime: 30 * 60 * 1000,
     })
 }
 
 export const useCategoriesQuery = () => {
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: medicineKeys.categories,
         queryFn: getCategories,
+        enabled: isAuthenticated,
         staleTime: Infinity,
         gcTime: Infinity,
     })
 }
 
 export const useFormsQuery = () => {
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: medicineKeys.forms,
         queryFn: getForms,
+        enabled: isAuthenticated,
         staleTime: Infinity,
         gcTime: Infinity,
     })

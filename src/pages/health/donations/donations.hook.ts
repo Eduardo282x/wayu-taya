@@ -2,6 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { DonationBody, DonationsQueryParams, PaginatedDonationsContent } from "@/services/donations/donations.interface"
 import { getDonations, getLotes, postDonation, putDonation } from "@/services/donations/donations.service"
 import { useDonationStore } from "./donationStore"
+import { useIsAuthenticated } from "@/store/auth.store"
 
 export const donationsKeys = {
     all: ["donations"] as const,
@@ -11,20 +12,25 @@ export const donationsKeys = {
 
 export const useDonationsQuery = () => {
     const { page, size, filters } = useDonationStore()
+    const isAuthenticated = useIsAuthenticated()
     const params: DonationsQueryParams = { page: page + 1, size, ...filters }
 
     return useQuery({
         queryKey: donationsKeys.list(params),
         queryFn: () => getDonations(params),
+        enabled: isAuthenticated,
         placeholderData: keepPreviousData,
         select: (data: PaginatedDonationsContent) => data,
     })
 }
 
 export const useLotesQuery = () => {
+    const isAuthenticated = useIsAuthenticated()
+
     return useQuery({
         queryKey: donationsKeys.lotes,
         queryFn: getLotes,
+        enabled: isAuthenticated,
     })
 }
 
