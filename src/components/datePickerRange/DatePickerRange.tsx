@@ -31,7 +31,7 @@ export const DatePickerRange = ({ className, value, onChange }: DatePickerRangeP
                     <Button
                         variant={"outline"}
                         className={cn(
-                            "justify-start text-left font-normal",
+                            "w-full justify-start px-3 text-left font-normal",
                             !selected && "text-muted-foreground"
                         )}
                     >
@@ -39,25 +39,25 @@ export const DatePickerRange = ({ className, value, onChange }: DatePickerRangeP
                         {selected?.from ? (
                             selected.to ? (
                                 <>
-                                    {format(selected.from, "PPP", { locale: es })} - {" "}
-                                    {format(selected.to, "PPP", { locale: es })}
+                                    {format(selected.from, "d MMM yy", { locale: es })} - {" "}
+                                    {format(selected.to, "d MMM yy", { locale: es })}
                                 </>
                             ) : (
-                                format(selected.from, "PPP", { locale: es })
+                                format(selected.from, "d MMM yy", { locale: es })
                             )
                         ) : (
-                            <span>Seleccionar rango de fechas</span>
+                            <span className="truncate">Seleccionar rango de fechas</span>
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 p-0 overflow-hidden rounded-md" align="start">
+                <PopoverContent className="w-auto p-0 overflow-hidden rounded-md" align="start">
                     <Calendar
                         autoFocus
                         mode="range"
                         defaultMonth={selected?.from}
                         selected={selected}
                         locale={es}
-                        className="rounded-lg border w-full"
+                        className="rounded-lg border"
                         onSelect={handleSelect}
                         numberOfMonths={1}
                     />

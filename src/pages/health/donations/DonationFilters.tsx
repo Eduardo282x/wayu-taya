@@ -94,11 +94,15 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
                     />
                 }
             </div>
-            <div className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
+            <div className="w-72">
+                <span className="block text-sm font-medium mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
                     Fecha
                 </span>
-                <DatePickerRange value={dateRangeValue} onChange={handleDateChange} />
+                <DatePickerRange
+                    className="w-full"
+                    value={dateRangeValue}
+                    onChange={handleDateChange}
+                />
             </div>
             <Tooltip>
                 <TooltipTrigger asChild>

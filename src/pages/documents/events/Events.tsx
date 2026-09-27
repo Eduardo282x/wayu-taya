@@ -87,14 +87,14 @@ export const Events = () => {
     <div>
       {loading && <ScreenLoader />}
       <HeaderPages title="Eventos" Icon={FaRegCalendarAlt} />
-      <div className="flex justify-between p-4">
+      <div className="flex justify-between p-2">
         <DatePickerRange />
         <Button onClick={newEvent} className="bg-blue-600 hover:bg-blue-700">
           <FaRegCircleCheck /> Agendar evento
         </Button>
       </div>
 
-      <div className="flex flex-col gap-3 h-[30rem] overflow-y-auto">
+      <div className="flex flex-col gap-3 h-120 overflow-y-auto px-2">
         {events.events.map((eve: IEvents, index: number) => (
           <CardEvents event={eve} key={`event-${eve.id}-${index}`} onEdit={openDialog} onDelete={handleDeleteEvent} />
         ))}
@@ -104,7 +104,7 @@ export const Events = () => {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-full max-w-md overflow-y-auto max-h-[90vh]">
+        <DialogContent className="w-full max-w-3xl overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-blue-700 text-xl">
               {isEditing ? "Editar evento" : "Crear nuevo evento"}

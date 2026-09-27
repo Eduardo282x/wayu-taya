@@ -85,14 +85,14 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
 
   const handleProviderSelect = (provider: string | number) => {
     // if (!formData.providersId.includes(Number(provider))) {
-      const providerArray = formData.providersId.find(item => item == provider)
-        ? formData.providersId.filter(pro => pro != provider)
-        : [...formData.providersId, Number(provider)]
-      setFormData((prev) => ({
-        ...prev,
-        cambio_proveedores: true,
-        providersId: providerArray,
-      }))
+    const providerArray = formData.providersId.find(item => item == provider)
+      ? formData.providersId.filter(pro => pro != provider)
+      : [...formData.providersId, Number(provider)]
+    setFormData((prev) => ({
+      ...prev,
+      cambio_proveedores: true,
+      providersId: providerArray,
+    }))
     // }
   }
 
@@ -138,122 +138,121 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
 
   return (
     <>
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="eventName" className="text-blue-700 font-medium">
-          Nombre del evento *
-        </Label>
-        <Input
-          id="eventName"
-          name="eventName"
-          type="text"
-          value={formData.name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("name", e.target.value)}
-          placeholder="Ej: Gala Benéfica"
-          className="bg-white border-blue-300 focus:border-blue-500"
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="startTime" className="text-blue-700 font-medium">
-            Hora inicio
+          <Label htmlFor="eventName" className="text-blue-700 font-medium">
+            Nombre del evento *
           </Label>
           <Input
-            id="startTime"
-            name="startTime"
-            type="time"
-            value={formData.startTime}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("startTime", e.target.value)}
+            id="eventName"
+            name="eventName"
+            type="text"
+            value={formData.name}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("name", e.target.value)}
+            placeholder="Ej: Gala Benéfica"
+            className="bg-white border-blue-300 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <div className="grid grid-cols-4 gap-4">
+          <div className="space-y-2 col-span-2">
+            <Label htmlFor="eventDate" className="text-blue-700 font-medium">
+              Fecha *
+            </Label>
+            <Input
+              id="eventDate"
+              name="eventDate"
+              type="date"
+              value={formData.startDate.toString()}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("startDate", e.target.value)}
+              className="bg-white border-blue-300 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="startTime" className="text-blue-700 font-medium">
+              Hora inicio
+            </Label>
+            <Input
+              id="startTime"
+              name="startTime"
+              type="time"
+              value={formData.startTime}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("startTime", e.target.value)}
+              className="bg-white border-blue-300 focus:border-blue-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="endTime" className="text-blue-700 font-medium">
+              Hora fin
+            </Label>
+            <Input
+              id="endTime"
+              name="endTime"
+              type="time"
+              value={formData.endTime}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("endTime", e.target.value)}
+              className="bg-white border-blue-300 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="eventAddress" className="text-blue-700 font-medium">
+            Dirección
+          </Label>
+          <Input
+            id="eventAddress"
+            name="address"
+            value={formData.address}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("address", e.target.value)}
+            placeholder="Dirección del evento"
             className="bg-white border-blue-300 focus:border-blue-500"
           />
         </div>
+
         <div className="space-y-2">
-          <Label htmlFor="endTime" className="text-blue-700 font-medium">
-            Hora fin
+          <Label className="text-blue-700 font-medium">
+            Ubicación
           </Label>
-          <Input
-            id="endTime"
-            name="endTime"
-            type="time"
-            value={formData.endTime}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("endTime", e.target.value)}
-            className="bg-white border-blue-300 focus:border-blue-500"
-          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsLocationOpen(true)}
+            className="w-full justify-start gap-2 text-[0.8rem] text-blue-700 border-blue-300 hover:bg-blue-50"
+          >
+            <FaMapMarkerAlt /> Seleccionar parroquia
+          </Button>
+          {locationCompleta ? (
+            <p className="text-xs text-gray-500 manrope">{formatLabelLocation(formData.location)}</p>
+          ) : (
+            <p className="text-xs text-gray-500 manrope">
+              Añade el estado, el municipio y la parroquia del evento.
+            </p>
+          )}
+          {locationError && <p className="text-red-500 text-xs">{locationError}</p>}
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="eventDate" className="text-blue-700 font-medium">
-          Fecha *
-        </Label>
-        <Input
-          id="eventDate"
-          name="eventDate"
-          type="date"
-          value={formData.startDate.toString()}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("startDate", e.target.value)}
-          className="bg-white border-blue-300 focus:border-blue-500"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="eventAddress" className="text-blue-700 font-medium">
-          Dirección
-        </Label>
-        <Input
-          id="eventAddress"
-          name="address"
-          value={formData.address}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("address", e.target.value)}
-          placeholder="Dirección del evento"
-          className="bg-white border-blue-300 focus:border-blue-500"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-blue-700 font-medium">
-          Ubicación
-        </Label>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setIsLocationOpen(true)}
-          className="w-full justify-start gap-2 text-[0.8rem] text-blue-700 border-blue-300 hover:bg-blue-50"
-        >
-          <FaMapMarkerAlt /> Seleccionar parroquia
-        </Button>
-        {locationCompleta ? (
-          <p className="text-xs text-gray-500 manrope">{formatLabelLocation(formData.location)}</p>
-        ) : (
-          <p className="text-xs text-gray-500 manrope">
-            Añade el estado, el municipio y la parroquia del evento.
-          </p>
-        )}
-        {locationError && <p className="text-red-500 text-xs">{locationError}</p>}
-      </div>
-
-      <div className="space-y-2">
-        {/* <Label htmlFor="providers" className="text-blue-700 font-medium">
+        <div className="space-y-2">
+          {/* <Label htmlFor="providers" className="text-blue-700 font-medium">
           Proveedores
         </Label> */}
 
-        <FormAutocompleteV2
-          label="Proveedor"
-          placeholder="Selecciona un proveedor"
-          data={providers.map(provider => ({
-            value: provider.id.toString(),
-            label: provider.name,
-          }))}
-          holdOpen={true}
-          onChange={(value) => handleProviderSelect(value)}
-          multiple={true}
-          dataSelected={formData.providersId.map(item => item.toString())}
-        />
+          <FormAutocompleteV2
+            label="Proveedor"
+            placeholder="Selecciona un proveedor"
+            data={providers.map(provider => ({
+              value: provider.id.toString(),
+              label: provider.name,
+            }))}
+            holdOpen={true}
+            onChange={(value) => handleProviderSelect(value)}
+            multiple={true}
+            dataSelected={formData.providersId.map(item => item.toString())}
+          />
 
-        {/* {unselectedProviders.length > 0 && (
+          {/* {unselectedProviders.length > 0 && (
           <Select onValueChange={handleProviderSelect}>
             <SelectTrigger className="bg-white border-blue-300 focus:border-blue-500">
               <SelectValue placeholder="Seleccionar proveedor" />
@@ -268,46 +267,46 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
           </Select>
         )} */}
 
-        {formData.providersId && formData.providersId.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {formData.providersId.map((provider) => (
-              <span
-                key={provider}
-                className="text-blue-700 bg-blue-200 px-2 pr-1 py-1 rounded-full text-sm inline-flex items-center"
-              >
-                {returnNameProvider(provider)}
-                <button
-                  type="button"
-                  onClick={() => removeProvider(provider)}
-                  className="ml-2 hover:bg-blue-300 rounded-full p-1 cursor-pointer"
+          {formData.providersId && formData.providersId.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.providersId.map((provider) => (
+                <span
+                  key={provider}
+                  className="text-blue-700 bg-blue-200 px-2 pr-1 py-1 rounded-full text-sm inline-flex items-center"
                 >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+                  {returnNameProvider(provider)}
+                  <button
+                    type="button"
+                    onClick={() => removeProvider(provider)}
+                    className="ml-2 hover:bg-blue-300 rounded-full p-1 cursor-pointer"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
 
-        {/* {unselectedProviders.length === 0 && (
+          {/* {unselectedProviders.length === 0 && (
           <p className="text-sm text-blue-600">Todos los proveedores han sido seleccionados</p>
         )} */}
-      </div>
+        </div>
 
-      <div className="flex gap-3 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          className="flex-1 border-blue-300 text-blue-600 hover:bg-blue-50"
-          onClick={onClose}
-          disabled={loading}
-        >
-          Cancelar
-        </Button>
-        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700" disabled={loading}>
-          {loading ? "Guardando..." : isEditing ? "Actualizar" : "Crear Evento"}
-        </Button>
-      </div>
-    </form>
+        <div className="flex gap-3 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 border-blue-300 text-blue-600 hover:bg-blue-50"
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700" disabled={loading}>
+            {loading ? "Guardando..." : isEditing ? "Actualizar" : "Crear Evento"}
+          </Button>
+        </div>
+      </form>
 
       {/* Fuera del `<form>` para que el boton del dialogo no dispare el submit.
           Sigue dentro del Dialog padre en el arbol de React, que es lo que hace
