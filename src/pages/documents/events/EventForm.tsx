@@ -5,9 +5,18 @@ import { Label } from "@/components/ui/label"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X } from "lucide-react"
 import { useState, useEffect } from "react"
+import { FaMapMarkerAlt } from "react-icons/fa"
 import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
+import { DialogLocation } from "@/components/dialog-location/Dialog-Location"
+import { formatLabelLocation } from "@/hooks/formaters"
 import { IProviders } from "@/services/provider/provider.interface"
 import { EventsBody, IEvents } from "@/services/events/events.interface"
+import type { Location } from "@/services/location.interface"
+
+const EMPTY_LOCATION: Location = { state: "", town: "", parish: "" }
+
+/** Campos que se actualizan con texto. `location` queda fuera: la elige el dialogo. */
+type TextField = Exclude<keyof EventsBody, "location">
 
 interface EventFormProps {
   selectedEvent: IEvents | null
@@ -22,8 +31,11 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
   const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
   const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
 
+  const [isLocationOpen, setIsLocationOpen] = useState<boolean>(false)
+  const [locationError, setLocationError] = useState<string | null>(null)
+
   const [formData, setFormData] = useState<EventsBody>({
-    parishId: 1,
+    location: { ...EMPTY_LOCATION },
     name: '',
     description: '',
     address: '',
@@ -40,7 +52,9 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
   useEffect(() => {
     if (selectedEvent) {
       setFormData({
-        parishId: selectedEvent.parishId,
+        // `location` es una columna Json: las filas anteriores a la migracion
+        // pueden traerla nula, y el backend la exige con los tres niveles.
+        location: selectedEvent.location ?? { ...EMPTY_LOCATION },
         name: selectedEvent.name,
         description: selectedEvent.description,
         address: selectedEvent.address,
@@ -54,12 +68,20 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
     }
   }, [selectedEvent])
 
-  const handleInputChange = (field: keyof EventsBody, value: string) => {
+  const handleInputChange = (field: TextField, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }))
   }
+
+  const handleLocationConfirm = (value: Location) => {
+    setFormData((prev) => ({ ...prev, location: value }))
+    setLocationError(null)
+    setIsLocationOpen(false)
+  }
+
+  const locationCompleta = !!formData.location.state && !!formData.location.town && !!formData.location.parish
 
   const handleProviderSelect = (provider: string | number) => {
     // if (!formData.providersId.includes(Number(provider))) {
@@ -92,6 +114,14 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // A diferencia de los otros campos, `location` no acepta cadena vacia: el
+    // backend la exige con los tres niveles.
+    if (!locationCompleta) {
+      setLocationError("Selecciona el estado, el municipio y la parroquia del evento")
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -107,6 +137,7 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
   // const unselectedProviders = providers.filter((provider) => !formData.providers?.includes(provider.id.toString()))
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="eventName" className="text-blue-700 font-medium">
@@ -169,17 +200,39 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="location" className="text-blue-700 font-medium">
-          Ubicación
+        <Label htmlFor="eventAddress" className="text-blue-700 font-medium">
+          Dirección
         </Label>
         <Input
-          id="location"
-          name="location"
+          id="eventAddress"
+          name="address"
           value={formData.address}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("address", e.target.value)}
           placeholder="Dirección del evento"
           className="bg-white border-blue-300 focus:border-blue-500"
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-blue-700 font-medium">
+          Ubicación
+        </Label>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setIsLocationOpen(true)}
+          className="w-full justify-start gap-2 text-[0.8rem] text-blue-700 border-blue-300 hover:bg-blue-50"
+        >
+          <FaMapMarkerAlt /> Seleccionar parroquia
+        </Button>
+        {locationCompleta ? (
+          <p className="text-xs text-gray-500 manrope">{formatLabelLocation(formData.location)}</p>
+        ) : (
+          <p className="text-xs text-gray-500 manrope">
+            Añade el estado, el municipio y la parroquia del evento.
+          </p>
+        )}
+        {locationError && <p className="text-red-500 text-xs">{locationError}</p>}
       </div>
 
       <div className="space-y-2">
@@ -255,5 +308,16 @@ export const EventForm = ({ selectedEvent, providers, isEditing, onClose, onEven
         </Button>
       </div>
     </form>
+
+      {/* Fuera del `<form>` para que el boton del dialogo no dispare el submit.
+          Sigue dentro del Dialog padre en el arbol de React, que es lo que hace
+          que Radix no cierre ese Dialog al pulsar aqui. */}
+      <DialogLocation
+        open={isLocationOpen}
+        onOpenChange={setIsLocationOpen}
+        onConfirm={handleLocationConfirm}
+        value={formData.location}
+      />
+    </>
   )
 }

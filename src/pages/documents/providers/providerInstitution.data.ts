@@ -1,4 +1,5 @@
 import { Column } from "@/components/table/table.interface";
+import { formatLabelLocation } from "@/hooks/formaters";
 import { IInstitution } from "@/services/institution/institution.interface";
 import { IProviders } from "@/services/provider/provider.interface";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -54,17 +55,15 @@ export const institutionColumns: Column[] = [
         isIcon: false,
         element: (data: IInstitution) => data.email,
     },
-    // Descomentar cuando se quiera la parroquia en la tabla. Antes apuntaba a
-    // `parish.name`, que dejo de existir al migrar a `location`.
-    // Ojo: el `FilterComponent` resuelve rutas planas, asi que una columna con
-    // punto se veria pero no se filtraria. Para que filtre habria que aplanar
-    // `location` en la respuesta o adaptar el filtrado.
+    // La columna existe y se ve, pero el `FilterComponent` resuelve rutas
+    // planas, asi que `location.parish` no llega a filtrar. Para que filtre
+    // habria que aplanar `location` en la respuesta o adaptar el filtrado.
     {
-        label: "Parroquia",
+        label: "Ubicación",
         column: "location.parish",
         visible: true,
         isIcon: false,
-        element: (data: IInstitution) => data.location?.parish ?? "",
+        element: (data: IInstitution) => formatLabelLocation(data.location, "Sin ubicación"),
     },
     {
         label: "Editar",

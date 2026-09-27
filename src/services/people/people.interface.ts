@@ -1,7 +1,7 @@
-import { Parish } from "../institution/institution.interface";
+import type { Location } from "../location.interface";
 
 export interface PeopleBody {
-    id_parroquia: number;
+    location: Location;
     name: string;
     lastName: string;
     address: string;
@@ -23,7 +23,7 @@ export interface IPeople {
     name:           string;
     lastName:       string;
     address:        string;
-    parishId:       number;
+    location:       Location;
     email:          string;
     phone:          string;
     identification: string;
@@ -32,5 +32,4 @@ export interface IPeople {
     createAt:       Date;
     updateAt:       Date;
     deleted:        boolean;
-    parish:         Parish;
 }

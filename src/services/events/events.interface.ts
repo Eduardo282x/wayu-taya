@@ -1,8 +1,8 @@
-import { Parish } from "../institution/institution.interface";
 import { IProviders } from "../provider/provider.interface";
+import type { Location } from "../location.interface";
 
 export interface EventsBody {
-    parishId: number;
+    location: Location;
     name: string;
     description: string;
     address: string;
@@ -24,12 +24,11 @@ export interface IEvents {
     name: string;
     description: string;
     address: string;
-    parishId: number;
+    location: Location;
     startDate: Date;
     endDate: Date;
     deleted: boolean;
     createAt: Date;
     updateAt: Date;
-    parish: Parish;
     providersEvents: IProviders[];
 }

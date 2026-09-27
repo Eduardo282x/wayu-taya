@@ -10,8 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Location } from "@/services/institution/institution.interface";
-import { formatLocation, locations } from "./location.data";
+import type { Location } from "@/services/location.interface";
+import { formatLabelLocation } from "@/hooks/formaters";
+import { locations } from "./location.data";
 
 interface DialogLocationProps {
   open: boolean;
@@ -143,7 +144,7 @@ export const DialogLocation = ({ open, onOpenChange, onConfirm, value }: DialogL
 
         {completo && (
           <p className="text-sm text-gray-700 manrope bg-white/60 rounded-md border px-3 py-2">
-            {formatLocation({ state, town, parish })}
+            {formatLabelLocation({ state, town, parish })}
           </p>
         )}
 

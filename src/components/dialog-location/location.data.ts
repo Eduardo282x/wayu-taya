@@ -1,5 +1,3 @@
-import type { Location } from "@/services/institution/institution.interface";
-
 /** Entrada del catalogo: un estado con sus municipios y parroquias. */
 export interface Estado {
     iso_31662: string;
@@ -15,13 +13,6 @@ export interface Municipio {
     capital: string;
     parroquias: string[];
 }
-
-/**
- * Resumen legible de una `Location`, para mostrarlo dentro del dialogo. Solo
- * es texto de apoyo: lo que se envia a la API es el objeto `Location` tal cual.
- */
-export const formatLocation = (value: Location): string =>
-    `Parroquia ${value.parish}, Municipio ${value.town}, Estado ${value.state}`;
 
 export const locations: Estado[] = [
     {

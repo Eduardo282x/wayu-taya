@@ -1,6 +1,7 @@
 import { Column } from "@/components/table/table.interface";
 import { IPeople } from "@/services/people/people.interface";
 import { formatDate } from "@/utils/formatters";
+import { formatLabelLocation } from "@/hooks/formaters";
 import { FiEdit2 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 
@@ -51,6 +52,13 @@ export const columnPeople: Column[] = [
     label: 'Dirección',
     column: 'address',
     element: (data: IPeople) => data.address,
+    isIcon: false,
+    visible: true
+  },
+  {
+    label: 'Ubicación',
+    column: 'location',
+    element: (data: IPeople) => formatLabelLocation(data.location, 'Sin ubicación'),
     isIcon: false,
     visible: true
   },

@@ -2,9 +2,15 @@ import { useForm } from "react-hook-form"
 
 // import { Input } from "@/components/ui/input"    
 import { IPeople, PeopleBody } from "@/services/people/people.interface"
+import type { Location } from "@/services/location.interface"
+import { DialogLocation } from "@/components/dialog-location/Dialog-Location"
+import { formatLabelLocation } from "@/hooks/formaters"
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FormInputCustom from "@/components/formInput/FormInputCustom";
+import { FaMapMarkerAlt } from "react-icons/fa";
+
+const EMPTY_LOCATION: Location = { state: "", town: "", parish: "" };
 
 interface PeopleFormProps {
     people: IPeople | null;
@@ -12,9 +18,11 @@ interface PeopleFormProps {
 }
 
 export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
-    const { register, handleSubmit, reset } = useForm<PeopleBody>({
+    const [isLocationOpen, setIsLocationOpen] = useState<boolean>(false);
+
+    const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<PeopleBody>({
         defaultValues: {
-            id_parroquia: 1,
+            location: { ...EMPTY_LOCATION },
             name: '',
             lastName: '',
             address: '',
@@ -29,7 +37,10 @@ export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
     useEffect(() => {
         if (people) {
             const setPeopleForm = {
-                id_parroquia: people.parishId,
+                // `location` es una columna Json: las filas anteriores a la
+                // migracion pueden traerla nula, y el backend la exige con los
+                // tres niveles. Si no esta, se deja vacia para elegirla.
+                location: people.location ?? { ...EMPTY_LOCATION },
                 name: people.name,
                 lastName: people.lastName,
                 address: people.address,
@@ -42,6 +53,38 @@ export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
             reset(setPeopleForm)
         }
     }, [people])
+
+    const watchedLocation = watch("location");
+
+    // Identidad estable: el dialogo reinicia su cascada cuando cambia la
+    // referencia de `value`, y `watch` puede devolver un objeto nuevo.
+    const dialogLocation = useMemo<Location>(
+        () => ({
+            state: watchedLocation?.state ?? "",
+            town: watchedLocation?.town ?? "",
+            parish: watchedLocation?.parish ?? "",
+        }),
+        [watchedLocation?.state, watchedLocation?.town, watchedLocation?.parish]
+    );
+
+    /**
+     * El dialogo aporta los tres niveles. Se escribe hoja por hoja porque son
+     * las rutas registradas con `required`: asi el submit se bloquea aqui y no
+     * con un 400 del backend.
+     */
+    const handleLocationConfirm = (value: Location) => {
+        setValue("location.state", value.state, { shouldValidate: true, shouldDirty: true });
+        setValue("location.town", value.town, { shouldValidate: true, shouldDirty: true });
+        setValue("location.parish", value.parish, { shouldValidate: true, shouldDirty: true });
+        setIsLocationOpen(false);
+    };
+
+    const locationCompleta = !!dialogLocation.state && !!dialogLocation.town && !!dialogLocation.parish;
+
+    const locationError =
+        errors.location?.state?.message
+        ?? errors.location?.town?.message
+        ?? errors.location?.parish?.message;
 
     const onSubmit = (data: PeopleBody) => {
         addPeople(data)
@@ -77,9 +120,38 @@ export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
                 <FormInputCustom
                     id="address"
                     label="Dirección"
+                    multiline
+                    rows={2}
                     placeholder="Calle Principal, Casa #1"
                     {...register("address")}
                 />
+
+                {/* La ubicacion no tiene control visible propio: la elige el
+                    dialogo. Estos campos ocultos existen para que RHF registre
+                    cada nivel con `required`. */}
+                <input type="hidden" {...register("location.state", { required: "Selecciona el estado" })} />
+                <input type="hidden" {...register("location.town", { required: "Selecciona el municipio" })} />
+                <input type="hidden" {...register("location.parish", { required: "Selecciona la parroquia" })} />
+
+                <div className="flex flex-col gap-1">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsLocationOpen(true)}
+                        className="w-full gap-2 text-[0.8rem]"
+                    >
+                        <FaMapMarkerAlt /> Seleccionar parroquia
+                    </Button>
+                    {locationCompleta ? (
+                        <p className="text-xs text-gray-500 manrope">{formatLabelLocation(dialogLocation)}</p>
+                    ) : (
+                        <p className="text-xs text-gray-500 manrope">
+                            Añade el estado, el municipio y la parroquia de la persona.
+                        </p>
+                    )}
+                    {locationError && <p className="text-red-500 text-xs">{locationError}</p>}
+                </div>
+
                 <FormInputCustom
                     id="birthdate"
                     label="F. Nacimiento"
@@ -105,6 +177,16 @@ export const PeopleForm = ({ addPeople, people }: PeopleFormProps) => {
                     <Button type="button" variant="outline">Cancelar</Button>
                 </div>
             </form>
+
+            {/* Fuera del `<form>` para que el boton del dialogo no dispare el
+                submit. Sigue dentro del Dialog padre en el arbol de React, que
+                es lo que hace que Radix no cierre ese Dialog al pulsar aqui. */}
+            <DialogLocation
+                open={isLocationOpen}
+                onOpenChange={setIsLocationOpen}
+                onConfirm={handleLocationConfirm}
+                value={dialogLocation}
+            />
         </>
     )
 }

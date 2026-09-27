@@ -1,3 +1,5 @@
+import type { Location } from "@/services/location.interface";
+
 export const formatDate = (dateToFormat: string | Date | number): string => {
     if (typeof dateToFormat === 'string' && !dateToFormat.includes('T')) {
         const date = dateToFormat.toString().replace(/-/g, '/');
@@ -66,3 +68,30 @@ export const formatDateOnly = (value: Date | string | null | undefined): string 
     if (Number.isNaN(date.getTime())) return '';
     return date.toISOString().slice(0, 10);
 };
+
+/**
+ * Une los tres niveles de una ubicacion para tablas y resumenes.
+ *
+ * Acepta `null` y objetos incompletos a proposito: `location` es una columna
+ * `Json` y las filas anteriores a la migracion la tienen nula o con niveles
+ * vacios, asi que asumir `Location` completa no es seguro.
+ *
+ * Los niveles repetidos se omiten porque el catalogo los tiene: el municipio
+ * Anaco tiene como parroquia "Anaco", y sin deduplicar saldria "Anaco, Anaco".
+ */
+export const formatLabelLocation = (
+    location: Location | Partial<Location> | null | undefined,
+    fallback = '',
+): string => {
+    if (!location) return fallback;
+
+    const niveles = [location.state, location.town, location.parish].reduce<string[]>(
+        (acc, nivel) => {
+            const limpio = typeof nivel === 'string' ? nivel.trim() : '';
+            return limpio && !acc.includes(limpio) ? [...acc, limpio] : acc;
+        },
+        [],
+    );
+
+    return niveles.length ? niveles.join(', ') : fallback;
+}

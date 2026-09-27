@@ -11,6 +11,7 @@ import { DatePickerRange } from "@/components/datePickerRange/DatePickerRange"
 import { getEvents, postEvents, putEvents } from "@/services/events/events.service"
 import type { EventsBody, GroupEvents, IEvents } from "@/services/events/events.interface"
 import { days, months } from "@/utils/formatters"
+import { formatLabelLocation } from "@/hooks/formaters"
 import { ScreenLoader } from "@/components/loaders/ScreenLoader"
 import { Trash2 } from "lucide-react"
 import { useAllProvidersQuery } from "@/pages/documents/providers/providers.hook"
@@ -192,7 +193,10 @@ const CardEvents = ({ event, onEdit, onDelete }: CardEventsProps) => {
                 <span className="font-semibold">Hora:</span> {formattedTimeRange}
               </div>
               <div>
-                <span className="font-semibold">Ubicación:</span> {event.address}
+                <span className="font-semibold">Dirección:</span> {event.address}
+              </div>
+              <div>
+                <span className="font-semibold">Ubicación:</span> {formatLabelLocation(event.location, 'Sin ubicación')}
               </div>
               {event.providersEvents && event.providersEvents.length > 0 && (
                 <div className="flex gap-2 items-start">
