@@ -5,7 +5,7 @@ import { DatePickerRange } from '@/components/datePickerRange/DatePickerRange';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { IInstitution } from '@/services/institution/institution.interface';
 import { IProviders } from '@/services/provider/provider.interface';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { Trash2 } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { useDonationStore } from './donationStore';
@@ -33,9 +33,17 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
     const { filters, setFilter, cleanFilters } = useDonationStore();
     const typeDonation = filters.type === 'all' ? 'Entrada' : filters.type;
 
+    // 'yyyy-MM-dd' se guarda con format() en hora local, asi que hay que
+    // releerlo con parse() (local). new Date('2026-09-15') se interpretaria
+    // como medianoche UTC y el calendario marcaria un dia antes.
+    const parseLocalDate = (value: string) => parse(value, 'yyyy-MM-dd', new Date());
+
     const dateRangeValue: DateRange | undefined =
-        filters.startDate && filters.endDate
-            ? { from: new Date(filters.startDate), to: new Date(filters.endDate) }
+        filters.startDate || filters.endDate
+            ? {
+                from: filters.startDate ? parseLocalDate(filters.startDate) : undefined,
+                to: filters.endDate ? parseLocalDate(filters.endDate) : undefined,
+            }
             : undefined;
 
     const handleDateChange = (range?: DateRange) => {
