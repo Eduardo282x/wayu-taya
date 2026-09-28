@@ -28,7 +28,7 @@ export const Sidebar = () => {
     const user = useUser();
     const rol = useRol();
     const logoutStore = useAuthStore((state) => state.logout);
-    const [menuData, setMenuData] = useState<IMenuSection[]>([{ items: menu }]);
+    const [menuData, setMenuData] = useState<IMenuSection[]>(menuHealth);
     const [currentModule, setCurrentModule] = useState<string>('Aplicaciones');
 
     /** /usuarios solo existe para Super Admin y Administrador. */
