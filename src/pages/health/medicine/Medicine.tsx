@@ -52,7 +52,7 @@ export const Medicine = () => {
   const queryClient = useQueryClient()
 
   const currentMedicines = medicinesData?.medicines ?? []
-  const totalMedicines = medicinesData?.total ?? 0
+  const totalMedicines = medicinesData?.pagination?.total ?? 0
 
   const [searchMedicine, setSearchMedicine] = useState<string>(name)
 

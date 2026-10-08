@@ -54,3 +54,14 @@ export interface PaginationQuery {
     page: number;
     size: number;
 }
+
+/**
+ * Metadatos de paginacion que devuelve la API en las respuestas paginadas,
+ * anidados bajo la propiedad `pagination`.
+ */
+export interface PaginationMeta {
+    total: number;
+    page: number;
+    size: number;
+    totalPages: number;
+}

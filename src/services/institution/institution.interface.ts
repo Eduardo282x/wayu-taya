@@ -1,4 +1,4 @@
-import { PaginationQuery } from "../base.interface";
+import { PaginationMeta, PaginationQuery } from "../base.interface";
 import type { Location } from "../location.interface";
 
 export interface InstitutionContent {
@@ -7,10 +7,7 @@ export interface InstitutionContent {
 
 export interface PaginatedInstitutionsContent {
     institutions: IInstitution[];
-    page: number;
-    size: number;
-    total: number;
-    totalPages: number;
+    pagination: PaginationMeta;
 }
 
 export type InstitutionsQueryParams = PaginationQuery;

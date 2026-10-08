@@ -1,4 +1,4 @@
-import { PaginationQuery } from "../base.interface";
+import { PaginationMeta, PaginationQuery } from "../base.interface";
 
 export interface MedicineBody {
     name: string;
@@ -25,22 +25,7 @@ export interface MedicineQueryParams extends PaginationQuery {
 
 export interface PaginatedMedicineContent {
     medicines: IMedicine[];
-    page: number;
-    size: number;
-    total: number;
-    totalPages: number;
-}
-
-export interface MedicineQueryParams extends PaginationQuery {
-    name?: string;
-}
-
-export interface PaginatedMedicineContent {
-    medicines: IMedicine[];
-    page: number;
-    size: number;
-    total: number;
-    totalPages: number;
+    pagination: PaginationMeta;
 }
 
 export interface IMedicine {

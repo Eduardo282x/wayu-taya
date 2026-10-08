@@ -34,7 +34,7 @@ export const Inventory = () => {
   const moveInventory = useMoveInventoryMutation()
 
   const currentInventory = inventoryData?.inventory ?? []
-  const totalInventory = inventoryData?.total ?? 0
+  const totalInventory = inventoryData?.pagination?.total ?? 0
   const stores: IStore[] = storesData?.stores ?? []
 
   const [searchInventory, setSearchInventory] = useState<string>(name)

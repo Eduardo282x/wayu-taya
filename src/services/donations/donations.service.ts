@@ -22,10 +22,12 @@ export const getDonations = async (params?: DonationsQueryParams): Promise<Pagin
     if (response.data == null) {
         return {
             donations: [],
-            page: params?.page ?? 1,
-            size: params?.size ?? 100,
-            total: 0,
-            totalPages: 0,
+            pagination: {
+                total: 0,
+                page: params?.page ?? 1,
+                size: params?.size ?? 100,
+                totalPages: 0,
+            },
         }
     }
     return response.data;

@@ -53,9 +53,9 @@ export const ProvidersInstitutions = () => {
 	const deleteInstitution = useDeleteInstitutionMutation();
 
 	const currentProviders = useMemo(() => providersData?.providers ?? [], [providersData]);
-	const totalProviders = providersData?.total ?? 0;
+	const totalProviders = providersData?.pagination?.total ?? 0;
 	const currentInstitutions = useMemo(() => institutionsData?.institutions ?? [], [institutionsData]);
-	const totalInstitutions = institutionsData?.total ?? 0;
+	const totalInstitutions = institutionsData?.pagination?.total ?? 0;
 
 	useEffect(() => {
 		setFilteredProviders(currentProviders);

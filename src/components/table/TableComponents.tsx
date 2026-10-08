@@ -138,7 +138,7 @@ export const TableComponents: FC<TableProps> = ({
           </TableBody>
         </Table>
 
-      {!loading && (totalElements >= 100 || isServerSide && totalElements > 0) ? (
+      {!loading && (totalElements >= 20 || isServerSide && totalElements > 0) ? (
         <PaginationTable
           page={page}
           setPage={handleSetPage}

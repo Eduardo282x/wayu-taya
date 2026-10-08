@@ -32,7 +32,7 @@ export const Donations = () => {
   const updateDonation = useUpdateDonationMutation()
 
   const currentDonations = donationsData?.donations ?? []
-  const totalDonations = donationsData?.total ?? 0
+  const totalDonations = donationsData?.pagination?.total ?? 0
 
   const [searchControl, setSearchControl] = useState<string>(filters.controlNumber)
 

@@ -1,6 +1,7 @@
 import { IMedicine } from "../medicine/medicine.interface";
 import { IInstitution } from "../institution/institution.interface";
 import { IProviders } from "../provider/provider.interface";
+import { PaginationMeta } from "../base.interface";
 
 export type TypeDonation = "Entrada" | "Salida";
 
@@ -80,11 +81,7 @@ export interface DonationsContent {
 
 export interface PaginatedDonationsContent {
     donations: IDonations[];
-    page: number;
-    size: number;
-    total: number;
-    totalPages: number;
-    pagination?: { total: number; page: number; size: number; totalPages: number };
+    pagination: PaginationMeta;
 }
 
 export interface IDonations {

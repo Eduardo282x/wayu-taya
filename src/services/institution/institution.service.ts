@@ -21,10 +21,12 @@ export const getInstitutionsPage = async (params: InstitutionsQueryParams): Prom
     if (response.data == null) {
         return {
             institutions: [],
-            page: params?.page ?? 1,
-            size: params?.size ?? 100,
-            total: 0,
-            totalPages: 0,
+            pagination: {
+                total: 0,
+                page: params?.page ?? 1,
+                size: params?.size ?? 100,
+                totalPages: 0,
+            },
         }
     }
     return response.data;

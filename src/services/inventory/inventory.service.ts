@@ -25,10 +25,12 @@ export const getInventoryPage = async (params: InventoryQueryParams): Promise<Pa
     if (response.data == null) {
         return {
             inventory: [],
-            page: params?.page ?? 1,
-            size: params?.size ?? 100,
-            total: 0,
-            totalPages: 0,
+            pagination: {
+                total: 0,
+                page: params?.page ?? 1,
+                size: params?.size ?? 100,
+                totalPages: 0,
+            },
         }
     }
     return response.data;
