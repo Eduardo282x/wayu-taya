@@ -485,6 +485,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                 label="Tipo"
                 id="type"
                 {...register("type")}
+                value={typeDonation}
                 options={[
                   { value: "Entrada", label: "Entrada" },
                   { value: "Salida", label: "Salida" }

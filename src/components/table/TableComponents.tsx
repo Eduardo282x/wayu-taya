@@ -79,6 +79,7 @@ export const TableComponents: FC<TableProps> = ({
 
   useEffect(() => {
     filterColumnsByUser()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [column])
 
   const filterColumnsByUser = () => {

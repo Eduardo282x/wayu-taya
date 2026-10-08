@@ -105,14 +105,16 @@ const FormInputCustom: React.FC<FormInputProps> = ({
               type="button"
               variant="outline"
               className={cn(
-                "w-full justify-start rounded-md border bg-white px-3 py-1 text-left",
+                "w-full justify-start overflow-hidden rounded-md border bg-white px-3 py-1 text-left",
                 !selectedDate && "text-muted-foreground",
                 className
               )}
               disabled={inputProps.disabled}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {selectedDate ? format(selectedDate, "PPP", { locale: es }) : placeholder}
+              <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+              <span className="min-w-0 truncate">
+                {selectedDate ? format(selectedDate, "PPP", { locale: es }) : placeholder}
+              </span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="p-0 overflow-hidden rounded-md" align="start">

@@ -41,6 +41,7 @@ export const Inventory = () => {
 
   const debouncedName = useMemo(
     () => debounce((value: string) => setName(value), 300),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
@@ -112,7 +113,7 @@ export const Inventory = () => {
           <input
             type="search"
             placeholder="Buscar medicina..."
-            className="w-40 lg:w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+            className="w-40 lg:w-60 focus:outline-0 shadow-2xl border border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
             value={searchInventory}
             onChange={(e) => {
               setSearchInventory(e.target.value)
