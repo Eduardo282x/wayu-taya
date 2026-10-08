@@ -8,6 +8,7 @@ import { useIsAuthenticated } from "@/store/auth.store"
 export const inventoryKeys = {
     all: ["inventory"] as const,
     list: (params: InventoryQueryParams) => ["inventory", "list", params] as const,
+    search: (name: string) => ["inventory", "search", name] as const,
     history: ["inventory", "history"] as const,
 }
 
@@ -33,6 +34,22 @@ export const useAllInventoryQuery = (enabled = true) => {
         enabled: enabled && isAuthenticated,
         staleTime: Infinity,
         gcTime: 30 * 60 * 1000,
+    })
+}
+
+/**
+ * Busca inventario por nombre de medicina directamente en la API. No usa el
+ * `inventoryStore` para no afectar la tabla del modulo de Inventario.
+ */
+export const useInventorySearchQuery = (name: string) => {
+    const isAuthenticated = useIsAuthenticated()
+    const params: InventoryQueryParams = { page: 1, size: 30, name }
+
+    return useQuery({
+        queryKey: inventoryKeys.search(name),
+        queryFn: () => getInventoryPage(params),
+        enabled: isAuthenticated && name.trim().length > 0,
+        staleTime: 60 * 1000,
     })
 }
 

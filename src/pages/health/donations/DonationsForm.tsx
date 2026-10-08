@@ -10,10 +10,11 @@ import FormSelectCustom from "@/components/formInput/FormSelectCustom"
 import { FormAutocompleteV2 } from "@/components/formInput/FormAutoCompleteCustomV2"
 import { IStore } from "@/services/store/store.interface"
 import { IMedicine, MedicineBody } from "@/services/medicine/medicine.interface"
-import { useCategoriesQuery, useFormsQuery, useCreateMedicineMutation } from "../medicine/medicine.hook"
+import { useCategoriesQuery, useFormsQuery, useCreateMedicineMutation, useMedicineSearchQuery } from "../medicine/medicine.hook"
 import { IInstitution } from "@/services/institution/institution.interface"
 import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
+import { useInventorySearchQuery } from "../inventory/inventory.hook"
 import { formatDate, formatDateForInput } from "@/utils/formatters"
 import { IoMdAdd } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -59,6 +60,71 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const { data: categoriesData } = useCategoriesQuery();
   const { data: formsData } = useFormsQuery();
   const createMedicine = useCreateMedicineMutation();
+
+  const [medicineQuery, setMedicineQuery] = useState("");
+  const [debouncedMedicineQuery, setDebouncedMedicineQuery] = useState("");
+  const [inventoryQuery, setInventoryQuery] = useState("");
+  const [debouncedInventoryQuery, setDebouncedInventoryQuery] = useState("");
+  const [medicineDirectory, setMedicineDirectory] = useState<Record<number, IMedicine>>({});
+  const [inventoryDirectory, setInventoryDirectory] = useState<Record<number, IInventory>>({});
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedMedicineQuery(medicineQuery), 300);
+    return () => clearTimeout(id);
+  }, [medicineQuery]);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedInventoryQuery(inventoryQuery), 300);
+    return () => clearTimeout(id);
+  }, [inventoryQuery]);
+
+  const { data: medicineSearchData, isFetching: isSearchingMedicines } = useMedicineSearchQuery(debouncedMedicineQuery);
+  const { data: inventorySearchData, isFetching: isSearchingInventory } = useInventorySearchQuery(debouncedInventoryQuery);
+
+  const resetMedicineSearch = () => {
+    setMedicineQuery("");
+    setDebouncedMedicineQuery("");
+  };
+
+  const resetInventorySearch = () => {
+    setInventoryQuery("");
+    setDebouncedInventoryQuery("");
+  };
+
+  useEffect(() => {
+    setMedicineDirectory((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      const sources: IMedicine[] = [
+        ...medicines,
+        ...createdMedicines,
+        ...(donation?.detDonation?.map((det) => det.medicine).filter(Boolean) as IMedicine[] ?? []),
+        ...(medicineSearchData?.medicines ?? []),
+      ];
+      sources.forEach((med) => {
+        if (med && next[med.id] == null) {
+          next[med.id] = med;
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [medicines, createdMedicines, donation, medicineSearchData]);
+
+  useEffect(() => {
+    setInventoryDirectory((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      const sources: IInventory[] = [...inventory, ...(inventorySearchData?.inventory ?? [])];
+      sources.forEach((inv) => {
+        if (inv?.medicine && next[inv.medicine.id] == null) {
+          next[inv.medicine.id] = inv;
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [inventory, inventorySearchData]);
 
   const { register, handleSubmit, reset, watch, setValue, getValues } = useForm<DonationBody & { storeId: number }>({
     defaultValues: {
@@ -322,9 +388,13 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }
 
   const filteredOptions = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
-    const allMedicines = [...medicines, ...createdMedicines].filter(
-      (med, i, arr) => arr.findIndex((m) => m.id === med.id) === i
-    );
+    const current = detail.medicineId ? medicineDirectory[detail.medicineId] : undefined;
+    const base = medicineQuery.trim()
+      ? (medicineSearchData?.medicines ?? [])
+      : Object.values(medicineDirectory);
+    const allMedicines = current && !base.some((med) => med.id === current.id)
+      ? [...base, current]
+      : base;
     return allMedicines
       .filter(med => {
         // Obtén los ids seleccionados en otros campos (excepto el actual)
@@ -346,7 +416,14 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }
 
   const filteredOptionsExit = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
-    return inventory
+    const current = detail.medicineId ? inventoryDirectory[detail.medicineId] : undefined;
+    const base = inventoryQuery.trim()
+      ? (inventorySearchData?.inventory ?? [])
+      : Object.values(inventoryDirectory);
+    const allInventory = current && !base.some((inv) => inv.medicine.id === current.medicine.id)
+      ? [...base, current]
+      : base;
+    return allInventory
       .filter(inv => {
         // Obtén los ids seleccionados en otros campos (excepto el actual)
         const selectedIds = medicineDetails
@@ -510,6 +587,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     medicineDetails={medicineDetails}
                     handleMedicineDetailChange={handleMedicineDetailChange}
                     onCreateMedicine={openCreateMedicine}
+                    onSearch={setMedicineQuery}
+                    searching={isSearchingMedicines || medicineQuery.trim() !== debouncedMedicineQuery.trim()}
+                    onOpenChange={(isOpen) => { if (isOpen) resetMedicineSearch(); }}
                   />
                 </div>
               ))
@@ -527,6 +607,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     medicineDetails={medicineDetails}
                     handleMedicineDetailChange={handleMedicineDetailChange}
                     onCreateMedicine={openCreateMedicine}
+                    onSearch={setInventoryQuery}
+                    searching={isSearchingInventory || inventoryQuery.trim() !== debouncedInventoryQuery.trim()}
+                    onOpenChange={(isOpen) => { if (isOpen) resetInventorySearch(); }}
                   />
                 </div>
               ))
@@ -609,6 +692,9 @@ interface DonationDetailFormEntryProps {
   medicineDetails: DonationMedicine[];
   handleMedicineDetailChange: (index: number, field: DonationTypeForm, value: string | number, indexDet?: number) => void;
   onCreateMedicine: (index: number) => void;
+  onSearch?: (query: string) => void;
+  searching?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 const DonationDetailFormEntry = ({
   removeMedicineDetail,
@@ -617,7 +703,10 @@ const DonationDetailFormEntry = ({
   medicineDetails,
   detail,
   handleMedicineDetailChange,
-  onCreateMedicine
+  onCreateMedicine,
+  onSearch,
+  searching,
+  onOpenChange
 }: DonationDetailFormEntryProps) => {
   return (
     <div className="border border-gray-400 rounded-lg p-2 bg-white relative ">
@@ -645,6 +734,9 @@ const DonationDetailFormEntry = ({
               data={filteredOptions(detail, index)}
               valueDefault={detail.medicineId}
               onChange={(value) => handleMedicineDetailChange(index, "medicineId", Number(value))}
+              onSearch={onSearch}
+              loading={searching}
+              onOpenChange={onOpenChange}
             />
           </div>
           <Tooltip>
@@ -705,7 +797,10 @@ const DonationDetailFormExit = ({
   detail,
   inventory,
   stores,
-  handleMedicineDetailChange
+  handleMedicineDetailChange,
+  onSearch,
+  searching,
+  onOpenChange
 }: DonationDetailFormExitProps) => {
 
   const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
@@ -774,6 +869,9 @@ const DonationDetailFormExit = ({
             data={filteredOptions(detail, index)}
             valueDefault={detail.medicineId}
             onChange={(value) => changeMedicine(value)}
+            onSearch={onSearch}
+            loading={searching}
+            onOpenChange={onOpenChange}
           />
         </div>
         <FormSelectCustom

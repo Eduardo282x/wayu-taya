@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Plus, SearchIcon } from "lucide-react"
+import { Check, ChevronsUpDown, Loader2, Plus, SearchIcon } from "lucide-react"
 import { FC, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
@@ -28,13 +28,22 @@ interface AutoCompleteProps {
    * mismo efecto visual sin portalizar.
    */
   overlay?: boolean
+  /**
+   * Cuando se entrega, el filtrado local se desactiva y cada cambio en el
+   * input dispara `onSearch` para que el consumidor resuelva las opciones
+   * contra la API (busqueda asincrona).
+   */
+  onSearch?: (query: string) => void
+  loading?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo, freeText, disabled, overlay }) => {
+export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo, freeText, disabled, overlay, onSearch, loading, onOpenChange }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string | number>(valueDefault ? valueDefault : "");
   const [inputValue, setInputValue] = useState<string>("");
-  const [dataFiltered, setDataFiltered] = useState<{ label: string, value: string }[]>(data);
+  const [localFiltered, setLocalFiltered] = useState<{ label: string, value: string }[]>(data);
+  const dataFiltered = onSearch ? data : localFiltered;
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -72,8 +81,13 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
   useEffect(() => {
     if (open) {
       setInputValue('')
-      setDataFiltered(data);
+      setLocalFiltered(data);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  useEffect(() => {
+    onOpenChange?.(open)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -93,16 +107,20 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
       left: rect.left,
       width: rect.width,
     });
-  }, [open, inputValue, dataFiltered]);
+  }, [open, inputValue]);
 
   const normalize = (str: string) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+    if (onSearch) {
+      onSearch(e.target.value);
+      return;
+    }
     const filteredData = data.filter((option) =>
       normalize(option.label).includes(normalize(e.target.value))
     );
-    setDataFiltered(filteredData);
+    setLocalFiltered(filteredData);
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -144,6 +162,12 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
         />
       </div>
       <div className="max-h-60 overflow-y-auto px-2 w-full">
+        {loading && (
+          <p className="flex items-center justify-center gap-1 text-[.85rem] py-2 text-gray-600">
+            <Loader2 className="size-4 animate-spin" /> Buscando...
+          </p>
+        )}
+
         {dataFiltered && dataFiltered.map((option: { label: string, value: string }, index: number) => {
           const isSelected = multiple
             ? dataSelected?.includes(option.value)
@@ -171,7 +195,7 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
           </p>
         )}
 
-        {dataFiltered.length == 0 && !(freeText && inputValue.trim()) && (
+        {!loading && dataFiltered.length == 0 && !(freeText && inputValue.trim()) && (
           <p className="text-[.85rem] py-2 text-center text-gray-600">No se encontraron datos.</p>
         )}
       </div>

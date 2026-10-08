@@ -8,6 +8,7 @@ export const medicineKeys = {
     all: ["medicines"] as const,
     allList: ["medicines", "all"] as const,
     list: (params: MedicineQueryParams) => ["medicines", "list", params] as const,
+    search: (name: string) => ["medicines", "search", name] as const,
     categories: ["medicines", "categories"] as const,
     forms: ["medicines", "forms"] as const,
 }
@@ -34,6 +35,22 @@ export const useAllMedicinesQuery = (enabled = true) => {
         enabled: enabled && isAuthenticated,
         staleTime: Infinity,
         gcTime: 30 * 60 * 1000,
+    })
+}
+
+/**
+ * Busca medicinas por nombre directamente en la API. Independiente del
+ * `medicineStore` para no interferir con la tabla del modulo de Medicamentos.
+ */
+export const useMedicineSearchQuery = (name: string) => {
+    const isAuthenticated = useIsAuthenticated()
+    const params: MedicineQueryParams = { page: 1, size: 30, name }
+
+    return useQuery({
+        queryKey: medicineKeys.search(name),
+        queryFn: () => getMedicinesPage(params),
+        enabled: isAuthenticated && name.trim().length > 0,
+        staleTime: 60 * 1000,
     })
 }
 

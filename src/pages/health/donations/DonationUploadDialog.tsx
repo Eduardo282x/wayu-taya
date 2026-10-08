@@ -14,6 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TableComponents } from "@/components/table/TableComponents"
 import { Column } from "@/components/table/table.interface"
 import { getDonationsExcelTemplate } from "@/services/donations/donations.service"
+import { getMedicinesPage } from "@/services/medicine/medicine.service"
 import { DonationMedicine } from "@/services/donations/donations.interface"
 import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface"
 import { MedicineForm } from "../medicine/MedicineForm"
@@ -83,14 +84,15 @@ export const DonationUploadDialog = ({
   const [parsing, setParsing] = useState(false)
   const [templateLoading, setTemplateLoading] = useState(false)
   const [newsCreated, setNewsCreated] = useState<IMedicine[]>(createdMedicines)
+  const [remoteMedicines, setRemoteMedicines] = useState<IMedicine[]>([])
   const [medicineFormOpen, setMedicineFormOpen] = useState(false)
   const [medicineFormRow, setMedicineFormRow] = useState<number | null>(null)
   const [alert, setAlert] = useState<string>("")
 
   const knownMedicines = useMemo(() => {
-    const combined = [...medicines, ...newsCreated]
+    const combined = [...medicines, ...newsCreated, ...remoteMedicines]
     return combined.filter((med, i, arr) => arr.findIndex((m) => m.id === med.id) === i)
-  }, [medicines, newsCreated])
+  }, [medicines, newsCreated, remoteMedicines])
 
   useEffect(() => {
     setNewsCreated(createdMedicines)
@@ -138,8 +140,11 @@ export const DonationUploadDialog = ({
     file
       .arrayBuffer()
       .then((buffer) => parseWorkbook(buffer))
-      .then((parsed) => {
-        setRows(validateRows(parsed))
+      .then(async (parsed) => {
+        const validated = validateRows(parsed)
+        setRows(validated)
+        const enriched = await enrichRows(validated)
+        setRows(enriched)
       })
       .catch(() => {
         setRows([])
@@ -200,39 +205,92 @@ export const DonationUploadDialog = ({
     return str
   }
 
-  const parsePasteContent = () => {
+  const parsePasteContent = async () => {
     const content = pasteContent.trim()
     if (!content) {
       setAlert("Pega filas copiadas desde Excel antes de validar.")
       return
     }
     setAlert("")
-    const lines = content
-      .split(/\r?\n/)
-      .map((line) => line.trimEnd())
-      .filter((line) => line.trim().length > 0)
+    setParsing(true)
+    try {
+      const lines = content
+        .split(/\r?\n/)
+        .map((line) => line.trimEnd())
+        .filter((line) => line.trim().length > 0)
 
-    if (lines.length === 0) {
-      setRows([])
-      return
+      if (lines.length === 0) {
+        setRows([])
+        return
+      }
+
+      const firstColumns = lines[0].split("\t").map((cell) => cell.trim())
+      const hasHeader = firstColumns.some((cell) =>
+        HEADERS.some((h) => normalizeText(h) === normalizeText(cell))
+      )
+      const dataLines = hasHeader ? lines.slice(1) : lines
+
+      const parsed = dataLines.map((line) => {
+        const [medicina = "", cantidad = "", lote = "", fechaExpiracion = ""] = line.split("\t")
+        return {
+          medicina: medicina.trim(),
+          cantidad: cantidad.trim(),
+          lote: lote.trim(),
+          fechaExpiracion: normalizeDateCell(fechaExpiracion.trim()),
+        }
+      })
+      const validated = validateRows(parsed)
+      setRows(validated)
+      const enriched = await enrichRows(validated)
+      setRows(enriched)
+    } finally {
+      setParsing(false)
+    }
+  }
+
+  const enrichRows = async (validated: ValidatedRow[]): Promise<ValidatedRow[]> => {
+    const unmatchedNames = Array.from(
+      new Set(validated.filter((row) => row.newMedicine && row.medicina).map((row) => row.medicina))
+    )
+
+    if (unmatchedNames.length === 0) return validated
+
+    const matches = await Promise.all(
+      unmatchedNames.map(async (name) => {
+        try {
+          const response = await getMedicinesPage({ page: 1, size: 5, name })
+          const found = response?.medicines ?? []
+          return found.find((med) => normalizeText(med.name) === normalizeText(name)) ?? null
+        } catch {
+          return null
+        }
+      })
+    )
+
+    const foundMedicines = matches.filter((med): med is IMedicine => med != null)
+    if (foundMedicines.length > 0) {
+      setRemoteMedicines((prev) => {
+        const next = [...prev]
+        foundMedicines.forEach((med) => {
+          if (!next.some((item) => item.id === med.id)) next.push(med)
+        })
+        return next
+      })
     }
 
-    const firstColumns = lines[0].split("\t").map((cell) => cell.trim())
-    const hasHeader = firstColumns.some((cell) =>
-      HEADERS.some((h) => normalizeText(h) === normalizeText(cell))
-    )
-    const dataLines = hasHeader ? lines.slice(1) : lines
-
-    const parsed = dataLines.map((line) => {
-      const [medicina = "", cantidad = "", lote = "", fechaExpiracion = ""] = line.split("\t")
+    const byName = new Map(foundMedicines.map((med) => [normalizeText(med.name), med]))
+    return validated.map((row) => {
+      const match = byName.get(normalizeText(row.medicina))
+      if (!match || !row.newMedicine) return row
+      const errors = row.errors.filter((error) => !error.includes("no registrada"))
       return {
-        medicina: medicina.trim(),
-        cantidad: cantidad.trim(),
-        lote: lote.trim(),
-        fechaExpiracion: normalizeDateCell(fechaExpiracion.trim()),
+        ...row,
+        medicineId: match.id,
+        newMedicine: false,
+        status: errors.length > 0 ? "error" : "valid",
+        errors,
       }
     })
-    setRows(validateRows(parsed))
   }
 
   const validateRows = (parsed: ParsedRow[]): ValidatedRow[] => {
