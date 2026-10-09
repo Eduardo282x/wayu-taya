@@ -1,4 +1,4 @@
-import { getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
+import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
 import { DonationBody, DonationsQueryParams, IDonations, LotesContent, PaginatedDonationsContent } from "./donations.interface";
 import { BaseResponse } from "../base.interface";
 
@@ -60,4 +60,8 @@ export const postDonation = async (data: DonationBody): Promise<BaseResponse<IDo
 
 export const putDonation = async (id: number, data: DonationBody): Promise<BaseResponse<IDonations | null>> => {
     return putDataApi<DonationBody, IDonations>(`${donationsUrl}/${id}`, data);
+}
+
+export const deleteDonation = async (id: number): Promise<BaseResponse<IDonations | null>> => {
+    return deleteDataApi<IDonations>(`${donationsUrl}/${id}`);
 }

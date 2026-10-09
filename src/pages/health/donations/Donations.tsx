@@ -10,26 +10,32 @@ import { DonationsForm } from "./DonationsForm"
 import PageTransitionComponent from "@/components/PageTransition"
 import { Plus } from "lucide-react"
 import { DonationFilterDropDown } from "./DonationFilters"
-import { useDonationsQuery, useLotesQuery, useCreateDonationMutation, useUpdateDonationMutation } from "./donations.hook"
+import { useDonationsQuery, useLotesQuery, useCreateDonationMutation, useUpdateDonationMutation, useDeleteDonationMutation } from "./donations.hook"
 import { useDonationStore } from "./donationStore"
 import { useStoresQuery } from "@/pages/health/store/store.hook"
 import { useAllInventoryQuery } from "@/pages/health/inventory/inventory.hook"
 import { useAllMedicinesQuery } from "@/pages/health/medicine/medicine.hook"
 import { useAllProvidersQuery, useAllInstitutionsQuery } from "@/pages/documents/providers/providers.hook"
+import { DonationInventoryWarningDialog } from "./DonationInventoryWarningDialog"
+import { apiMessage } from "@/services/api-error"
+import toast from "react-hot-toast"
 
 export const Donations = () => {
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [deleteWarningOpen, setDeleteWarningOpen] = useState<boolean>(false)
+  const [deleting, setDeleting] = useState<boolean>(false)
   const { page, size, setPage, setSize, filters, setFilter } = useDonationStore()
   const { data: donationsData, isFetching } = useDonationsQuery()
   const { data: lotesData } = useLotesQuery()
-  const { data: storesData } = useStoresQuery(openDialog)
+  const { data: storesData } = useStoresQuery(openDialog || deleteWarningOpen)
   const { data: allInventoryData } = useAllInventoryQuery(openDialog)
   const { data: allMedicinesData } = useAllMedicinesQuery(openDialog)
   const { data: allProvidersData } = useAllProvidersQuery()
   const { data: allInstitutionsData } = useAllInstitutionsQuery()
   const createDonation = useCreateDonationMutation()
   const updateDonation = useUpdateDonationMutation()
+  const deleteDonation = useDeleteDonationMutation()
 
   const currentDonations = donationsData?.donations ?? []
   const totalDonations = donationsData?.pagination?.total ?? 0
@@ -56,11 +62,42 @@ export const Donations = () => {
     if (action == "edit") {
       setOpenDialog(true)
     }
+
+    if (action == "delete") {
+      setDeleteWarningOpen(true)
+    }
   }
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setDonationSelected(null);
+  }
+
+  const handleCloseDeleteWarning = () => {
+    setDeleteWarningOpen(false);
+    setDonationSelected(null);
+  }
+
+  const handleConfirmDeleteDonation = async () => {
+    if (!donationSelected) return;
+
+    setDeleting(true);
+    try {
+      const response = await deleteDonation.mutateAsync(donationSelected.id);
+
+      if (!response.success) {
+        toast.error(apiMessage(response, 'No se pudo eliminar la donación.'));
+        return;
+      }
+
+      toast.success(response.message || 'Donación eliminada correctamente.');
+      setDeleteWarningOpen(false);
+      setDonationSelected(null);
+    } catch {
+      toast.error('Error inesperado al eliminar la donación.');
+    } finally {
+      setDeleting(false);
+    }
   }
 
   const handleSaveDonation = async (donationData: DonationBody): Promise<{ success: boolean; message?: string }> => {
@@ -148,6 +185,16 @@ export const Donations = () => {
             onCancel={handleCloseDialog} />
         </div>
       </PageTransitionComponent>
+
+      <DonationInventoryWarningDialog
+        open={deleteWarningOpen}
+        onOpenChange={(open) => { if (!open) handleCloseDeleteWarning(); }}
+        mode="delete"
+        donation={donationSelected}
+        stores={storesData?.stores ?? []}
+        loading={deleting}
+        onConfirm={handleConfirmDeleteDonation}
+      />
     </div>
   )
 }

@@ -96,10 +96,22 @@ export interface IDonations {
     lote: string;
     benefited?: number | null;
     changeDonDetails?: boolean;
+    outflows: Outflows[];
+    hasOutflows: boolean;
     createAt: Date;
     updateAt: Date;
     detDonation: DetDonation[];
 }
+
+export interface Outflows {
+    medicineId:     number;
+    lote:           string;
+    storeId:        number;
+    salidas:        number;
+    transferencias: number;
+    total:          number;
+}
+
 
 export interface DetDonation {
     id: number;

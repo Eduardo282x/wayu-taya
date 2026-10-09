@@ -2,6 +2,7 @@ import { Column } from "@/components/table/table.interface";
 import { DetDonation, IDonations } from "@/services/donations/donations.interface";
 import { formatDate } from "@/utils/formatters";
 import { FiEdit2 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 import { DonationDownloadMenu } from "./DonationDownloadMenu";
 import { formatNumberWithDots } from "@/hooks/formaters";
 
@@ -86,6 +87,20 @@ export const donationsColumns: Column[] = [
         element: (data: IDonations) =>
             data.type === 'Entrada' ? null : <DonationDownloadMenu donationId={data.id} controlNumber={data.controlNumber} />,
         className: () => 'w-48 max-w-48 text-ellipsis overflow-hidden',
+    },
+    {
+        label: "Eliminar",
+        column: "delete",
+        visible: true,
+        isIcon: true,
+        element: () => "",
+        icon: {
+            label: "Eliminar donación",
+            icon: FiTrash2,
+            className: "text-red-500 font-bold",
+            variant: "delete",
+        },
+        className: () => 'w-20 max-w-20 text-ellipsis overflow-hidden'
     },
 ];
 

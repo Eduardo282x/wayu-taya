@@ -27,6 +27,7 @@ import {
 } from "@/components/StyledDialog/StyledDialog"
 import { MedicineForm } from "../medicine/MedicineForm"
 import { DonationUploadDialog } from "./DonationUploadDialog"
+import { DonationInventoryWarningDialog } from "./DonationInventoryWarningDialog"
 import { FaFileExcel } from "react-icons/fa";
 export interface SaveDonationResult {
   success: boolean;
@@ -55,6 +56,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const [medicineFormIndex, setMedicineFormIndex] = useState<number | null>(null);
   const [createdMedicines, setCreatedMedicines] = useState<IMedicine[]>([]);
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
+  const [inventoryWarningOpen, setInventoryWarningOpen] = useState<boolean>(false);
+  const [pendingDonation, setPendingDonation] = useState<DonationBody | null>(null);
   // const defaultTime = today.toTimeString().slice(0, 5); // "HH:mm"
 
   const { data: categoriesData } = useCategoriesQuery();
@@ -170,6 +173,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   useEffect(() => {
     setAlert(false);
     setMessage('');
+    setInventoryWarningOpen(false);
+    setPendingDonation(null);
 
     if (donation) {
       reset({
@@ -325,6 +330,59 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     return JSON.stringify(currentDetails) !== JSON.stringify(originalDetails);
   };
 
+  /**
+   * Un cambio afecta al inventario cuando se modifican los elementos de la
+   * donación, cuando cambia el almacén de una Entrada o cuando se cambia el
+   * tipo (Entrada <-> Salida). Cambios de cabecera como proveedor, institución,
+   * control o fecha no reprocesan el inventario por sí solos.
+   */
+  const hasInventoryAffectingChanges = (data: DonationBody): boolean => {
+    if (!donation) return false;
+
+    const detailsChanged = hasDonationDetailsChanged();
+    const typeChanged = data.type !== donation.type;
+    const storeChanged =
+      data.type === 'Entrada' &&
+      Number(getValues('storeId')) !== Number(donation.detDonation?.[0]?.storageId ?? 0);
+
+    return detailsChanged || typeChanged || storeChanged;
+  };
+
+  const persistDonation = async (parseData: DonationBody) => {
+    let result: SaveDonationResult;
+    setSaving(true);
+    try {
+      result = await onSave(parseData);
+    } catch {
+      result = { success: false, message: 'Error inesperado al guardar la donación.' };
+    }
+    setSaving(false);
+
+    if (!result.success) {
+      setAlert(true);
+      setMessage(result.message || 'Error al guardar la donación.');
+      return;
+    }
+
+    reset();
+    setMedicineDetails([createEmptyMedicine(1), createEmptyMedicine(2)]);
+    setAlert(false);
+    setMessage('');
+  }
+
+  const handleConfirmInventoryWarning = async () => {
+    if (!pendingDonation) return;
+    const parseData = pendingDonation;
+    setInventoryWarningOpen(false);
+    setPendingDonation(null);
+    await persistDonation(parseData);
+  }
+
+  const handleCancelInventoryWarning = () => {
+    setInventoryWarningOpen(false);
+    setPendingDonation(null);
+  }
+
   const onSubmit = async (data: DonationBody) => {
     if (data.lote == '' || data.date == '') {
       setAlert(true)
@@ -352,7 +410,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       lote: data.lote,
       controlNumber: data.controlNumber,
       date: new Date(data.date),
-      changeDonDetails: donation ? hasDonationDetailsChanged() : false,
+      changeDonDetails: donation ? hasInventoryAffectingChanges(data) : false,
       medicines: parseMedicineDetails.map(det => {
         return {
           medicineId: det.medicineId == 0 ? undefined : Number(det.medicineId),
@@ -366,25 +424,14 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         }
       }),
     };
-    let result: SaveDonationResult;
-    setSaving(true);
-    try {
-      result = await onSave(parseData);
-    } catch {
-      result = { success: false, message: 'Error inesperado al guardar la donación.' };
-    }
-    setSaving(false);
 
-    if (!result.success) {
-      setAlert(true);
-      setMessage(result.message || 'Error al guardar la donación.');
+    if (donation?.hasOutflows && parseData.changeDonDetails) {
+      setPendingDonation(parseData);
+      setInventoryWarningOpen(true);
       return;
     }
 
-    reset();
-    setMedicineDetails([createEmptyMedicine(1), createEmptyMedicine(2)]);
-    setAlert(false);
-    setMessage('');
+    await persistDonation(parseData);
   }
 
   const filteredOptions = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
@@ -680,6 +727,16 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         forms={formsData?.forms ?? []}
         onCreateMedicine={(formData) => createMedicine.mutateAsync(formData)}
         onApply={handleApplyUpload}
+      />
+
+      <DonationInventoryWarningDialog
+        open={inventoryWarningOpen}
+        onOpenChange={(openDialog) => { if (!openDialog) handleCancelInventoryWarning(); }}
+        mode="edit"
+        donation={donation}
+        stores={stores}
+        loading={saving}
+        onConfirm={handleConfirmInventoryWarning}
       />
     </div>
   )
