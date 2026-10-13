@@ -12,20 +12,12 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { FaExchangeAlt, FaWarehouse, FaPills, FaPlus } from "react-icons/fa"
-import type { IInventory } from "@/services/inventory/inventory.interface"
+import type { IInventory, MoveMedicineFormData } from "@/services/inventory/inventory.interface"
 import { Trash2 } from "lucide-react"
 import { IStore } from "@/services/store/store.interface"
 
-interface MovementItem {
-  medicineId: string | number;
-  sourceStoreId: string | number;
-  quantity: number;
-  targetStoreId: string | number;
-}
-
-export interface MoveMedicineFormData {
-  movements: MovementItem[]
-}
+// Reexport temporal para compatibilidad de imports existentes.
+export type { MoveMedicineFormData }
 
 interface MoveMedicineDialogProps {
   open: boolean
@@ -41,6 +33,7 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<MoveMedicineFormData>({
     defaultValues: {
@@ -179,14 +172,9 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
                           onValueChange={(value) => {
                             field.onChange(value)
                             // Reset dependent fields when medicine changes
-                            const currentMovements = watchedMovements
-                            currentMovements[index] = {
-                              ...currentMovements[index],
-                              medicineId: value,
-                              sourceStoreId: "",
-                              targetStoreId: "",
-                              quantity: 1,
-                            }
+                            setValue(`movements.${index}.sourceStoreId`, "")
+                            setValue(`movements.${index}.targetStoreId`, "")
+                            setValue(`movements.${index}.quantity`, 1)
                           }}
                           value={field.value.toString()}
                         >
@@ -223,12 +211,7 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
                           onValueChange={(value) => {
                             field.onChange(value)
                             // Reset target store when source changes
-                            const currentMovements = watchedMovements
-                            currentMovements[index] = {
-                              ...currentMovements[index],
-                              sourceStoreId: value,
-                              targetStoreId: "",
-                            }
+                            setValue(`movements.${index}.targetStoreId`, "")
                           }}
                           value={field.value.toString()}
                         >
@@ -319,14 +302,17 @@ export const MoveMedicineDialog = ({ open, onOpenChange, inventory, stores, onSu
               <div className="space-y-2 text-sm text-green-700">
                 {watchedMovements
                   .filter((m) => m.medicineId && m.sourceStoreId && m.targetStoreId && m.quantity > 0)
-                  .map((movement, index) => {
+                  .map((movement) => {
                     const medicine = getMedicineById(movement.medicineId.toString())
                     const allStores = inventory.flatMap((inv) => inv.stores)
                     const sourceStore = allStores.find((s) => s.id.toString() === movement.sourceStoreId)
                     const targetStore = allStores.find((s) => s.id.toString() === movement.targetStoreId)
 
                     return (
-                      <div key={index} className="flex justify-between items-center bg-white p-2 rounded">
+                      <div
+                        key={`${movement.medicineId}-${movement.sourceStoreId}-${movement.targetStoreId}`}
+                        className="flex justify-between items-center bg-white p-2 rounded"
+                      >
                         <span>
                           {medicine?.medicine.name} - {movement.quantity} unidades
                         </span>

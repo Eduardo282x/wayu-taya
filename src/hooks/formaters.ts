@@ -1,20 +1,7 @@
 import type { Location } from "@/services/location.interface";
 
-export const formatDate = (dateToFormat: string | Date | number): string => {
-    if (typeof dateToFormat === 'string' && !dateToFormat.includes('T')) {
-        const date = dateToFormat.toString().replace(/-/g, '/');
-        const reverseDate = date.split("/").reverse().join("/");
-        return `${reverseDate}`;
-    }
-
-    const date = new Date(dateToFormat);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses empiezan desde 0
-    const year = date.getFullYear();
-
-    return `${day}/${month}/${year}`;
-
-}
+// `formatDate` se removio: la fuente canonica es `@/utils/formatters`.
+// Aqui solo viven utilidades que no duplican ese formateo.
 
 export const formatDateTime = (dateToFormat: string | Date): string => {
     const date = new Date(dateToFormat);

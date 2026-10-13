@@ -25,7 +25,7 @@ export const Store = () => {
   /** Mensaje real de la API cuando la escritura o el borrado fallan. */
   const [actionError, setActionError] = useState("");
 
-  const { data: storesData, isFetching } = useStoresQuery();
+  const { data: storesData, isPending } = useStoresQuery();
   const createStore = useCreateStoreMutation();
   const updateStore = useUpdateStoreMutation();
   const deleteStore = useDeleteStoreMutation();
@@ -123,7 +123,7 @@ export const Store = () => {
           column={storeColumns}
           data={filteredStores}
           actionTable={getActionTable}
-          loading={isFetching}
+          loading={isPending}
         />
       </div>
 

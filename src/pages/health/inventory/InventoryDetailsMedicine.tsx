@@ -1,4 +1,5 @@
 import { IInventory } from "@/services/inventory/inventory.interface";
+import { formatDate } from "@/utils/formatters";
 import { FaCalendarAlt, FaFlask, FaLayerGroup, FaWarehouse } from "react-icons/fa";
 
 interface InventoryDetailsMedicine {
@@ -27,8 +28,8 @@ export const InventoryDetailsMedicine = ({ inventory }: InventoryDetailsMedicine
       <div>
         <h4 className="font-medium flex items-center gap-2 text-blue-600"><FaLayerGroup /> Lotes</h4>
         <ul className="list-disc list-inside ml-2 text-gray-800">
-          {lotes.map((lote, index) => (
-            <li key={index}>{lote.name}</li>
+          {lotes.map((lote) => (
+            <li key={`${lote.name}-${lote.storeId}`}>{lote.name}</li>
           ))}
         </ul>
       </div>
@@ -51,9 +52,9 @@ export const InventoryDetailsMedicine = ({ inventory }: InventoryDetailsMedicine
       <div>
         <h4 className="font-medium flex items-center gap-2 text-blue-600"><FaCalendarAlt /> Fechas de ingreso y vencimiento</h4>
         <ul className="list-disc list-inside ml-2 text-gray-800">
-          {datesMedicine.map((date, index) => (
-            <li key={index}>
-              <strong>Ingreso:</strong> {new Date(date.admissionDate).toLocaleDateString()} | <strong>Vence:</strong> {new Date(date.expirationDate).toLocaleDateString()}
+          {datesMedicine.map((date) => (
+            <li key={`${new Date(date.admissionDate).getTime()}-${new Date(date.expirationDate).getTime()}`}>
+              <strong>Ingreso:</strong> {formatDate(date.admissionDate)} | <strong>Vence:</strong> {formatDate(date.expirationDate)}
             </li>
           ))}
         </ul>

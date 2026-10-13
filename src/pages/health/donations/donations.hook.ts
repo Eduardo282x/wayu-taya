@@ -3,6 +3,7 @@ import { DonationBody, DonationsQueryParams, PaginatedDonationsContent } from "@
 import { getDonations, getLotes, postDonation, putDonation, deleteDonation } from "@/services/donations/donations.service"
 import { useDonationStore } from "./donationStore"
 import { useIsAuthenticated } from "@/store/auth.store"
+import { inventoryKeys } from "@/pages/health/inventory/inventory.hook"
 
 export const donationsKeys = {
     all: ["donations"] as const,
@@ -42,7 +43,7 @@ export const useCreateDonationMutation = () => {
         onSuccess: (response) => {
             if (response.success) {
                 queryClient.invalidateQueries({ queryKey: donationsKeys.all })
-                queryClient.invalidateQueries({ queryKey: ["inventory"] })
+                queryClient.invalidateQueries({ queryKey: inventoryKeys.all })
             }
         },
     })
@@ -56,7 +57,7 @@ export const useUpdateDonationMutation = () => {
         onSuccess: (response) => {
             if (response.success) {
                 queryClient.invalidateQueries({ queryKey: donationsKeys.all })
-                queryClient.invalidateQueries({ queryKey: ["inventory"] })
+                queryClient.invalidateQueries({ queryKey: inventoryKeys.all })
             }
         },
     })
@@ -70,7 +71,7 @@ export const useDeleteDonationMutation = () => {
         onSuccess: (response) => {
             if (response.success) {
                 queryClient.invalidateQueries({ queryKey: donationsKeys.all })
-                queryClient.invalidateQueries({ queryKey: ["inventory"] })
+                queryClient.invalidateQueries({ queryKey: inventoryKeys.all })
             }
         },
     })
