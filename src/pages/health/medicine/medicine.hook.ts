@@ -83,8 +83,10 @@ export const useCreateMedicineMutation = () => {
 
     return useMutation({
         mutationFn: (data: MedicineBody) => postMedicine(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: medicineKeys.all })
+        onSuccess: (response) => {
+            if (response?.success) {
+                queryClient.invalidateQueries({ queryKey: medicineKeys.all })
+            }
         },
     })
 }
@@ -94,8 +96,10 @@ export const useUpdateMedicineMutation = () => {
 
     return useMutation({
         mutationFn: ({ id, data }: { id: number; data: MedicineBody }) => putMedicine(id, data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: medicineKeys.all })
+        onSuccess: (response) => {
+            if (response?.success) {
+                queryClient.invalidateQueries({ queryKey: medicineKeys.all })
+            }
         },
     })
 }
@@ -105,8 +109,10 @@ export const useDeleteMedicineMutation = () => {
 
     return useMutation({
         mutationFn: (id: number) => deleteMedicine(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: medicineKeys.all })
+        onSuccess: (response) => {
+            if (response?.success) {
+                queryClient.invalidateQueries({ queryKey: medicineKeys.all })
+            }
         },
     })
 }

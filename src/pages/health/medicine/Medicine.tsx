@@ -30,6 +30,8 @@ import {
 import { useMedicineStore } from "./medicineStore"
 import { useQueryClient } from "@tanstack/react-query"
 import { debounce } from "@/lib/debounce"
+import { apiMessage } from "@/services/api-error"
+import toast from "react-hot-toast"
 
 export const Medicine = () => {
   const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(null)
@@ -39,11 +41,12 @@ export const Medicine = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false)
   const [dragActive, setDragActive] = useState<boolean>(false)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
 
   const { page, size, name, setPage, setSize, setName } = useMedicineStore()
-  const { data: medicinesData, isFetching } = useMedicinesQuery()
+  const { data: medicinesData, isPending } = useMedicinesQuery()
   const { data: categoriesData } = useCategoriesQuery()
   const { data: formsData } = useFormsQuery()
   const createMedicine = useCreateMedicineMutation()
@@ -72,26 +75,38 @@ export const Medicine = () => {
 
   const handleMedicineSubmit = async (formData: MedicineBody) => {
     try {
-      if (medicineSelected) {
-        await updateMedicine.mutateAsync({ id: medicineSelected.id, data: formData })
-      } else {
-        await createMedicine.mutateAsync(formData)
+      const response = medicineSelected
+        ? await updateMedicine.mutateAsync({ id: medicineSelected.id, data: formData })
+        : await createMedicine.mutateAsync(formData)
+
+      if (!response?.success) {
+        toast.error(apiMessage(response, 'No se pudo guardar el medicamento.'))
+        return
       }
+
+      toast.success(response.message || (medicineSelected ? 'Medicamento actualizado.' : 'Medicamento registrado.'))
       setIsAddFormOpen(false)
-    } catch (error) {
-      console.error("Error al guardar el medicamento:", error)
+    } catch {
+      toast.error('Error inesperado al guardar el medicamento.')
     }
   }
 
   const handleConfirmDeleteMedicine = async () => {
-    if (medicineSelected) {
-      try {
-        await deleteMedicine.mutateAsync(medicineSelected.id)
-        setIsDeleteDialogOpen(false)
-        setMedicineSelected(null)
-      } catch (error) {
-        console.error("Error al eliminar el medicamento:", error)
+    if (!medicineSelected) return
+
+    try {
+      const response = await deleteMedicine.mutateAsync(medicineSelected.id)
+
+      if (!response?.success) {
+        toast.error(apiMessage(response, 'No se pudo eliminar el medicamento.'))
+        return
       }
+
+      toast.success(response.message || 'Medicamento eliminado correctamente.')
+      setIsDeleteDialogOpen(false)
+      setMedicineSelected(null)
+    } catch {
+      toast.error('Error inesperado al eliminar el medicamento.')
     }
   }
 
@@ -156,16 +171,24 @@ export const Medicine = () => {
 
   const handleSaveMedicineFile = async () => {
     if (!uploadedFile) return
-    setLoading(true);
+    setUploading(true);
 
     const formData = new FormData();
     formData.append('file', uploadedFile);
 
-    await uploadMedicineFile(formData);
+    const response = await uploadMedicineFile(formData);
+
+    if (!response?.success) {
+      setUploading(false);
+      toast.error(apiMessage(response, 'No se pudieron cargar las medicinas.'));
+      return;
+    }
+
+    toast.success(response.message || 'Medicinas cargadas correctamente.')
     setUploadedFile(null)
     setIsUploadOpen(false);
     queryClient.invalidateQueries({ queryKey: medicineKeys.all })
-    setLoading(false);
+    setUploading(false);
   }
 
   const removeUploadedFile = () => {
@@ -222,7 +245,7 @@ export const Medicine = () => {
                 onPageChange={setPage}
                 rowsPerPage={size}
                 onRowsPerPageChange={setSize}
-                loading={isFetching}
+                loading={isPending}
               />
             </div>
 
@@ -243,6 +266,7 @@ export const Medicine = () => {
                 handleFileInput={handleFileInput}
                 formatFileSize={formatFileSize}
                 uploadedFile={uploadedFile}
+                saving={uploading}
                 handleSaveMedicineFile={handleSaveMedicineFile}
                 removeUploadedFile={removeUploadedFile}
               />
