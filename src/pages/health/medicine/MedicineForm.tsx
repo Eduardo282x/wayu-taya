@@ -37,6 +37,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
         medicine: medicineData.medicine,
         presentation: medicineData.presentation ?? "",
         temperate: medicineData.temperate ?? "",
+        lote: medicineData.lote ?? "",
         manufacturer: medicineData.manufacturer ?? "",
         activeIngredient: medicineData.activeIngredient ?? "",
         countryOfOrigin: medicineData.countryOfOrigin ?? "",
@@ -55,6 +56,7 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
     setValue("medicine", value === "medicamento");
 
     if (value === "producto") {
+      setValue("lote", "");
       setValue("temperate", "");
       setValue("manufacturer", "");
       setValue("activeIngredient", "");
@@ -211,6 +213,18 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
                 error={errors.temperate?.message}
               />
               <FormInput
+                label="Lote (base)"
+                id="lote"
+                placeholder="Lote de referencia"
+                {...register("lote")}
+              />
+              <FormInput
+                label="Proveedor"
+                id="proveedor"
+                placeholder="Nombre del proveedor"
+                {...register("provider")}
+              />
+              <FormInput
                 label="Descripción"
                 id="descripcion"
                 placeholder="Analgésico para el dolor de cabeza"
@@ -219,17 +233,17 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
                 })}
                 error={errors.description?.message}
               />
-              <FormInput
-                label="Proveedor"
-                id="proveedor"
-                placeholder="Nombre del proveedor"
-                {...register("provider")}
-              />
             </TabsContent>
           )}
 
           {currentTab === "producto" && (
             <TabsContent value="producto" className={`col-span-3 grid ${ignoreHeader ? 'grid-cols-1' : 'grid-cols-3'} mt-0 gap-2`}>
+              <FormInput
+                label="Código"
+                id="codigo"
+                placeholder="Código del medicamento"
+                {...register("code")}
+              />
               <FormInput
                 label="Nombre"
                 id="nombre_producto"

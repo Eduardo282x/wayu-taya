@@ -10,6 +10,7 @@ export interface MedicineBody {
     form: string;
     presentation: string;
     temperate: string;
+    lote: string;
     manufacturer: string;
     activeIngredient: string;
     countryOfOrigin: string;
@@ -36,6 +37,7 @@ export interface IMedicine {
     categoryId: number;
     medicine: boolean;
     presentation: string;
+    lote: string;
     temperate: string;
     manufacturer: string;
     activeIngredient: string;
