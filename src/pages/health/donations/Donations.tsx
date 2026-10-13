@@ -175,6 +175,7 @@ export const Donations = () => {
 
         <div className="h-full px-2">
           <DonationsForm
+            key={openDialog ? `donation-form-${donationSelected?.id ?? 'new'}` : 'donation-form-idle'}
             donation={donationSelected}
             providers={allProvidersData?.providers ?? []}
             stores={storesData?.stores ?? []}
