@@ -16,8 +16,6 @@ import { useInventoryQuery, useInventoryHistoryQuery, useAllInventoryQuery, useM
 import { useInventoryStore } from "./inventoryStore"
 import { useStoresQuery } from "@/pages/health/store/store.hook"
 import { debounce } from "@/lib/debounce"
-import { apiMessage } from "@/services/api-error"
-import toast from "react-hot-toast"
 // import { SuccessDialog } from "./success-dialog"
 
 export const Inventory = () => {
@@ -86,12 +84,9 @@ export const Inventory = () => {
 
     const response = await moveInventory.mutateAsync({ movements: parseData })
 
-    if (!response?.success) {
-      toast.error(apiMessage(response, 'No se pudieron mover las medicinas.'));
-      return;
-    }
+    // El interceptor ya notifica exito/error. Cerrar solo en exito.
+    if (!response?.success) return;
 
-    toast.success(response.message || 'Movimiento realizado correctamente.');
     setIsMoveDialogOpen(false);
   }
 

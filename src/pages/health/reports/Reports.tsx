@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -81,13 +81,8 @@ export const Reports = () => {
     const monthsList = getMonthsFrom2025();
 
     // Un solo camino de fetch: el cambio de `filtersDate` reacciona via queryKey.
-    const { data: report, isPending, isError } = useSummaryReportQuery(filtersDate)
-
-    useEffect(() => {
-        if (isError) {
-            toast.error('No se pudieron cargar las métricas.')
-        }
-    }, [isError])
+    // El interceptor ya notifica el error (es un POST a summary-report).
+    const { data: report, isPending } = useSummaryReportQuery(filtersDate)
 
     const warehouseData = useMemo(
         () => buildWarehouseData(report?.productByStorage),

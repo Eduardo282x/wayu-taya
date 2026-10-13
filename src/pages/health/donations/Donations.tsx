@@ -17,8 +17,6 @@ import { useAllInventoryQuery } from "@/pages/health/inventory/inventory.hook"
 import { useAllMedicinesQuery } from "@/pages/health/medicine/medicine.hook"
 import { useAllProvidersQuery, useAllInstitutionsQuery } from "@/pages/documents/providers/providers.hook"
 import { DonationInventoryWarningDialog } from "./DonationInventoryWarningDialog"
-import { apiMessage } from "@/services/api-error"
-import toast from "react-hot-toast"
 
 export const Donations = () => {
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
@@ -91,16 +89,13 @@ export const Donations = () => {
     try {
       const response = await deleteDonation.mutateAsync(donationSelected.id);
 
-      if (!response.success) {
-        toast.error(apiMessage(response, 'No se pudo eliminar la donación.'));
-        return;
-      }
+      // El interceptor ya notifica exito/error. Cerrar solo en exito.
+      if (!response.success) return;
 
-      toast.success(response.message || 'Donación eliminada correctamente.');
       setDeleteWarningOpen(false);
       setDonationSelected(null);
     } catch {
-      toast.error('Error inesperado al eliminar la donación.');
+      // El interceptor notifica el error; el dialogo permanece abierto.
     } finally {
       setDeleting(false);
     }

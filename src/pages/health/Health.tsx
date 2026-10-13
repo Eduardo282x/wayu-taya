@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { HeaderPages } from "@/layout/header/Header"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FaHeartbeat } from "react-icons/fa"
@@ -12,7 +12,6 @@ import { MostDonatedList } from "./reports/components/MostDonatedList"
 import { InventoryAlertsPanel } from "./inventory/InventoryAlertsPanel"
 import { useInventoryAlertsQuery } from "./inventory/inventory.hook"
 import type { BodyReport } from "@/services/reports/report.interface"
-import toast from "react-hot-toast"
 
 const buildMonths = () => {
     const months: { value: string; label: string }[] = []
@@ -46,14 +45,9 @@ export const Health = () => {
         rangeForMonth(monthsList[monthsList.length - 1]?.value ?? ''),
     )
 
-    const { data: report, isPending, isError } = useSummaryReportQuery(range)
+    // El interceptor ya notifica el error (summary-report es un POST).
+    const { data: report, isPending } = useSummaryReportQuery(range)
     const { data: alerts, isPending: alertsPending } = useInventoryAlertsQuery({ days: 30 })
-
-    useEffect(() => {
-        if (isError) {
-            toast.error('No se pudieron cargar las métricas.')
-        }
-    }, [isError])
 
     const warehouseData = useMemo(
         () => buildWarehouseData(report?.productByStorage),

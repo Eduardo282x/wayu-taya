@@ -30,8 +30,6 @@ import {
 import { useMedicineStore } from "./medicineStore"
 import { useQueryClient } from "@tanstack/react-query"
 import { debounce } from "@/lib/debounce"
-import { apiMessage } from "@/services/api-error"
-import toast from "react-hot-toast"
 
 export const Medicine = () => {
   const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(null)
@@ -79,15 +77,12 @@ export const Medicine = () => {
         ? await updateMedicine.mutateAsync({ id: medicineSelected.id, data: formData })
         : await createMedicine.mutateAsync(formData)
 
-      if (!response?.success) {
-        toast.error(apiMessage(response, 'No se pudo guardar el medicamento.'))
-        return
+      // El interceptor ya notifica exito/error. Solo se cierra el dialogo en exito.
+      if (response?.success) {
+        setIsAddFormOpen(false)
       }
-
-      toast.success(response.message || (medicineSelected ? 'Medicamento actualizado.' : 'Medicamento registrado.'))
-      setIsAddFormOpen(false)
     } catch {
-      toast.error('Error inesperado al guardar el medicamento.')
+      // El interceptor notifica el error; no se cierra el dialogo.
     }
   }
 
@@ -97,16 +92,12 @@ export const Medicine = () => {
     try {
       const response = await deleteMedicine.mutateAsync(medicineSelected.id)
 
-      if (!response?.success) {
-        toast.error(apiMessage(response, 'No se pudo eliminar el medicamento.'))
-        return
+      if (response?.success) {
+        setIsDeleteDialogOpen(false)
+        setMedicineSelected(null)
       }
-
-      toast.success(response.message || 'Medicamento eliminado correctamente.')
-      setIsDeleteDialogOpen(false)
-      setMedicineSelected(null)
     } catch {
-      toast.error('Error inesperado al eliminar el medicamento.')
+      // El interceptor notifica el error; no se cierra el dialogo.
     }
   }
 
@@ -178,13 +169,12 @@ export const Medicine = () => {
 
     const response = await uploadMedicineFile(formData);
 
+    // El interceptor ya notifica. En error NO se invalida ni se cierra.
     if (!response?.success) {
       setUploading(false);
-      toast.error(apiMessage(response, 'No se pudieron cargar las medicinas.'));
       return;
     }
 
-    toast.success(response.message || 'Medicinas cargadas correctamente.')
     setUploadedFile(null)
     setIsUploadOpen(false);
     queryClient.invalidateQueries({ queryKey: medicineKeys.all })
