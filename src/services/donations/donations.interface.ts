@@ -120,7 +120,7 @@ export interface DetDonation {
     amount: number;
     medicine: IMedicine;
     storageId?: number;
-    lote?: string;
+    lote: string;
     benefited?: number | null;
     admissionDate: Date;
     expirationDate: Date;
