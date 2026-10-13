@@ -554,172 +554,175 @@ export const DonationUploadDialog = ({
   return (
     <>
       <StyledDialog open={open} onOpenChange={onOpenChange}>
-      <StyledDialogContent className="sm:max-w-5xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-auto bg-gray-100">
-        <StyledDialogHeader>
-          <div className="flex items-start justify-between gap-4 pr-10">
-            <div>
-              <StyledDialogTitle>Cargar donación por Excel</StyledDialogTitle>
-              <StyledDialogDescription>
-                Descarga la plantilla, complétala y valida las filas antes de aplicar. Las
-                medicinas no registradas deben completarse para poder crearlas.
-              </StyledDialogDescription>
+        <StyledDialogContent className="sm:max-w-5xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-auto bg-gray-100">
+          <StyledDialogHeader>
+            <div className="flex items-start justify-between gap-4 pr-10">
+              <div>
+                <StyledDialogTitle>Cargar donación por Excel</StyledDialogTitle>
+                <StyledDialogDescription>
+                  Descarga la plantilla, complétala y valida las filas antes de aplicar. Las
+                  medicinas no registradas deben completarse para poder crearlas.
+                </StyledDialogDescription>
+              </div>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={downloadTemplate}
-              disabled={templateLoading || parsing}
-              className="shrink-0 border-[#0250b0] text-[#0250b0]"
-            >
-              <Download className="w-4 h-4 mr-1" />
-              {templateLoading ? "Descargando..." : "Plantilla"}
-            </Button>
+          </StyledDialogHeader>
+
+          <Accordion type="single" collapsible className="rounded-md border border-gray-300 px-3">
+            <AccordionItem value="guia" className="border-b-0">
+              <AccordionTrigger className="py-2.5 text-sm font-medium text-[#0250b0]">
+                <span className="flex items-center gap-2">
+                  <Info className="w-4 h-4" /> Guía de uso
+                </span>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-1.5 text-sm text-gray-700 list-disc pl-5">
+                  {guideItems.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          <div className="space-y-4 p-1">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={mode === "file" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMode("file")}
+                >
+                  <FileSpreadsheet className="w-4 h-4 mr-1" /> Archivo Excel
+                </Button>
+                <Button
+                  type="button"
+                  variant={mode === "paste" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMode("paste")}
+                >
+                  <ClipboardPaste className="w-4 h-4 mr-1" /> Pegar desde Excel
+                </Button>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={downloadTemplate}
+                disabled={templateLoading || parsing}
+                className="shrink-0 border-[#0250b0] text-[#0250b0]"
+              >
+                <Download className="w-4 h-4 mr-1" />
+                {templateLoading ? "Descargando..." : "Plantilla"}
+              </Button>
+            </div>
+
+            {mode === "file" && (
+              <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors border-gray-500 hover:border-[#0250b0] hover:bg-blue-50">
+                <Upload className="mx-auto h-10 w-10 text-gray-400 mb-3" />
+                <strong className="text-sm text-gray-900">
+                  {fileName || "Selecciona el archivo completado"}
+                </strong>
+                <span className="text-xs text-gray-500">Formatos soportados: .xlsx y .xls</span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".xlsx,.xls"
+                  onChange={handleFileSelected}
+                  disabled={parsing}
+                />
+                <span className="mt-3 inline-flex items-center px-4 py-1.5 text-sm rounded-md text-white bg-[#0250b0] hover:bg-blue-900">
+                  Buscar archivo
+                </span>
+              </label>
+            )}
+
+            {mode === "paste" && (
+              <div className="space-y-2">
+                <textarea
+                  rows={8}
+                  value={pasteContent}
+                  onChange={(e) => setPasteContent(e.target.value)}
+                  placeholder="Pega aquí las filas copiadas desde Excel (con o sin encabezado)."
+                  className="w-full rounded-md border border-gray-400 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0250b0]"
+                />
+                <div className="flex justify-end">
+                  <Button type="button" variant="outline" size="sm" onClick={parsePasteContent} disabled={parsing}>
+                    Validar pegado
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {parsing && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Loader2 className="w-4 h-4 animate-spin" /> Validando archivo...
+              </div>
+            )}
+
+            {rows.length > 0 && (
+              <>
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Total: </span>
+                    <strong>{rows.length}</strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Válidas: </span>
+                    <strong>{validCount - warningCount}</strong>
+                  </div>
+                  <div>
+                    <span className="text-yellow-600">Nuevas medicinas: </span>
+                    <strong>{warningCount}</strong>
+                  </div>
+                  <div>
+                    <span className="text-red-600">Con error: </span>
+                    <strong>{errorCount}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[#0250b0]">A aplicar: </span>
+                    <strong>{includedCount}</strong>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg overflow-hidden">
+                  <TableComponents
+                    column={previewColumns}
+                    data={rows}
+                    actionTable={() => { }}
+                  />
+                </div>
+              </>
+            )}
+
+            {rows.length === 0 && !parsing && (
+              <div className="text-center text-sm text-gray-500 py-6">No hay filas validadas todavía.</div>
+            )}
+
+            {alert && <p className="text-red-600 font-semibold text-sm">{alert}</p>}
           </div>
-        </StyledDialogHeader>
 
-        <Accordion type="single" collapsible className="rounded-md border border-gray-300 px-3">
-          <AccordionItem value="guia" className="border-b-0">
-            <AccordionTrigger className="py-2.5 text-sm font-medium text-[#0250b0]">
-              <span className="flex items-center gap-2">
-                <Info className="w-4 h-4" /> Guía de uso
-              </span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ul className="space-y-1.5 text-sm text-gray-700 list-disc pl-5">
-                {guideItems.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-
-        <div className="space-y-4 p-1">
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant={mode === "file" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setMode("file")}
-            >
-              <FileSpreadsheet className="w-4 h-4 mr-1" /> Archivo Excel
-            </Button>
-            <Button
-              type="button"
-              variant={mode === "paste" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setMode("paste")}
-            >
-              <ClipboardPaste className="w-4 h-4 mr-1" /> Pegar desde Excel
-            </Button>
-          </div>
-
-          {mode === "file" && (
-            <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors border-gray-500 hover:border-[#0250b0] hover:bg-blue-50">
-              <Upload className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-              <strong className="text-sm text-gray-900">
-                {fileName || "Selecciona el archivo completado"}
-              </strong>
-              <span className="text-xs text-gray-500">Formatos soportados: .xlsx y .xls</span>
-              <input
-                type="file"
-                className="hidden"
-                accept=".xlsx,.xls"
-                onChange={handleFileSelected}
-                disabled={parsing}
-              />
-              <span className="mt-3 inline-flex items-center px-4 py-1.5 text-sm rounded-md text-white bg-[#0250b0] hover:bg-blue-900">
-                Buscar archivo
-              </span>
-            </label>
-          )}
-
-          {mode === "paste" && (
-            <div className="space-y-2">
-              <textarea
-                rows={8}
-                value={pasteContent}
-                onChange={(e) => setPasteContent(e.target.value)}
-                placeholder="Pega aquí las filas copiadas desde Excel (con o sin encabezado)."
-                className="w-full rounded-md border border-gray-400 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0250b0]"
-              />
-              <div className="flex justify-end">
-                <Button type="button" variant="outline" size="sm" onClick={parsePasteContent} disabled={parsing}>
-                  Validar pegado
+          <StyledDialogFooter>
+            <div className="flex justify-between items-center w-full gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={clearRows}
+                disabled={rows.length === 0}
+              >
+                <Trash2 className="w-4 h-4 mr-1" /> Limpiar
+              </Button>
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  Cancelar
+                </Button>
+                <Button type="button" variant="animated" onClick={applyRows} disabled={includedCount === 0}>
+                  Aplicar al formulario
                 </Button>
               </div>
             </div>
-          )}
-
-          {parsing && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Loader2 className="w-4 h-4 animate-spin" /> Validando archivo...
-            </div>
-          )}
-
-          {rows.length > 0 && (
-            <>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div>
-                  <span className="text-gray-500">Total: </span>
-                  <strong>{rows.length}</strong>
-                </div>
-                <div>
-                  <span className="text-gray-500">Válidas: </span>
-                  <strong>{validCount - warningCount}</strong>
-                </div>
-                <div>
-                  <span className="text-yellow-600">Nuevas medicinas: </span>
-                  <strong>{warningCount}</strong>
-                </div>
-                <div>
-                  <span className="text-red-600">Con error: </span>
-                  <strong>{errorCount}</strong>
-                </div>
-                <div>
-                  <span className="text-[#0250b0]">A aplicar: </span>
-                  <strong>{includedCount}</strong>
-                </div>
-              </div>
-
-              <div className="border rounded-lg overflow-hidden">
-                <TableComponents
-                  column={previewColumns}
-                  data={rows}
-                  actionTable={() => {}}
-                />
-              </div>
-            </>
-          )}
-
-          {rows.length === 0 && !parsing && (
-            <div className="text-center text-sm text-gray-500 py-6">No hay filas validadas todavía.</div>
-          )}
-
-          {alert && <p className="text-red-600 font-semibold text-sm">{alert}</p>}
-        </div>
-
-        <StyledDialogFooter>
-          <div className="flex justify-between items-center w-full gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={clearRows}
-              disabled={rows.length === 0}
-            >
-              <Trash2 className="w-4 h-4 mr-1" /> Limpiar
-            </Button>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
-              </Button>
-              <Button type="button" variant="animated" onClick={applyRows} disabled={includedCount === 0}>
-                Aplicar al formulario
-              </Button>
-            </div>
-          </div>
-        </StyledDialogFooter>
-      </StyledDialogContent>
+          </StyledDialogFooter>
+        </StyledDialogContent>
       </StyledDialog>
 
       <StyledDialog open={medicineFormOpen} onOpenChange={setMedicineFormOpen}>
