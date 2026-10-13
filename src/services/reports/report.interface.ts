@@ -10,6 +10,18 @@ export interface ReportDonations {
     lotes: string[];
 }
 
+/**
+ * Filtros de exportacion (correccion 41 del backend). Todos opcionales: sin
+ * ellos el reporte sigue exportando todo, como antes.
+ */
+export interface ReportFilters {
+    from?: Date | string;
+    to?: Date | string;
+    providerId?: number;
+    lote?: string;
+    storeId?: number;
+}
+
 export interface IReports {
     donations: Donaciones[];
     productMostDonated: ProductsMostDonated[];

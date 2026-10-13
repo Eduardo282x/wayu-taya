@@ -63,9 +63,9 @@ export const getDataApi = async <R>(url: string, config?: AxiosRequestConfig): P
     }
 };
 
-export const getDataFileApi = (endpoint: string) => {
+export const getDataFileApi = (endpoint: string, config?: AxiosRequestConfig) => {
     return api
-        .get(endpoint, { responseType: "blob" })
+        .get(endpoint, { responseType: "blob", ...config })
         .then((response) => {
             return response.data;
         })
