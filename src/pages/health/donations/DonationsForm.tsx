@@ -198,6 +198,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             details: [{
               amount: det.amount || 0,
               storageId: det.storageId || 0,
+              lote: det.lote ?? '',
               benefited: det.benefited ?? 1,
             }],
             expirationDate: new Date(det.expirationDate)
@@ -876,6 +877,13 @@ const DonationDetailFormExit = ({
 
   const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
   const rowStoreId = Number(detail.details?.[0]?.storageId) || 0;
+
+  useEffect(() => {
+    if (!detail.medicineId) return;
+    const found = inventory.find(item => item.medicine.id === detail.medicineId);
+    if (found) setMedicineSelected(found);
+  }, [detail.medicineId, inventory]);
+
   const selectedStore = medicineSelected?.stores.find(store => store.id === rowStoreId);
   const availableStock = medicineSelected
     ? selectedStore?.amount ?? medicineSelected.totalStock ?? 0
