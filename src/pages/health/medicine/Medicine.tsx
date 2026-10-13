@@ -110,7 +110,7 @@ export const Medicine = () => {
     const url = URL.createObjectURL(response)
     const link = window.document.createElement("a")
     link.href = url
-    link.download = `Plantilla excel`
+    link.download = `Plantilla de Carga Masiva para Medicinas ${new Date().toISOString()}.xlsx`
     window.document.body.appendChild(link)
     link.click()
     window.document.body.removeChild(link)

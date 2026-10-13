@@ -148,7 +148,7 @@ export const DonationUploadDialog = ({
       const url = URL.createObjectURL(response)
       const link = document.createElement("a")
       link.href = url
-      link.download = "donacion_plantilla.xlsx"
+      link.download = `Plantilla de donacion ${new Date().toISOString()}.xlsx`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
