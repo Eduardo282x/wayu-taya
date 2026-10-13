@@ -16,6 +16,7 @@ import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
 import { useInventorySearchQuery } from "../inventory/inventory.hook"
 import { formatDate, formatDateForInput } from "@/utils/formatters"
+import { apiMessage } from "@/services/api-error"
 import { IoMdAdd } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
@@ -34,6 +35,14 @@ export interface SaveDonationResult {
   message?: string;
 }
 
+/** Fila del formulario con clave estable para React (no usar el indice). */
+type DonationMedicineRow = DonationMedicine & { rowKey: string };
+
+const createRowKey = (): string =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
 interface DonationsFormProps {
   donation: IDonations | null;
   providers: IProviders[];
@@ -48,7 +57,7 @@ interface DonationsFormProps {
 export const DonationsForm = ({ donation, providers, stores, inventory, medicines, institutions, onSave, onCancel }: DonationsFormProps) => {
   // const [medicineFilter, setMedicineFilter] = useState<IMedicine[]>([]);
   const today = new Date();
-  const defaultDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const defaultDate = formatDateForInput(today); // "YYYY-MM-DD" en calendario local
   const [alert, setAlert] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
@@ -144,8 +153,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   const typeDonation = watch("type");
 
-  const createEmptyMedicine = (id: number, defaultStorageId = 0): DonationMedicine => ({
+  const createEmptyMedicine = (id: number, defaultStorageId = 0): DonationMedicineRow => ({
     id,
+    rowKey: createRowKey(),
     medicineId: 0,
     details: [{
       amount: 0,
@@ -161,10 +171,13 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     return Number(selected?.details?.[0]?.storageId) || 0;
   }
 
-  const [medicineDetails, setMedicineDetails] = useState<DonationMedicine[]>([
+  const [medicineDetails, setMedicineDetails] = useState<DonationMedicineRow[]>([
     createEmptyMedicine(1),
     createEmptyMedicine(2),
   ])
+
+  /** Almacen por defecto derivado de datos reales (nunca un id fijo). */
+  const defaultStoreId = stores[0]?.id ?? 0;
 
   const totalMedicines = medicineDetails.filter((med) => med.medicineId).length;
   const totalUnits = medicineDetails.reduce((acc, med) =>
@@ -183,7 +196,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         type: donation.type as TypeDonation || "Entrada",
         lote: donation.lote,
         controlNumber: donation.controlNumber == null ? undefined : String(donation.controlNumber),
-        date: new Date(donation.date).toISOString().split('T')[0],
+        date: formatDateForInput(donation.date),
       });
 
       if (donation.type === 'Entrada') {
@@ -194,6 +207,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         setMedicineDetails(
           donation.detDonation.map((det, index: number) => ({
             id: index + 1,
+            rowKey: createRowKey(),
             medicineId: det.medicine?.id || 0,
             details: [{
               amount: det.amount || 0,
@@ -271,6 +285,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       uploaded.map((item, index) => ({
         ...item,
         id: index + 1,
+        rowKey: createRowKey(),
         details: item.details.map((det) => ({
           ...det,
           storageId: defaultStorageId,
@@ -286,10 +301,11 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   const handleCreateMedicine = async (formData: MedicineBody) => {
     try {
-      const created = await createMedicine.mutateAsync(formData);
-      if (!created) {
+      const response = await createMedicine.mutateAsync(formData);
+      const created = response?.data;
+      if (!response?.success || !created) {
         setAlert(true);
-        setMessage('No se pudo crear la medicina.');
+        setMessage(apiMessage(response, 'No se pudo crear la medicina.'));
         return;
       }
       setCreatedMedicines((prev) => [...prev, created]);
@@ -308,11 +324,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     if (!donation) return false;
 
     const normalizeDate = (value: Date | string) => {
-      if (value instanceof Date) {
-        return value.toISOString().split('T')[0];
-      }
-
-      return value;
+      return formatDateForInput(value);
     };
 
     const currentDetails = medicineDetails.map((item) => ({
@@ -408,7 +420,13 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         }).flat()
       ).flat()
 
-    const globalStoreId = Number(getValues('storeId')) || 1;
+    const globalStoreId = Number(getValues('storeId')) || defaultStoreId;
+
+    if (data.type === 'Entrada' && !globalStoreId) {
+      setAlert(true);
+      setMessage('No hay almacenes disponibles. Registra un almacén antes de continuar.');
+      return;
+    }
 
     const parseData: DonationBody = {
       providerId: data.providerId == 0 ? null : Number(data.providerId),
@@ -425,12 +443,18 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           benefited: det.benefited ?? 1,
           storageId: data.type === 'Entrada'
             ? globalStoreId
-            : (det.storageId == 0 ? 1 : Number(det.storageId)),
+            : (Number(det.storageId) || defaultStoreId),
           lote: det.lote ?? undefined,
           expirationDate: new Date(det.expirationDate),
         }
       }),
     };
+
+    if (parseData.medicines.some((med) => !med.storageId)) {
+      setAlert(true);
+      setMessage('Selecciona un almacén para cada medicina.');
+      return;
+    }
 
     if (donation?.hasOutflows && parseData.changeDonDetails) {
       setPendingDonation(parseData);
@@ -632,9 +656,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             {typeDonation == 'Entrada'
               ?
               medicineDetails.map((detail, index) => (
-                <div key={index} onFocusCapture={() => handleMedicineDetailFocus(index)}>
+                <div key={detail.rowKey} onFocusCapture={() => handleMedicineDetailFocus(index)}>
                   <DonationDetailFormEntry
-                    key={index}
+                    key={detail.rowKey}
                     removeMedicineDetail={removeMedicineDetail}
                     filteredOptions={filteredOptions}
                     index={index}
@@ -651,9 +675,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
               ))
               :
               medicineDetails.map((detail, index) => (
-                <div key={index} onFocusCapture={() => handleMedicineDetailFocus(index)}>
+                <div key={detail.rowKey} onFocusCapture={() => handleMedicineDetailFocus(index)}>
                   <DonationDetailFormExit
-                    key={index}
+                    key={detail.rowKey}
                     removeMedicineDetail={removeMedicineDetail}
                     filteredOptions={filteredOptionsExit}
                     index={index}
@@ -733,7 +757,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         createdMedicines={createdMedicines}
         categories={categoriesData?.categories ?? []}
         forms={formsData?.forms ?? []}
-        onCreateMedicine={(formData) => createMedicine.mutateAsync(formData)}
+        onCreateMedicine={async (formData) => (await createMedicine.mutateAsync(formData)).data}
         onApply={handleApplyUpload}
       />
 

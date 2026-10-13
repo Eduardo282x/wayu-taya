@@ -13,6 +13,7 @@ interface UploadMedicineDialogProps {
     handleFileInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
     formatFileSize: (bytes: number) => string;
     uploadedFile: File | null;
+    saving?: boolean;
     handleSaveMedicineFile: () => void;
     removeUploadedFile: () => void;
 }
@@ -26,6 +27,7 @@ export const UploadMedicineDialog = ({
     handleFileInput,
     formatFileSize,
     uploadedFile,
+    saving = false,
     handleSaveMedicineFile,
     removeUploadedFile,
 }: UploadMedicineDialogProps) => {
@@ -84,15 +86,15 @@ export const UploadMedicineDialog = ({
                     )}
 
                     <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setIsUploadOpen(false)}>
+                        <Button variant="outline" onClick={() => setIsUploadOpen(false)} disabled={saving}>
                             Cancelar
                         </Button>
                         <Button
                             onClick={handleSaveMedicineFile}
-                            disabled={!uploadedFile}
+                            disabled={!uploadedFile || saving}
                             className="bg-blue-800 hover:bg-blue-900"
                         >
-                            Cargar medicinas
+                            {saving ? "Cargando..." : "Cargar medicinas"}
                         </Button>
                     </div>
                 </div>

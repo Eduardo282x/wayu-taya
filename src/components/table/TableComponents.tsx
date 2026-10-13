@@ -25,6 +25,11 @@ interface TableProps {
   rowsPerPage?: number;
   onRowsPerPageChange?: (size: number) => void;
   loading?: boolean;
+  /**
+   * Clave estable por fila. Por defecto usa `item.id` y cae al indice. Pasar
+   * cuando la lista se reordena/elimina para no mezclar el estado de las filas.
+   */
+  getRowId?: (item: any, index: number) => string | number;
 }
 
 export const TableComponents: FC<TableProps> = ({
@@ -40,6 +45,7 @@ export const TableComponents: FC<TableProps> = ({
   rowsPerPage: controlledRowsPerPage,
   onRowsPerPageChange,
   loading = false,
+  getRowId,
 }) => {
   const isServerSide = totalItems !== undefined;
   const [page, setPage] = useState<number>(controlledPage ?? 0);
@@ -113,15 +119,18 @@ export const TableComponents: FC<TableProps> = ({
           <TableBody>
             {loading ? (
               <TableSkeleton columns={columns} isExpansible={isExpansible} />
-            ) : currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => (
-              <Fragment key={index}>
-                {isExpansible ?
-                  <TableRowExpansible index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
-                  :
-                  <TableRowNormal index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
-                }
-              </Fragment>
-            ))
+            ) : currentItems && currentItems.length > 0 ? (currentItems.map((item, index: number) => {
+              const rowKey = getRowId ? getRowId(item, index) : (item?.id ?? index)
+              return (
+                <Fragment key={rowKey}>
+                  {isExpansible ?
+                    <TableRowExpansible rowKey={rowKey} index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
+                    :
+                    <TableRowNormal rowKey={rowKey} index={index} data={item} columns={columns} action={actionTable} renderRow={renderRow} colSpanColumns={colSpanColumns} columnData={columns} />
+                  }
+                </Fragment>
+              )
+            })
             ) : (
               <TableRow>
                 <TableCell
@@ -181,6 +190,7 @@ const TableSkeleton = ({ columns, isExpansible, rows = 10 }: TableSkeletonProps)
 
 interface TableRowNormalProps<T> {
   index: number;
+  rowKey?: string | number;
   columns: Column[];
   columnData: Column[];
   data: T;
@@ -189,9 +199,9 @@ interface TableRowNormalProps<T> {
   renderRow?: (item: any, index: number) => React.ReactNode;
 }
 
-const TableRowNormal = <T,>({ index, columns, data, action }: TableRowNormalProps<T>) => {
+const TableRowNormal = <T,>({ index, rowKey, columns, data, action }: TableRowNormalProps<T>) => {
   return (
-    <TableRow key={index}>
+    <TableRow key={rowKey ?? index}>
       {columns && columns.map((col: Column, index: number) => (
         col.isIcon
           ? <ColumnIcon col={col} item={data} actionTable={action} key={index} />
@@ -201,14 +211,14 @@ const TableRowNormal = <T,>({ index, columns, data, action }: TableRowNormalProp
   )
 }
 
-const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: TableRowNormalProps<T>) => {
+const TableRowExpansible = <T,>({ index, rowKey, columns, data, action, renderRow }: TableRowNormalProps<T>) => {
   const [open, setOpen] = useState<boolean>(false);
   const rowRef = useRef<HTMLTableRowElement>(null);
 
   return (
     <>
       <TableRow
-        key={`main-${index}`}
+        key={`main-${rowKey ?? index}`}
         ref={rowRef}
         onClick={() => setOpen(!open)}
         className="cursor-pointer transition-all"
@@ -226,7 +236,7 @@ const TableRowExpansible = <T,>({ index, columns, data, action, renderRow }: Tab
       </TableRow>
 
       {/* Fila expandida */}
-      <TableRow key={`expand-${index}`} className="bg-muted">
+      <TableRow key={`expand-${rowKey ?? index}`} className="bg-muted">
         <TableCell colSpan={columns.length + 1} className="!p-0 max-w-full">
           <div
             className={`transition-all duration-300 ease-in-out w-full ${open ? 'h-auto px-4 py-2' : '!h-0'} interpolate overflow-hidden`}

@@ -21,6 +21,7 @@ import { Health } from './pages/health/Health';
 
 import { Users } from './pages/users/Users';
 import { Profile } from './pages/users/profile/Profile';
+import { Audit } from './pages/audit/Audit';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
 import { Store } from './pages/health/store/Store';
@@ -84,6 +85,16 @@ function App() {
                   element={
                     <RequireRole roles={ROLES_GESTION_USUARIOS}>
                       <Users />
+                    </RequireRole>
+                  }
+                ></Route>
+
+                {/* Auditoria: solo Super Admin y Administrador. */}
+                <Route
+                  path='auditoria'
+                  element={
+                    <RequireRole roles={ROLES_GESTION_USUARIOS}>
+                      <Audit />
                     </RequireRole>
                   }
                 ></Route>

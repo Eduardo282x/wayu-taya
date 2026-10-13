@@ -26,7 +26,7 @@ export const Donations = () => {
   const [deleteWarningOpen, setDeleteWarningOpen] = useState<boolean>(false)
   const [deleting, setDeleting] = useState<boolean>(false)
   const { page, size, setPage, setSize, filters, setFilter } = useDonationStore()
-  const { data: donationsData, isFetching } = useDonationsQuery()
+  const { data: donationsData, isPending } = useDonationsQuery()
   const { data: lotesData } = useLotesQuery()
   const { data: storesData } = useStoresQuery(openDialog || deleteWarningOpen)
   const { data: allInventoryData } = useAllInventoryQuery(openDialog)
@@ -39,6 +39,12 @@ export const Donations = () => {
 
   const currentDonations = donationsData?.donations ?? []
   const totalDonations = donationsData?.pagination?.total ?? 0
+
+  // La columna de descarga solo aplica a Salida. Predicado booleano explicito:
+  // antes se devolvia el objeto columna (truthy) en la rama else.
+  const visibleColumns = donationsColumns.filter((column) =>
+    filters.type === 'Entrada' ? !column.column.includes('download') : true,
+  )
 
   const [searchControl, setSearchControl] = useState<string>(filters.controlNumber)
 
@@ -154,7 +160,7 @@ export const Donations = () => {
           <div className="lg:mx-2 mt-3 flex-1 min-h-0 flex flex-col">
             <TableComponents
               data={currentDonations}
-              column={donationsColumns.filter(type => filters.type == 'Entrada' ? !type.column.includes('download') : type)}
+              column={visibleColumns}
               actionTable={getActionTable}
               colSpanColumns={true}
               isExpansible={true}
@@ -163,9 +169,9 @@ export const Donations = () => {
               onPageChange={setPage}
               rowsPerPage={size}
               onRowsPerPageChange={setSize}
-              loading={isFetching}
-              renderRow={(donations: IDonations, index: number) => (
-                <div key={index} className="w-full [&_.table-shell]:max-h-none [&_.table-shell]:min-h-0">
+              loading={isPending}
+              renderRow={(donations: IDonations) => (
+                <div key={donations.id} className="w-full [&_.table-shell]:max-h-none [&_.table-shell]:min-h-0">
                   <TableComponents data={donations.detDonation} column={detDonationsColumns} actionTable={getActionTable} />
                 </div>
               )}

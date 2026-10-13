@@ -20,6 +20,7 @@ import { DonationMedicine } from "@/services/donations/donations.interface"
 import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface"
 import { MedicineForm } from "../medicine/MedicineForm"
 import { formatDateForInput } from "@/utils/formatters"
+import { donationImportRowSchema } from "@/lib/import-schemas"
 
 type RowStatus = "valid" | "warning" | "error"
 type ImportMode = "file" | "paste"
@@ -334,28 +335,13 @@ export const DonationUploadDialog = ({
   }
 
   const validateRow = (row: ParsedRow, rowNumber: number): ValidatedRow => {
-    const errors: string[] = []
+    // Fuente unica de reglas (compartida con el backend).
+    const parsed = donationImportRowSchema.safeParse(row)
+    const errors: string[] = parsed.success
+      ? []
+      : parsed.error.issues.map((issue) => issue.message)
+
     const medicina = row.medicina.trim()
-    const cantidad = row.cantidad.trim()
-
-    if (!medicina) {
-      errors.push("La medicina es obligatoria.")
-    }
-    if (!cantidad) {
-      errors.push("La cantidad es obligatoria.")
-    } else {
-      const amount = Number(cantidad)
-      if (!Number.isFinite(amount) || !Number.isInteger(amount) || amount <= 0) {
-        errors.push("La cantidad debe ser un número entero mayor a 0.")
-      }
-    }
-    if (row.fechaExpiracion) {
-      const date = new Date(row.fechaExpiracion)
-      if (isNaN(date.getTime())) {
-        errors.push("La fecha de expiración no es válida.")
-      }
-    }
-
     const matched = knownMedicines.find((med) => matchesMedicine(med, medicina))
     const newMedicine = medicina !== "" && !matched
 
@@ -366,7 +352,7 @@ export const DonationUploadDialog = ({
     return {
       rowNumber,
       medicina,
-      cantidad,
+      cantidad: row.cantidad.trim(),
       lote: row.lote.trim(),
       fechaExpiracion: row.fechaExpiracion,
       status: errors.length > 0 ? (newMedicine ? "warning" : "error") : "valid",
@@ -690,6 +676,7 @@ export const DonationUploadDialog = ({
                     column={previewColumns}
                     data={rows}
                     actionTable={() => { }}
+                    getRowId={(row: ValidatedRow) => row.rowNumber}
                   />
                 </div>
               </>
