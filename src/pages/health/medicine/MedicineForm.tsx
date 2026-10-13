@@ -16,11 +16,13 @@ interface MedicineFormProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: MedicineBody) => void;
   medicineData: IMedicine | null;
+  /** Valores iniciales para precargar el formulario cuando no se edita (`medicineData` null). */
+  initialValues?: Partial<MedicineBody>;
   categories: Category[];
   forms: Form[];
 }
 
-export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, onOpenChange, onSubmit, medicineData, categories, forms }) => {
+export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, onOpenChange, onSubmit, medicineData, initialValues, categories, forms }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">("medicamento");
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<MedicineBody>({
@@ -47,9 +49,10 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
 
       setCurrentTab(medicineData.medicine ? "medicamento" : "producto");
     } else {
-      reset(baseMedicine)
+      reset({ ...baseMedicine, ...initialValues })
+      setCurrentTab(initialValues?.medicine === false ? "producto" : "medicamento")
     }
-  }, [open, reset, medicineData]);
+  }, [open, reset, medicineData, initialValues]);
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value as "medicamento" | "producto");

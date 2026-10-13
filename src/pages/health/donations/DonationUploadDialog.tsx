@@ -61,10 +61,29 @@ const normalizeText = (text: string): string =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim()
+    .replace(/\s+/g, " ")
 
 const stringifyCell = (value: unknown): string => {
   if (value === null || value === undefined) return ""
   return String(value).trim()
+}
+
+const formatMedicineLabel = (med: IMedicine): string =>
+  `${med.name} - ${(med.presentation ?? "").trim()}`
+
+const extractMedicineName = (label: string): string => {
+  const idx = label.indexOf(" - ")
+  return idx >= 0 ? label.slice(0, idx).trim() : label.trim()
+}
+
+const extractPresentation = (label: string): string => {
+  const idx = label.indexOf(" - ")
+  return idx >= 0 ? label.slice(idx + 3).trim() : ""
+}
+
+const matchesMedicine = (med: IMedicine, value: string): boolean => {
+  const target = normalizeText(value)
+  return target === normalizeText(med.name) || target === normalizeText(formatMedicineLabel(med))
 }
 
 export const DonationUploadDialog = ({
@@ -93,6 +112,16 @@ export const DonationUploadDialog = ({
     const combined = [...medicines, ...newsCreated, ...remoteMedicines]
     return combined.filter((med, i, arr) => arr.findIndex((m) => m.id === med.id) === i)
   }, [medicines, newsCreated, remoteMedicines])
+
+  const medicineFormInitialValues = useMemo<Partial<MedicineBody> | undefined>(() => {
+    if (medicineFormRow == null) return undefined
+    const row = rows.find((item) => item.rowNumber === medicineFormRow)
+    if (!row) return undefined
+    return {
+      name: extractMedicineName(row.medicina),
+      presentation: extractPresentation(row.medicina),
+    }
+  }, [medicineFormRow, rows])
 
   useEffect(() => {
     setNewsCreated(createdMedicines)
@@ -256,11 +285,11 @@ export const DonationUploadDialog = ({
     if (unmatchedNames.length === 0) return validated
 
     const matches = await Promise.all(
-      unmatchedNames.map(async (name) => {
+      unmatchedNames.map(async (label) => {
         try {
-          const response = await getMedicinesPage({ page: 1, size: 5, name })
+          const response = await getMedicinesPage({ page: 1, size: 10, name: extractMedicineName(label) })
           const found = response?.medicines ?? []
-          return found.find((med) => normalizeText(med.name) === normalizeText(name)) ?? null
+          return found.find((med) => matchesMedicine(med, label)) ?? null
         } catch {
           return null
         }
@@ -278,9 +307,13 @@ export const DonationUploadDialog = ({
       })
     }
 
-    const byName = new Map(foundMedicines.map((med) => [normalizeText(med.name), med]))
+    const byLabel = new Map<string, IMedicine>()
+    foundMedicines.forEach((med) => {
+      byLabel.set(normalizeText(med.name), med)
+      byLabel.set(normalizeText(formatMedicineLabel(med)), med)
+    })
     return validated.map((row) => {
-      const match = byName.get(normalizeText(row.medicina))
+      const match = byLabel.get(normalizeText(row.medicina))
       if (!match || !row.newMedicine) return row
       const errors = row.errors.filter((error) => !error.includes("no registrada"))
       return {
@@ -322,7 +355,7 @@ export const DonationUploadDialog = ({
       }
     }
 
-    const matched = knownMedicines.find((med) => normalizeText(med.name) === normalizeText(medicina))
+    const matched = knownMedicines.find((med) => matchesMedicine(med, medicina))
     const newMedicine = medicina !== "" && !matched
 
     if (newMedicine && errors.length === 0) {
@@ -500,7 +533,7 @@ export const DonationUploadDialog = ({
 
   const guideItems = [
     'Completa una fila por cada medicina en la hoja "Donacion".',
-    'En la columna "Medicina" se muestran las medicinas registradas como sugerencia, pero puedes escribir cualquier nombre.',
+    'En la columna "Medicina" usa el formato "Nombre - Presentación" (ej: Amoxicilina - Suspensión 250mg/5ml), tal como viene en la plantilla.',
     'La columna "Cantidad" debe ser un número entero mayor a 0.',
     'El formato de "Fecha de Expiración" es AAAA-MM-DD (ej: 2027-12-31).',
     'Si escribes una medicina que no existe, deberás completar sus datos con el botón "Crear" para poder incluirla.',
@@ -510,7 +543,7 @@ export const DonationUploadDialog = ({
   return (
     <>
       <StyledDialog open={open} onOpenChange={onOpenChange}>
-      <StyledDialogContent className="sm:max-w-4xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-auto bg-gray-100">
+      <StyledDialogContent className="sm:max-w-6xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-auto bg-gray-100">
         <StyledDialogHeader>
           <div className="flex items-start justify-between gap-4 pr-10">
             <div>
@@ -692,6 +725,7 @@ export const DonationUploadDialog = ({
             onOpenChange={setMedicineFormOpen}
             onSubmit={handleCreateMedicine}
             medicineData={null}
+            initialValues={medicineFormInitialValues}
             categories={categories}
             forms={forms}
           />
