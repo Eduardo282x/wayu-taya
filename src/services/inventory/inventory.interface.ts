@@ -36,6 +36,64 @@ export interface ILotes {
 export interface InventoryHistoryContent {
     history: IInventoryHistory[]
 }
+
+export interface InventoryHistoryQueryParams extends PaginationQuery {
+    name?: string;
+    storeId?: number | null;
+}
+
+export interface PaginatedInventoryHistoryContent {
+    history: IInventoryHistory[];
+    pagination: PaginationMeta;
+}
+
+export interface InventoryAlertsQueryParams {
+    days?: number;
+    minStock?: number;
+    storeId?: number | null;
+}
+
+export interface ExpiringLote {
+    medicineId: number;
+    medicineName: string;
+    presentation?: string;
+    lote: string;
+    storeId: number;
+    storeName: string;
+    expirationDate: Date | string;
+    amount: number;
+    daysUntilExpiration?: number;
+}
+
+export interface LowStockItem {
+    medicineId: number;
+    medicineName: string;
+    presentation?: string;
+    storeId: number;
+    storeName: string;
+    stock: number;
+    minStock?: number;
+}
+
+/**
+ * Contrato esperado de `GET /inventory/alerts` (correccion 40 del backend).
+ * El panel tolera que falte cualquiera de las dos listas.
+ */
+export interface InventoryAlertsContent {
+    expiringLotes: ExpiringLote[];
+    lowStock: LowStockItem[];
+}
+
+export interface MovementItem {
+    medicineId: string | number;
+    sourceStoreId: string | number;
+    quantity: number;
+    targetStoreId: string | number;
+}
+
+export interface MoveMedicineFormData {
+    movements: MovementItem[];
+}
 export interface IInventoryHistory {
     id: number;
     medicineId: number;

@@ -21,6 +21,7 @@ import { Snackbar } from '@/components/snackbar/Snackbar';
 import { useAuthStore, useRol, useUser } from '@/store/auth.store';
 import { canManageUsers } from '@/lib/roles';
 import { CategoryCardProps, optionsMenu } from '@/pages/home/menu.data';
+import { useInventoryAlertsQuery } from '@/pages/health/inventory/inventory.hook';
 
 export const Sidebar = () => {
     const navigate = useNavigate();
@@ -31,9 +32,13 @@ export const Sidebar = () => {
     const [menuData, setMenuData] = useState<IMenuSection[]>(menuHealth);
     const [currentModule, setCurrentModule] = useState<string>('Aplicaciones');
 
-    /** /usuarios solo existe para Super Admin y Administrador. */
+    /** Insignia de alertas de inventario (vencimientos + stock bajo). */
+    const { data: alertsData } = useInventoryAlertsQuery({ days: 30 });
+    const alertCount = (alertsData?.expiringLotes.length ?? 0) + (alertsData?.lowStock.length ?? 0);
+
+    /** /usuarios y /auditoria solo existen para Super Admin y Administrador. */
     const isVisibleMenuItem = (item: IMenu): boolean => {
-        if (item.url === '/usuarios') return canManageUsers(rol);
+        if (item.url === '/usuarios' || item.url === '/auditoria') return canManageUsers(rol);
         return true;
     };
 
@@ -162,6 +167,11 @@ export const Sidebar = () => {
                                     className={`flex items-center justify-start gap-3 cursor-pointer rounded-lg text-white w-full p-2 manrope border border-transparent text-sm hover:border-white ${me.active && ' border-white shadow-2xl font-medium '} transition-all`}
                                 >
                                     <me.icon className='text-3xl' /> {me.label}
+                                    {me.url === '/salud/inventario' && alertCount > 0 && (
+                                        <span className='ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold'>
+                                            {alertCount}
+                                        </span>
+                                    )}
                                 </div>
                             ))}
                         </div>

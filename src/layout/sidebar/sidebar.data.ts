@@ -1,5 +1,5 @@
 import { PiUserList, PiUsersThree } from "react-icons/pi";
-import { FaRegCalendarAlt } from "react-icons/fa";
+import { FaRegCalendarAlt, FaClipboardList } from "react-icons/fa";
 // import { MdAccessTime } from "react-icons/md";
 // import { FaBuilding } from "react-icons/fa";
 import { IoDocumentTextOutline } from "react-icons/io5";
@@ -171,6 +171,12 @@ export const menuHealth: IMenuSection[] = [
                 active: false,
                 url: '/usuarios',
                 icon: PiUsersThree,
+            },
+            {
+                label: 'Auditoría',
+                active: false,
+                url: '/auditoria',
+                icon: FaClipboardList,
             },
             {
                 label: 'Mi perfil',

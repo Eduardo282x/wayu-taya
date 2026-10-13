@@ -16,6 +16,8 @@ import { useInventoryQuery, useInventoryHistoryQuery, useAllInventoryQuery, useM
 import { useInventoryStore } from "./inventoryStore"
 import { useStoresQuery } from "@/pages/health/store/store.hook"
 import { debounce } from "@/lib/debounce"
+import { apiMessage } from "@/services/api-error"
+import toast from "react-hot-toast"
 // import { SuccessDialog } from "./success-dialog"
 
 export const Inventory = () => {
@@ -24,17 +26,23 @@ export const Inventory = () => {
   const [inventorySelected, setInventorySelected] = useState<IInventory | null>(null)
   const [currentView, setCurrentView] = useState<"inventory" | "history">("inventory")
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
+  const [historyPage, setHistoryPage] = useState(0)
+  const [historySize, setHistorySize] = useState(100)
   // const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
 
   const { page, size, name, storeId, setPage, setSize, setName, setStoreId } = useInventoryStore()
-  const { data: inventoryData, isFetching } = useInventoryQuery()
-  const { data: historyData, isFetching: historyIsFetching } = useInventoryHistoryQuery(currentView === 'history')
+  const { data: inventoryData, isPending } = useInventoryQuery()
+  const { data: historyData, isPending: historyIsPending } = useInventoryHistoryQuery(
+    { page: historyPage + 1, size: historySize },
+    currentView === 'history',
+  )
   const { data: allInventoryData } = useAllInventoryQuery(isMoveDialogOpen)
   const { data: storesData } = useStoresQuery()
   const moveInventory = useMoveInventoryMutation()
 
   const currentInventory = inventoryData?.inventory ?? []
   const totalInventory = inventoryData?.pagination?.total ?? 0
+  const totalHistory = historyData?.pagination?.total ?? 0
   const stores: IStore[] = storesData?.stores ?? []
 
   const [searchInventory, setSearchInventory] = useState<string>(name)
@@ -61,6 +69,11 @@ export const Inventory = () => {
     setStoreId(storeValue === 'all' ? null : Number(storeValue))
   }
 
+  const handleHistorySizeChange = (nextSize: number) => {
+    setHistorySize(nextSize)
+    setHistoryPage(0)
+  }
+
   const onSubmitMovedInventory = async (data: MoveMedicineFormData) => {
     const parseData = data.movements.map(item => {
       return {
@@ -71,9 +84,14 @@ export const Inventory = () => {
       }
     });
 
-    await moveInventory.mutateAsync({ movements: parseData })
+    const response = await moveInventory.mutateAsync({ movements: parseData })
 
-    // Cerrar el diálogo de movimiento y abrir el de éxito
+    if (!response?.success) {
+      toast.error(apiMessage(response, 'No se pudieron mover las medicinas.'));
+      return;
+    }
+
+    toast.success(response.message || 'Movimiento realizado correctamente.');
     setIsMoveDialogOpen(false);
   }
 
@@ -155,9 +173,9 @@ export const Inventory = () => {
             onPageChange={setPage}
             rowsPerPage={size}
             onRowsPerPageChange={setSize}
-            loading={isFetching}
-            renderRow={(inventory: IInventory, index: number) => (
-              <InventoryDetailsMedicine inventory={inventory} key={index} />
+            loading={isPending}
+            renderRow={(inventory: IInventory) => (
+              <InventoryDetailsMedicine inventory={inventory} key={inventory.id} />
             )}
           />
         ) : (
@@ -168,7 +186,12 @@ export const Inventory = () => {
             actionTable={() => { }}
             colSpanColumns={false}
             isExpansible={false}
-            loading={historyIsFetching}
+            totalItems={totalHistory}
+            page={historyPage}
+            onPageChange={setHistoryPage}
+            rowsPerPage={historySize}
+            onRowsPerPageChange={handleHistorySizeChange}
+            loading={historyIsPending}
           />
         )}
 

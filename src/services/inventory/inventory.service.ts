@@ -1,6 +1,13 @@
-import { MoveMedicineFormData } from "@/pages/health/inventory/move-medicine-dialog";
 import { deleteDataApi, getDataApi, putDataApi } from "@/services/api.service"
-import { InventoryContent, InventoryHistoryContent, InventoryQueryParams, PaginatedInventoryContent } from "./inventory.interface";
+import type { BaseResponse } from "@/services/base.interface";
+import {
+    InventoryContent,
+    InventoryHistoryQueryParams,
+    InventoryQueryParams,
+    MoveMedicineFormData,
+    PaginatedInventoryContent,
+    PaginatedInventoryHistoryContent,
+} from "./inventory.interface";
 
 const inventoryUrl = "/inventory";
 
@@ -36,17 +43,38 @@ export const getInventoryPage = async (params: InventoryQueryParams): Promise<Pa
     return response.data;
 }
 
-export const getInventoryHistorial = async (): Promise<InventoryHistoryContent> => {
-    const response = await getDataApi<InventoryHistoryContent>(`${inventoryUrl}/historial`);
+export const getInventoryHistorial = async (
+    params?: InventoryHistoryQueryParams,
+): Promise<PaginatedInventoryHistoryContent> => {
+    const queryParams: Record<string, string | number> = {
+        page: params?.page ?? 1,
+        size: params?.size ?? 100,
+    };
+
+    if (params?.name) queryParams.name = params.name;
+    if (params?.storeId != null) queryParams.storeId = params.storeId;
+
+    const response = await getDataApi<PaginatedInventoryHistoryContent>(`${inventoryUrl}/historial`, {
+        params: queryParams,
+    });
     if (response.data == null) {
-        return { history: [] }
+        return {
+            history: [],
+            pagination: {
+                total: 0,
+                page: params?.page ?? 1,
+                size: params?.size ?? 100,
+                totalPages: 0,
+            },
+        }
     }
     return response.data;
 }
 
-export const moveInventoryStorage = async (data: MoveMedicineFormData): Promise<unknown> => {
-    const response = await putDataApi<MoveMedicineFormData, unknown>(`${inventoryUrl}/move`, data);
-    return response.data;
+export const moveInventoryStorage = async (
+    data: MoveMedicineFormData,
+): Promise<BaseResponse<unknown>> => {
+    return putDataApi<MoveMedicineFormData, unknown>(`${inventoryUrl}/move`, data);
 }
 
 export const deleteInventory = async (id: number): Promise<unknown> => {

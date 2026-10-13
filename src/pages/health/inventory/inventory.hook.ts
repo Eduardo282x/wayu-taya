@@ -1,7 +1,12 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { InventoryQueryParams } from "@/services/inventory/inventory.interface"
+import {
+    InventoryAlertsQueryParams,
+    InventoryHistoryQueryParams,
+    InventoryQueryParams,
+    MoveMedicineFormData,
+} from "@/services/inventory/inventory.interface"
 import { getInventory, getInventoryHistorial, getInventoryPage, moveInventoryStorage } from "@/services/inventory/inventory.service"
-import { MoveMedicineFormData } from "./move-medicine-dialog"
+import { getInventoryAlerts } from "@/services/inventory/inventory.alert.service"
 import { useInventoryStore } from "./inventoryStore"
 import { useIsAuthenticated } from "@/store/auth.store"
 
@@ -9,7 +14,10 @@ export const inventoryKeys = {
     all: ["inventory"] as const,
     list: (params: InventoryQueryParams) => ["inventory", "list", params] as const,
     search: (name: string) => ["inventory", "search", name] as const,
+    /** Clave base del historial: invalida todas las paginas por prefijo. */
     history: ["inventory", "history"] as const,
+    historyList: (params: InventoryHistoryQueryParams) => ["inventory", "history", "list", params] as const,
+    alerts: (params: InventoryAlertsQueryParams) => ["inventory", "alerts", params] as const,
 }
 
 export const useInventoryQuery = () => {
@@ -53,15 +61,33 @@ export const useInventorySearchQuery = (name: string) => {
     })
 }
 
-export const useInventoryHistoryQuery = (enabled = true) => {
+export const useInventoryHistoryQuery = (
+    params: InventoryHistoryQueryParams = { page: 1, size: 100 },
+    enabled = true,
+) => {
     const isAuthenticated = useIsAuthenticated()
 
     return useQuery({
-        queryKey: inventoryKeys.history,
-        queryFn: getInventoryHistorial,
+        queryKey: inventoryKeys.historyList(params),
+        queryFn: () => getInventoryHistorial(params),
         enabled: enabled && isAuthenticated,
-        staleTime: Infinity,
+        placeholderData: keepPreviousData,
+        staleTime: 60 * 1000,
         gcTime: 30 * 60 * 1000,
+    })
+}
+
+export const useInventoryAlertsQuery = (
+    params: InventoryAlertsQueryParams = { days: 30 },
+    enabled = true,
+) => {
+    const isAuthenticated = useIsAuthenticated()
+
+    return useQuery({
+        queryKey: inventoryKeys.alerts(params),
+        queryFn: () => getInventoryAlerts(params),
+        enabled: enabled && isAuthenticated,
+        staleTime: 60 * 1000,
     })
 }
 
@@ -70,9 +96,12 @@ export const useMoveInventoryMutation = () => {
 
     return useMutation({
         mutationFn: (data: MoveMedicineFormData) => moveInventoryStorage(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: inventoryKeys.all })
-            queryClient.invalidateQueries({ queryKey: inventoryKeys.history })
+        onSuccess: (response) => {
+            // El servicio devuelve el sobre: un fallo NO debe disparar refetch.
+            if (response?.success) {
+                queryClient.invalidateQueries({ queryKey: inventoryKeys.all })
+                queryClient.invalidateQueries({ queryKey: inventoryKeys.history })
+            }
         },
     })
 }
