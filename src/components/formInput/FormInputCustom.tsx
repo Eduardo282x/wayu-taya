@@ -1,10 +1,8 @@
 import React from "react";
-import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -15,10 +13,87 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   error?: string;
   required?: boolean;
-  /** Renderiza un `textarea` en vez de un `input`. Para direcciones o notas largas. */
+  /** Renderiza un `textarea` en vez de `input`. Para direcciones o notas largas. */
   multiline?: boolean;
   rows?: number;
+  /** Mes/año mínimo navegable del calendario cuando `type="date"`. */
+  minDate?: Date;
+  /** Mes/año máximo navegable del calendario cuando `type="date"`. */
+  maxDate?: Date;
 }
+
+const toDisplayDate = (value: unknown): string => {
+  if (!value) return "";
+
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return "";
+    return `${String(value.getDate()).padStart(2, "0")}/${String(value.getMonth() + 1).padStart(2, "0")}/${value.getFullYear()}`;
+  }
+
+  if (typeof value === "string") {
+    const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+    if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+
+    const br = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+    if (br) return value;
+
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return `${String(parsed.getDate()).padStart(2, "0")}/${String(parsed.getMonth() + 1).padStart(2, "0")}/${parsed.getFullYear()}`;
+    }
+  }
+
+  return "";
+};
+
+const maskDateInput = (raw: string): string => {
+  const digits = raw.replace(/\D/g, "").slice(0, 8);
+  const parts = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(
+    (part) => part.length > 0
+  );
+  return parts.join("/");
+};
+
+const parseDisplayDate = (text: string): string | null => {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text);
+  if (!match) return null;
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return null;
+  }
+
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+};
+
+const parseAnyToDate = (value: unknown): Date | undefined => {
+  if (!value) return undefined;
+
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? undefined : value;
+  }
+
+  if (typeof value === "string") {
+    const br = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+    if (br) {
+      const date = new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]));
+      return Number.isNaN(date.getTime()) ? undefined : date;
+    }
+
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+  }
+
+  return undefined;
+};
+
+const toISODate = (date: Date): string =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
 const FormInputCustom: React.FC<FormInputProps> = ({
   label,
@@ -32,6 +107,8 @@ const FormInputCustom: React.FC<FormInputProps> = ({
   required = true,
   multiline = false,
   rows = 3,
+  minDate,
+  maxDate,
   ...inputProps
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -40,18 +117,33 @@ const FormInputCustom: React.FC<FormInputProps> = ({
   const isDateInput = type === "date";
   const isPasswordInput = type === "password";
 
-  const selectedDate = React.useMemo(() => {
-    if (!value) return undefined;
+  const isControlled = value !== undefined;
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const [dateText, setDateText] = React.useState<string>(() =>
+    toDisplayDate(isControlled ? value : (inputProps as { defaultValue?: unknown }).defaultValue)
+  );
 
-    if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      const [year, month, day] = value.split("-").map(Number);
-      const parsedDate = new Date(year, month - 1, day);
-      return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate;
+  React.useEffect(() => {
+    if (isControlled) setDateText(toDisplayDate(value));
+  }, [value, isControlled]);
+
+  const selectedDate = React.useMemo(
+    () => parseAnyToDate(isControlled ? value : dateText),
+    [isControlled, value, dateText]
+  );
+
+  const calendarStartMonth = minDate ?? new Date(1900, 0, 1);
+  const calendarEndMonth = maxDate ?? new Date(new Date().getFullYear() + 100, 11, 31);
+
+  const assignInputRef = (node: HTMLInputElement | null) => {
+    inputRef.current = node;
+    const externalRef = (inputProps as { ref?: React.Ref<HTMLInputElement> }).ref;
+    if (typeof externalRef === "function") {
+      externalRef(node);
+    } else if (externalRef && typeof externalRef === "object") {
+      (externalRef as { current: HTMLInputElement | null }).current = node;
     }
-
-    const parsedDate = new Date(value as string | Date | number);
-    return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate;
-  }, [value]);
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(event);
@@ -66,21 +158,61 @@ const FormInputCustom: React.FC<FormInputProps> = ({
     (inputProps as { onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void }).onChange?.(compatible);
   };
 
-  const handleDateSelect = (date?: Date) => {
-    const formattedValue = date ? new Date(date) : "";
-
+  const emitDateChange = (isoValue: string) => {
     const syntheticEvent = {
       target: {
-        value: formattedValue,
-        name: inputProps.name,
+        value: isoValue,
+        name: (inputProps as { name?: string }).name,
         id,
       },
-    } as React.ChangeEvent<HTMLInputElement>;
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
 
     onChange?.(syntheticEvent);
     (inputProps as { onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void }).onChange?.(syntheticEvent);
+  };
 
+  const handleDateSelect = (date?: Date) => {
+    if (date) {
+      const display = toDisplayDate(date);
+      setDateText(display);
+      if (inputRef.current) inputRef.current.value = display;
+      emitDateChange(toISODate(date));
+    }
     setOpen(false);
+  };
+
+  const handleDateTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const masked = maskDateInput(event.target.value);
+    if (!isControlled) {
+      event.currentTarget.value = masked;
+    }
+    setDateText(masked);
+
+    const iso = parseDisplayDate(masked);
+    if (iso) emitDateChange(iso);
+  };
+
+  const handleDateFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (!isControlled) {
+      const display = toDisplayDate(event.currentTarget.value);
+      if (display) event.currentTarget.value = display;
+    }
+    (inputProps as { onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void }).onFocus?.(event);
+  };
+
+  const handleDateBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    (inputProps as { onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void }).onBlur?.(event);
+  };
+
+  const handleDateKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const iso = parseDisplayDate(maskDateInput(event.currentTarget.value));
+      if (iso) emitDateChange(iso);
+      setOpen(false);
+      return;
+    }
+    (inputProps as { onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void }).onKeyDown?.(event);
   };
 
   return (
@@ -98,36 +230,57 @@ const FormInputCustom: React.FC<FormInputProps> = ({
       </label>
 
       {isDateInput ? (
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              id={id}
-              type="button"
-              variant="outline"
-              className={cn(
-                "w-full justify-start overflow-hidden rounded-md border bg-white px-3 py-1 text-left",
-                !selectedDate && "text-muted-foreground",
-                className
-              )}
-              disabled={inputProps.disabled}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-              <span className="min-w-0 truncate">
-                {selectedDate ? format(selectedDate, "PPP", { locale: es }) : placeholder}
-              </span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="p-0 overflow-hidden rounded-md" align="start">
-            <Calendar
-              mode="single"
-              locale={es}
-              selected={selectedDate}
-              onSelect={handleDateSelect}
-              className="rounded-lg border w-full"
-              captionLayout="dropdown"
-            />
-          </PopoverContent>
-        </Popover>
+        <div className="relative w-full">
+          <input
+            {...inputProps}
+            ref={assignInputRef}
+            id={id}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder={placeholder === "Selecciona una fecha" ? "dd/mm/aaaa" : placeholder}
+            className={cn(
+              "w-full rounded-md focus:outline-1 focus:outline-blue-800 px-3 py-1 pr-9 bg-white border",
+              className
+            )}
+            value={isControlled ? dateText : undefined}
+            defaultValue={
+              !isControlled
+                ? toDisplayDate((inputProps as { defaultValue?: unknown }).defaultValue)
+                : undefined
+            }
+            onChange={handleDateTextChange}
+            onFocus={handleDateFocus}
+            onBlur={handleDateBlur}
+            onKeyDown={handleDateKeyDown}
+            disabled={inputProps.disabled}
+          />
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                aria-label="Abrir calendario"
+                disabled={inputProps.disabled}
+                className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-50"
+              >
+                <CalendarIcon className="h-4 w-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="p-0 overflow-hidden rounded-md" align="start">
+              <Calendar
+                mode="single"
+                locale={es}
+                selected={selectedDate}
+                defaultMonth={selectedDate}
+                onSelect={handleDateSelect}
+                className="rounded-lg border w-full"
+                captionLayout="dropdown"
+                startMonth={calendarStartMonth}
+                endMonth={calendarEndMonth}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       ) : isPasswordInput ? (
         <div className="relative w-full">
           <input
