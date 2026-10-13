@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Upload, Download, FileSpreadsheet, ClipboardPaste, Trash2, Plus, Loader2, Info } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { TableComponents } from "@/components/table/TableComponents"
 import { Column } from "@/components/table/table.interface"
 import { getDonationsExcelTemplate } from "@/services/donations/donations.service"
@@ -463,7 +464,8 @@ export const DonationUploadDialog = ({
       label: "Medicina",
       column: "medicina",
       visible: true,
-      className: (row: ValidatedRow) => rowBg(row),
+      // className: (row: ValidatedRow) => rowBg(row),
+      className: () => 'max-w-100 w-100 overflow-hidden text-ellipsis truncate',
       element: (row: ValidatedRow) => <span>{row.medicina || "-"}</span>,
     },
     {
@@ -492,24 +494,33 @@ export const DonationUploadDialog = ({
       column: "estado",
       visible: true,
       className: (row: ValidatedRow) => rowBg(row),
-      element: (row: ValidatedRow) => (
-        <div>
-          {row.status === "error" ? (
+      element: (row: ValidatedRow) => {
+        const statusLabel =
+          row.status === "error" ? (
             <span className="text-xs font-semibold text-red-600">Error</span>
           ) : row.newMedicine ? (
             <span className="text-xs font-semibold text-yellow-600">Nueva medicina</span>
           ) : (
             <span className="text-xs font-semibold text-green-600">Válida</span>
-          )}
-          {row.errors.length > 0 && (
-            <div className="text-xs text-gray-600 mt-0.5">
-              {row.errors.map((err, i) => (
-                <div key={i}>• {err}</div>
-              ))}
-            </div>
-          )}
-        </div>
-      ),
+          )
+
+        if (row.errors.length === 0) return statusLabel
+
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex cursor-help">{statusLabel}</span>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64">
+              <ul className="space-y-0.5">
+                {row.errors.map((err, i) => (
+                  <li key={i}>• {err}</li>
+                ))}
+              </ul>
+            </TooltipContent>
+          </Tooltip>
+        )
+      },
     },
     {
       label: "",
@@ -543,7 +554,7 @@ export const DonationUploadDialog = ({
   return (
     <>
       <StyledDialog open={open} onOpenChange={onOpenChange}>
-      <StyledDialogContent className="sm:max-w-6xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-auto bg-gray-100">
+      <StyledDialogContent className="sm:max-w-5xl max-w-[95vw] w-full mx-4 max-h-[90vh] overflow-y-auto bg-gray-100">
         <StyledDialogHeader>
           <div className="flex items-start justify-between gap-4 pr-10">
             <div>

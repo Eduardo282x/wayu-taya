@@ -17,7 +17,7 @@ export const medicineColumns: Column[] = [
     element: (data: IMedicine) => `${data.name} ${data.presentation}`,
     visible: true,
     isIcon: false,
-    className: () => 'max-w-160 w-160 overflow-hidden text-ellipsis'
+    className: () => 'max-w-160 w-160 overflow-hidden text-ellipsis truncate'
   },
   {
     label: "Forma",
