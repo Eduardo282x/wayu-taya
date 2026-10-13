@@ -258,6 +258,12 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     );
   }
 
+  const handleMedicineSelectEntry = (index: number, medicineId: number) => {
+    handleMedicineDetailChange(index, "medicineId", medicineId);
+    const medicine = medicineDirectory[medicineId];
+    handleMedicineDetailChange(index, "lote", medicine?.lote ?? "", 0);
+  }
+
   const handleApplyUpload = (uploaded: DonationMedicine[]) => {
     const defaultStorageId = getDefaultStorageId();
     setMedicineDetails(
@@ -638,6 +644,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     onSearch={setMedicineQuery}
                     searching={isSearchingMedicines || medicineQuery.trim() !== debouncedMedicineQuery.trim()}
                     onOpenChange={(isOpen) => { if (isOpen) resetMedicineSearch(); }}
+                    onMedicineChange={handleMedicineSelectEntry}
                   />
                 </div>
               ))
@@ -753,6 +760,7 @@ interface DonationDetailFormEntryProps {
   onSearch?: (query: string) => void;
   searching?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onMedicineChange?: (index: number, medicineId: number) => void;
 }
 const DonationDetailFormEntry = ({
   removeMedicineDetail,
@@ -764,7 +772,8 @@ const DonationDetailFormEntry = ({
   onCreateMedicine,
   onSearch,
   searching,
-  onOpenChange
+  onOpenChange,
+  onMedicineChange
 }: DonationDetailFormEntryProps) => {
   return (
     <div className="border border-gray-400 rounded-lg p-2 bg-white relative ">
@@ -791,7 +800,11 @@ const DonationDetailFormEntry = ({
               placeholder="Nombre de la medicina"
               data={filteredOptions(detail, index)}
               valueDefault={detail.medicineId}
-              onChange={(value) => handleMedicineDetailChange(index, "medicineId", Number(value))}
+              onChange={(value) =>
+                onMedicineChange
+                  ? onMedicineChange(index, Number(value))
+                  : handleMedicineDetailChange(index, "medicineId", Number(value))
+              }
               onSearch={onSearch}
               loading={searching}
               onOpenChange={onOpenChange}
