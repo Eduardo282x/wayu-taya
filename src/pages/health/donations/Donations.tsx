@@ -139,22 +139,24 @@ export const Donations = () => {
               institutions={allInstitutionsData?.institutions ?? []}
               lotes={lotesData?.lotes ?? []}
             />
-            <div className="flex flex-wrap items-end gap-1 w-full lg:w-auto">
+            <div className="flex flex-col lg:flex-row items-end gap-1 w-full lg:w-auto">
               <input
                 type="search"
                 placeholder="Buscar donación..."
-                className="flex-1 min-w-0 lg:flex-none lg:w-60 focus:outline-0 shadow-2xl border border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+                className="flex-1 min-w-0 lg:flex-none w-full lg:w-60 focus:outline-0 shadow-2xl border border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
                 value={searchControl}
                 onChange={(e) => {
                   setSearchControl(e.target.value)
                   debouncedControlNumber(e.target.value)
                 }}
               />
-              <DonationSummaryPopover data={summaryData} isLoading={summaryPending} />
-              <Button variant={"animated"} className="h-9 whitespace-nowrap" onClick={newDonations}>
-                <Plus className="w-4 h-4" />
-                Donación
-              </Button>
+              <div className="flex items-center justify-between w-full gap-2">
+                <DonationSummaryPopover data={summaryData} isLoading={summaryPending} />
+                <Button variant={"animated"} className="w-1/2 lg:w-auto h-9 whitespace-nowrap" onClick={newDonations}>
+                  <Plus className="w-4 h-4" />
+                  Donación
+                </Button>
+              </div>
 
             </div>
           </div>

@@ -103,31 +103,33 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
                     />
                 }
             </div>
-            <div className="w-full sm:w-60">
-                <span className="block text-sm font-medium mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
-                    Fecha
-                </span>
-                <DatePickerRange
-                    className="w-40"
-                    value={dateRangeValue}
-                    onChange={handleDateChange}
-                />
+            <div className="flex items-end justify-between gap-2">
+                <div className="w-full ">
+                    <span className="block text-sm font-medium mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
+                        Fecha
+                    </span>
+                    <DatePickerRange
+                        className="w-full"
+                        value={dateRangeValue}
+                        onChange={handleDateChange}
+                    />
+                </div>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            onClick={cleanFilters}
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="opacity-70" side="top">
+                        <span>Limpiar filtros</span>
+                    </TooltipContent>
+                </Tooltip>
             </div>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                        onClick={cleanFilters}
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent className="opacity-70" side="top">
-                    <span>Limpiar filtros</span>
-                </TooltipContent>
-            </Tooltip>
         </div>
     )
 }

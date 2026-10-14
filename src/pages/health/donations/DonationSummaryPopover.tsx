@@ -36,7 +36,7 @@ export const DonationSummaryPopover = ({ data, isLoading }: IDonationSummaryPopo
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="outline" className="h-9">
+                <Button variant="outline" className="w-1/2 lg:w-auto h-9">
                     <ChartColumn className="w-4 h-4" />
                     Resumen
                 </Button>
