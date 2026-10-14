@@ -12,10 +12,11 @@ import { Button } from "@/components/ui/button"
 import { MoveMedicineDialog, MoveMedicineFormData } from "./move-medicine-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { IStore } from "@/services/store/store.interface"
-import { useInventoryQuery, useInventoryHistoryQuery, useAllInventoryQuery, useMoveInventoryMutation } from "./inventory.hook"
+import { useInventoryQuery, useInventoryHistoryQuery, useAllInventoryQuery, useInventorySummaryQuery, useMoveInventoryMutation } from "./inventory.hook"
 import { useInventoryStore } from "./inventoryStore"
 import { useStoresQuery } from "@/pages/health/store/store.hook"
 import { debounce } from "@/lib/debounce"
+import { InventorySummaryPopover } from "./InventorySummaryPopover"
 // import { SuccessDialog } from "./success-dialog"
 
 export const Inventory = () => {
@@ -35,6 +36,7 @@ export const Inventory = () => {
     currentView === 'history',
   )
   const { data: allInventoryData } = useAllInventoryQuery(isMoveDialogOpen)
+  const { data: summaryData, isPending: summaryIsPending } = useInventorySummaryQuery()
   const { data: storesData } = useStoresQuery()
   const moveInventory = useMoveInventoryMutation()
 
@@ -96,15 +98,19 @@ export const Inventory = () => {
 
       {/* Barra de herramientas con filtros */}
       <div className="w-full h-fit border-b-2 border-gray-300 flex items-center pb-2 px-2 lg:justify-between flex-col lg:flex-row gap-2 lg:gap-0">
-        <Button
-          onClick={() => setIsMoveDialogOpen(true)}
-          className="flex items-center gap-2"
-          size="sm"
-          variant={'animated'}
-        >
-          <FaExchangeAlt className="w-4 h-4" />
-          Mover Medicinas
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setIsMoveDialogOpen(true)}
+            className="flex items-center gap-2"
+            size="sm"
+            variant={'animated'}
+          >
+            <FaExchangeAlt className="w-4 h-4" />
+            Mover Medicinas
+          </Button>
+
+          <InventorySummaryPopover data={summaryData} isLoading={summaryIsPending} />
+        </div>
 
         <div className="flex items-center gap-2">
           <Select value={storeId == null ? 'all' : storeId.toString()} onValueChange={filterInventoryByStore}>

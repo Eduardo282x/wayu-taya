@@ -25,6 +25,35 @@ export interface IInventory {
     lotes: ILotes[];
 }
 
+export type InventorySummaryQueryParams = Omit<InventoryQueryParams, 'page' | 'size'>;
+
+export interface InventorySummaryGroup {
+    items: number;
+    count: number;
+}
+
+export interface InventorySummaryStore {
+    storeId: number;
+    storeName: string;
+    address: string;
+    items: number;
+    records: number;
+    medicines: number;
+    capacity: number;
+    usedCapacity: number;
+    availableCapacity: number;
+    capacityPercentage: number;
+}
+
+export interface InventorySummary {
+    totalItems: number;
+    totalRecords: number;
+    totalMedicines: number;
+    medicamentos: InventorySummaryGroup;
+    productos: InventorySummaryGroup;
+    byStore: InventorySummaryStore[];
+}
+
 export interface ILotes {
     name: string;
     storeId: number;
