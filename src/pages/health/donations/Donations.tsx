@@ -10,13 +10,14 @@ import { DonationsForm } from "./DonationsForm"
 import PageTransitionComponent from "@/components/PageTransition"
 import { Plus } from "lucide-react"
 import { DonationFilterDropDown } from "./DonationFilters"
-import { useDonationsQuery, useLotesQuery, useCreateDonationMutation, useUpdateDonationMutation, useDeleteDonationMutation } from "./donations.hook"
+import { useDonationsQuery, useLotesQuery, useDonationsSummaryQuery, useCreateDonationMutation, useUpdateDonationMutation, useDeleteDonationMutation } from "./donations.hook"
 import { useDonationStore } from "./donationStore"
 import { useStoresQuery } from "@/pages/health/store/store.hook"
 import { useAllInventoryQuery } from "@/pages/health/inventory/inventory.hook"
 import { useAllMedicinesQuery } from "@/pages/health/medicine/medicine.hook"
 import { useAllProvidersQuery, useAllInstitutionsQuery } from "@/pages/documents/providers/providers.hook"
 import { DonationInventoryWarningDialog } from "./DonationInventoryWarningDialog"
+import { DonationSummaryPopover } from "./DonationSummaryPopover"
 
 export const Donations = () => {
   const [donationSelected, setDonationSelected] = useState<IDonations | null>(null)
@@ -25,6 +26,7 @@ export const Donations = () => {
   const [deleting, setDeleting] = useState<boolean>(false)
   const { page, size, setPage, setSize, filters, setFilter } = useDonationStore()
   const { data: donationsData, isPending } = useDonationsQuery()
+  const { data: summaryData, isPending: summaryPending } = useDonationsSummaryQuery()
   const { data: lotesData } = useLotesQuery()
   const { data: storesData } = useStoresQuery(openDialog || deleteWarningOpen)
   const { data: allInventoryData } = useAllInventoryQuery(openDialog)
@@ -127,23 +129,24 @@ export const Donations = () => {
         <div className="h-full flex flex-col min-h-0">
           <HeaderPages title="Donaciones" Icon={BiDonateHeart} />
 
-          <div className="flex justify-between items-end gap-4 p-3 bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="flex justify-between items-end p-2 lg:mx-2 bg-white rounded-xl shadow-sm border border-gray-200">
             <DonationFilterDropDown
               providers={allProvidersData?.providers ?? []}
               institutions={allInstitutionsData?.institutions ?? []}
               lotes={lotesData?.lotes ?? []}
             />
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-1">
               <input
                 type="search"
                 placeholder="Buscar donación..."
-                className="w-40 lg:w-60 focus:outline-0 shadow-2xl border-1 border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
+                className="w-40 lg:w-60 focus:outline-0 shadow-2xl border border-gray-400 bg-white rounded-lg h-9 placeholder:opacity-60 p-2 manrope focus:ring-1 focus:ring-[#3449D5] transition-all 100s"
                 value={searchControl}
                 onChange={(e) => {
                   setSearchControl(e.target.value)
                   debouncedControlNumber(e.target.value)
                 }}
               />
+              <DonationSummaryPopover data={summaryData} isLoading={summaryPending} />
               <Button variant={"animated"} className="h-full" onClick={newDonations}>
                 <Plus className="w-4 h-4" />
                 Donación

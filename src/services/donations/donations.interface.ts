@@ -79,9 +79,32 @@ export interface DonationsContent {
     donations: IDonations[];
 }
 
+export type DonationSummaryQueryParams = Omit<DonationsQueryParams, 'page' | 'size'>;
+
 export interface PaginatedDonationsContent {
     donations: IDonations[];
     pagination: PaginationMeta;
+}
+
+export interface DonationSummaryGroup {
+    donations: number;
+    items: number;
+    benefited: number;
+}
+
+export interface DonationSummaryDateRange {
+    from: string;
+    to: string;
+}
+
+export interface DonationSummary {
+    totalDonations: number;
+    totalItems: number;
+    totalBenefited: number;
+    entrada: DonationSummaryGroup;
+    salida: DonationSummaryGroup;
+    averageItemsPerDonation: number;
+    dateRange: DonationSummaryDateRange | null;
 }
 
 export interface IDonations {

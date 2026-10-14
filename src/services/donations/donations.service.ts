@@ -1,14 +1,11 @@
 import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
-import { DonationBody, DonationsQueryParams, IDonations, LotesContent, PaginatedDonationsContent } from "./donations.interface";
+import { DonationBody, DonationSummary, DonationSummaryQueryParams, DonationsQueryParams, IDonations, LotesContent, PaginatedDonationsContent } from "./donations.interface";
 import { BaseResponse } from "../base.interface";
 
 const donationsUrl = "/donations";
 
-export const getDonations = async (params?: DonationsQueryParams): Promise<PaginatedDonationsContent> => {
-    const queryParams: Record<string, string | number> = {
-        page: params?.page ?? 1,
-        size: params?.size ?? 100,
-    };
+const buildDonationsQueryParams = (params?: DonationSummaryQueryParams): Record<string, string | number> => {
+    const queryParams: Record<string, string | number> = {};
 
     if (params?.type && params.type !== 'all') queryParams.type = params.type;
     if (params?.lote) queryParams.lote = params.lote;
@@ -17,6 +14,16 @@ export const getDonations = async (params?: DonationsQueryParams): Promise<Pagin
     if (params?.startDate) queryParams.startDate = params.startDate;
     if (params?.endDate) queryParams.endDate = params.endDate;
     if (params?.controlNumber) queryParams.controlNumber = params.controlNumber;
+
+    return queryParams;
+}
+
+export const getDonations = async (params?: DonationsQueryParams): Promise<PaginatedDonationsContent> => {
+    const queryParams: Record<string, string | number> = {
+        page: params?.page ?? 1,
+        size: params?.size ?? 100,
+        ...buildDonationsQueryParams(params),
+    };
 
     const response = await getDataApi<PaginatedDonationsContent>(donationsUrl, { params: queryParams });
     if (response.data == null) {
@@ -39,6 +46,13 @@ export const getLotes = async (): Promise<LotesContent> => {
         return { lotes: [] }
     }
     return response.data;
+}
+
+export const getDonationsSummary = async (params?: DonationSummaryQueryParams): Promise<DonationSummary | null> => {
+    const response = await getDataApi<DonationSummary>(`${donationsUrl}/summary`, {
+        params: buildDonationsQueryParams(params),
+    });
+    return response.data ?? null;
 }
 
 export const getDonationsNormalDownloadReport = (id: number) => {

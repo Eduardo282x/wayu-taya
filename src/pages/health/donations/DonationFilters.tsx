@@ -52,7 +52,7 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
     };
 
     return (
-        <div className="flex items-end gap-3">
+        <div className="flex items-end gap-1">
             <FormSelectCustom
                 label='Tipo'
                 id='1'
@@ -92,6 +92,7 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
                     :
                     <FormAutocompleteV2
                         label="Institución"
+                        appendTo='body'
                         placeholder="Selecciona una institución"
                         valueDefault={filters.institutionId?.toString() ?? ''}
                         data={institutions.map(institution => ({

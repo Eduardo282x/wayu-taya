@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { DonationBody, DonationsQueryParams, PaginatedDonationsContent } from "@/services/donations/donations.interface"
-import { getDonations, getLotes, postDonation, putDonation, deleteDonation } from "@/services/donations/donations.service"
+import { DonationBody, DonationSummaryQueryParams, DonationsQueryParams, PaginatedDonationsContent } from "@/services/donations/donations.interface"
+import { getDonations, getDonationsSummary, getLotes, postDonation, putDonation, deleteDonation } from "@/services/donations/donations.service"
 import { useDonationStore } from "./donationStore"
 import { useIsAuthenticated } from "@/store/auth.store"
 import { inventoryKeys } from "@/pages/health/inventory/inventory.hook"
@@ -8,6 +8,7 @@ import { inventoryKeys } from "@/pages/health/inventory/inventory.hook"
 export const donationsKeys = {
     all: ["donations"] as const,
     list: (params: DonationsQueryParams) => ["donations", "list", params] as const,
+    summary: (params: DonationSummaryQueryParams) => ["donations", "summary", params] as const,
     lotes: ["donations", "lotes"] as const,
 }
 
@@ -31,6 +32,18 @@ export const useLotesQuery = () => {
     return useQuery({
         queryKey: donationsKeys.lotes,
         queryFn: getLotes,
+        enabled: isAuthenticated,
+    })
+}
+
+export const useDonationsSummaryQuery = () => {
+    const { filters } = useDonationStore()
+    const isAuthenticated = useIsAuthenticated()
+    const params: DonationSummaryQueryParams = { ...filters }
+
+    return useQuery({
+        queryKey: donationsKeys.summary(params),
+        queryFn: () => getDonationsSummary(params),
         enabled: isAuthenticated,
     })
 }
