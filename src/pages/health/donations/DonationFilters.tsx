@@ -52,11 +52,11 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
     };
 
     return (
-        <div className="flex items-end gap-1">
+        <div className="flex flex-wrap items-end gap-2 w-full">
             <FormSelectCustom
                 label='Tipo'
                 id='1'
-                className='w-28'
+                className='w-full sm:w-28'
                 value={filters.type}
                 options={[
                     { value: 'all', label: 'Todos' },
@@ -68,7 +68,7 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
             <FormSelectCustom
                 label='Lote'
                 id='2'
-                className='w-28'
+                className='w-full sm:w-28'
                 value={filters.lote === '' ? 'all' : filters.lote}
                 options={[
                     { value: 'all', label: 'Todos' },
@@ -76,7 +76,7 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
                 ]}
                 onChange={(e) => setFilter('lote', e.target.value === 'all' ? '' : e.target.value)}
             />
-            <div className='w-48'>
+            <div className='w-full sm:w-48'>
                 {typeDonation == 'Entrada' ?
                     <FormAutocompleteV2
                         label="Proveedor"
@@ -103,12 +103,12 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
                     />
                 }
             </div>
-            <div className="w-72">
+            <div className="w-full sm:w-60">
                 <span className="block text-sm font-medium mb-1 bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
                     Fecha
                 </span>
                 <DatePickerRange
-                    className="w-full"
+                    className="w-40"
                     value={dateRangeValue}
                     onChange={handleDateChange}
                 />

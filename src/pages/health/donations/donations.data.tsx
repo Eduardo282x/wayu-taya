@@ -112,7 +112,7 @@ export const detDonationsColumns: Column[] = [
         isIcon: false,
         element: (data: DetDonation) => (
             <div className="w-100 max-w-100 truncate text-ellipsis overflow-hidden">
-                {data.medicine.name} ${data.medicine.presentation}
+                {data.medicine.name} {data.medicine.presentation}
             </div>
         ),
         disabledClassName: true,

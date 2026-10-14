@@ -523,7 +523,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 lg:gap-4 px-2 pb-4 pt-1 border-b-2 border-gray-300">
         <div>
           <h2 className="bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent manrope text-2xl">
             {donation ? "Editar Donación" : "Registrar Nueva Donación"}
@@ -544,14 +544,14 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
-        <div className="space-y-4 p-2">
+        <div className="space-y-4 p-2 h-full overflow-y-auto lg:overflow-hidden">
           <div className="space-y-1">
             <h3 className="text-base font-semibold bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
               Información General
             </h3>
 
             {/* Caberera */}
-            <div className={`grid gap-4 bg-white rounded-2xl p-3 ${typeDonation == 'Entrada' ? 'grid-cols-7' : 'grid-cols-5'}`}>
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white rounded-2xl p-3 ${typeDonation == 'Entrada' ? 'lg:grid-cols-7' : 'lg:grid-cols-5'}`}>
               <FormInputCustom
                 label="N° Control"
                 id="controlNumber"
@@ -570,7 +570,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                 ]}
               />
 
-              <div className={`${typeDonation == 'Entrada' ? 'col-span-2' : ''}`}>
+              <div className={`${typeDonation == 'Entrada' ? 'sm:col-span-2 lg:col-span-2' : ''}`}>
                 {typeDonation == 'Entrada' ?
                   <FormAutocompleteV2
                     label="Proveedor"
@@ -630,12 +630,12 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           </div>
 
           {/* Detalles  */}
-          <div className="space-y-2 h-100 max-h-100 overflow-y-auto">
-            <div className="flex items-center justify-between">
+          <div className="space-y-2 h-72 max-h-72 lg:h-100 lg:max-h-100 overflow-y-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <h3 className="text-base font-semibold bg-linear-to-r from-blue-800 to-[#3089FD] bg-clip-text text-transparent">
                 Detalles de Donación
               </h3>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 lg:gap-3">
                 {typeDonation == 'Entrada' && (
                   <Button
                     type="button"
@@ -708,22 +708,23 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         </div>
 
         {/* Botones */}
-        <div className="sticky bottom-0 z-10 bg-white border-t px-4 py-3 flex justify-between items-center gap-4 shrink-0">
-          <div className="w-1/2">
+        <div className="sticky bottom-0 z-10 bg-white border-t px-4 py-3 flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 lg:gap-4 shrink-0">
+          <div className="w-full sm:w-1/2">
             {alert && (
               <p className="text-red-600 font-semibold">{message}</p>
             )}
           </div>
 
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-2 justify-end w-full sm:w-auto">
             <Button
               type="button"
               variant={'destructive'}
+              className="flex-1 sm:flex-none"
               onClick={onCancel}
             >
               Cancelar
             </Button>
-            <Button type="submit" variant={'animated'} disabled={saving}>
+            <Button type="submit" variant={'animated'} className="flex-1 sm:flex-none" disabled={saving}>
               {saving ? "Guardando..." : `${donation ? "Actualizar" : "Registrar"} Donación`}
             </Button>
           </div>
@@ -816,8 +817,8 @@ const DonationDetailFormEntry = ({
         </div>
       )}
 
-      <div className="grid grid-cols-6 gap-4">
-        <div className="col-span-3 flex items-end justify-between gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="sm:col-span-2 lg:col-span-3 flex items-end justify-between gap-2">
           <div className="w-[92%]">
             <FormAutocompleteV2
               label="Medicina"
@@ -963,8 +964,8 @@ const DonationDetailFormExit = ({
         </div>
       )}
 
-      <div className="grid grid-cols-7 gap-4">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
+        <div className="sm:col-span-2 lg:col-span-2">
           <FormAutocompleteV2
             label="Medicina"
             appendTo='body'
