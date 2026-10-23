@@ -9,6 +9,7 @@ export interface InventoryContent {
 export interface InventoryQueryParams extends PaginationQuery {
     name?: string;
     storeId?: number | null;
+    medicineId?: number | null;
 }
 
 export interface PaginatedInventoryContent {

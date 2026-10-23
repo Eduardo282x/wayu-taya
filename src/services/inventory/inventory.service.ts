@@ -18,6 +18,7 @@ const buildInventoryFilterParams = (params?: InventorySummaryQueryParams): Recor
 
     if (params?.name) queryParams.name = params.name;
     if (params?.storeId != null) queryParams.storeId = params.storeId;
+    if (params?.medicineId != null) queryParams.medicineId = params.medicineId;
 
     return queryParams;
 }

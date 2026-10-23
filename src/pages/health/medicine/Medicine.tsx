@@ -30,11 +30,14 @@ import {
 import { useMedicineStore } from "./medicineStore"
 import { useQueryClient } from "@tanstack/react-query"
 import { debounce } from "@/lib/debounce"
+import { apiMessage, getFieldErrors, getRequestId } from "@/services/api-error"
 
 export const Medicine = () => {
   const [medicineSelected, setMedicineSelected] = useState<IMedicine | null>(null)
   const [columns, setColumns] = useState<Column[]>(medicineColumns)
   const [isAddFormOpen, setIsAddFormOpen] = useState(false)
+  const [medicineFormError, setMedicineFormError] = useState<string>('')
+  const [medicineFieldErrors, setMedicineFieldErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState<boolean>(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
@@ -67,6 +70,8 @@ export const Medicine = () => {
   }, [name])
 
   const openAddForm = () => {
+    setMedicineFormError('')
+    setMedicineFieldErrors({})
     setMedicineSelected(null)
     setIsAddFormOpen(true)
   }
@@ -77,10 +82,20 @@ export const Medicine = () => {
         ? await updateMedicine.mutateAsync({ id: medicineSelected.id, data: formData })
         : await createMedicine.mutateAsync(formData)
 
-      // El interceptor ya notifica exito/error. MedicineForm cierra y limpia solo en exito.
-      return response?.success === true
+      if (response?.success !== true) {
+        const requestId = getRequestId(response)
+        setMedicineFormError(
+          `${apiMessage(response, 'No se pudo guardar la medicina.')}${requestId ? ` (Referencia: ${requestId})` : ''}`,
+        )
+        setMedicineFieldErrors(getFieldErrors(response))
+        return false
+      }
+
+      setMedicineFormError('')
+      setMedicineFieldErrors({})
+      return true
     } catch {
-      // El interceptor notifica el error; no se cierra el dialogo.
+      setMedicineFormError('Error inesperado al guardar la medicina.')
       return false
     }
   }
@@ -103,6 +118,8 @@ export const Medicine = () => {
   const getActionTable = (action: string, data: IMedicine) => {
     setMedicineSelected(data)
     if (action === "edit") {
+      setMedicineFormError('')
+      setMedicineFieldErrors({})
       setIsAddFormOpen(true)
     }
     if (action === "delete") {
@@ -268,6 +285,8 @@ export const Medicine = () => {
               onOpenChange={setIsAddFormOpen}
               onSubmit={handleMedicineSubmit}
               medicineData={medicineSelected}
+              submitError={medicineFormError}
+              fieldErrors={medicineFieldErrors}
               categories={categoriesData?.categories ?? []}
               forms={formsData?.forms ?? []}
               ignoreHeader={false}

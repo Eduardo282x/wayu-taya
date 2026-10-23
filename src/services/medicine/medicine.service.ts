@@ -1,4 +1,4 @@
-import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, postFilesDataApi, putDataApi } from "@/services/api.service"
+import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, postFilesDataApi, putDataApi, type ApiRequestOptions } from "@/services/api.service"
 import type { BaseResponse } from "@/services/base.interface";
 import { MedicineContent, IMedicine, MedicineBody, FormContent, CategoryContent, MedicineQueryParams, PaginatedMedicineContent } from "./medicine.interface";
 
@@ -55,16 +55,16 @@ export const getMedicineTemplate = () => {
     return getDataFileApi(`${medicineUrl}/template`);
 }
 
-export const postMedicine = async (data: MedicineBody): Promise<BaseResponse<IMedicine | null>> => {
-    return postDataApi<MedicineBody, IMedicine>(medicineUrl, data);
+export const postMedicine = async (data: MedicineBody, options?: ApiRequestOptions): Promise<BaseResponse<IMedicine | null>> => {
+    return postDataApi<MedicineBody, IMedicine>(medicineUrl, data, options);
 }
 
 export const uploadMedicineFile = (data: FormData) => {
     return postFilesDataApi(`${medicineUrl}/upload`, data)
 }
 
-export const putMedicine = async (id: number, data: MedicineBody): Promise<BaseResponse<IMedicine | null>> => {
-    return putDataApi<MedicineBody, IMedicine>(`${medicineUrl}/${id}`, data);
+export const putMedicine = async (id: number, data: MedicineBody, options?: ApiRequestOptions): Promise<BaseResponse<IMedicine | null>> => {
+    return putDataApi<MedicineBody, IMedicine>(`${medicineUrl}/${id}`, data, options);
 }
 
 export const deleteMedicine = async (id: number): Promise<BaseResponse<IMedicine | null>> => {

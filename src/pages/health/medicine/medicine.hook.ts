@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { MedicineBody, MedicineQueryParams } from "@/services/medicine/medicine.interface"
-import { getCategories, getForms, getMedicine, getMedicinesPage, postMedicine, putMedicine, deleteMedicine } from "@/services/medicine/medicine.service"
+import { getCategories, getForms, getMedicinesPage, postMedicine, putMedicine, deleteMedicine } from "@/services/medicine/medicine.service"
 import { useMedicineStore } from "./medicineStore"
 import { useIsAuthenticated } from "@/store/auth.store"
 
@@ -31,7 +31,8 @@ export const useAllMedicinesQuery = (enabled = true) => {
 
     return useQuery({
         queryKey: medicineKeys.allList,
-        queryFn: getMedicine,
+        // Lista inicial acotada: el resto se resuelve con búsqueda por nombre.
+        queryFn: () => getMedicinesPage({ page: 1, size: 100 }),
         enabled: enabled && isAuthenticated,
         staleTime: Infinity,
         gcTime: 30 * 60 * 1000,
@@ -49,7 +50,7 @@ export const useMedicineSearchQuery = (name: string) => {
     return useQuery({
         queryKey: medicineKeys.search(name),
         queryFn: () => getMedicinesPage(params),
-        enabled: isAuthenticated && name.trim().length > 0,
+        enabled: isAuthenticated && name.trim().length >= 2,
         staleTime: 60 * 1000,
     })
 }
@@ -82,7 +83,7 @@ export const useCreateMedicineMutation = () => {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: (data: MedicineBody) => postMedicine(data),
+        mutationFn: (data: MedicineBody) => postMedicine(data, { silent: true }),
         onSuccess: (response) => {
             if (response?.success) {
                 queryClient.invalidateQueries({ queryKey: medicineKeys.all })
@@ -95,7 +96,7 @@ export const useUpdateMedicineMutation = () => {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: ({ id, data }: { id: number; data: MedicineBody }) => putMedicine(id, data),
+        mutationFn: ({ id, data }: { id: number; data: MedicineBody }) => putMedicine(id, data, { silent: true }),
         onSuccess: (response) => {
             if (response?.success) {
                 queryClient.invalidateQueries({ queryKey: medicineKeys.all })

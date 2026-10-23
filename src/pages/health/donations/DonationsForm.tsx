@@ -3,6 +3,7 @@ import FormInputCustom from "@/components/formInput/FormInputCustom"
 import { Button } from "@/components/ui/button"
 import { FaArrowLeft } from "react-icons/fa"
 import { useState, useEffect } from "react"
+import { useQueries } from "@tanstack/react-query"
 import { Plus, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { IProviders } from "@/services/provider/provider.interface"
@@ -14,7 +15,8 @@ import { useCategoriesQuery, useFormsQuery, useCreateMedicineMutation, useMedici
 import { IInstitution } from "@/services/institution/institution.interface"
 import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
-import { useInventorySearchQuery } from "../inventory/inventory.hook"
+import { inventoryKeys, useInventorySearchQuery } from "../inventory/inventory.hook"
+import { getInventoryPage } from "@/services/inventory/inventory.service"
 import { formatDate, formatDateForInput } from "@/utils/formatters"
 import { apiMessage, getFieldErrors, getRequestId } from "@/services/api-error"
 import { IoMdAdd } from "react-icons/io";
@@ -178,6 +180,80 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     createEmptyMedicine(1),
     createEmptyMedicine(2),
   ])
+
+  // Solo se consulta el inventario de las medicinas seleccionadas. Para una
+  // Salida con una medicina fuera de los primeros 100, esto trae únicamente
+  // ese grupo (almacenes, lotes y stock), sin cargar todo el inventario.
+  const selectedInventoryIds =
+    typeDonation === 'Salida'
+      ? Array.from(
+          new Set(
+            medicineDetails
+              .filter(
+                (row) =>
+                  Number(row.medicineId) > 0 &&
+                  inventoryDirectory[Number(row.medicineId)] == null,
+              )
+              .map((row) => Number(row.medicineId)),
+          ),
+        )
+      : [];
+
+  const selectedInventoryQueries = useQueries({
+    queries: selectedInventoryIds.map((medicineId) => ({
+      queryKey: inventoryKeys.byMedicine(medicineId),
+      queryFn: () =>
+        getInventoryPage({ page: 1, size: 1, medicineId }),
+      enabled: medicineId > 0,
+      staleTime: 60 * 1000,
+    })),
+  });
+
+  const selectedInventorySignature = selectedInventoryQueries
+    .map((query) => query.dataUpdatedAt)
+    .join("|");
+
+  useEffect(() => {
+    const successful = selectedInventoryQueries
+      .map((query, index) => ({ query, medicineId: selectedInventoryIds[index] }))
+      .filter(({ query }) => query.isSuccess);
+
+    if (successful.length === 0) return;
+
+    const sources = successful.flatMap(
+      ({ query }) => query.data?.inventory ?? [],
+    );
+
+    setInventoryDirectory((prev) => {
+      const next = { ...prev };
+      let changed = false;
+
+      // Si una medicina seleccionada ya no tiene stock, se quita del
+      // directorio para no ofrecer almacenes obsoletos.
+      successful.forEach(({ medicineId }) => {
+        const hasInventory = sources.some(
+          (inv) => inv.medicine.id === medicineId,
+        );
+        if (!hasInventory && next[medicineId] != null) {
+          delete next[medicineId];
+          changed = true;
+        }
+      });
+
+      sources.forEach((inv) => {
+        if (inv?.medicine) {
+          // La consulta dirigida manda sobre la lista inicial: así el stock y
+          // los lotes de una medicina seleccionada están actualizados.
+          next[inv.medicine.id] = inv;
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+    // La firma resume los datos de todas las consultas sin crear un efecto
+    // nuevo por cada render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedInventorySignature]);
 
   /** Almacen por defecto derivado de datos reales (nunca un id fijo). */
   const defaultStoreId = stores[0]?.id ?? 0;
@@ -601,9 +677,15 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   const filteredOptions = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
     const current = detail.medicineId ? medicineDirectory[detail.medicineId] : undefined;
-    const base = medicineQuery.trim()
+    const query = medicineQuery.trim();
+    const base = query.length >= 2
       ? (medicineSearchData?.medicines ?? [])
-      : Object.values(medicineDirectory);
+      : Object.values(medicineDirectory).filter((med) =>
+          query.length === 0 ||
+          `${med.name} ${med.presentation ?? ''}`
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+        );
     const allMedicines = current && !base.some((med) => med.id === current.id)
       ? [...base, current]
       : base;
@@ -629,9 +711,15 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   const filteredOptionsExit = (detail: DonationMedicine, index: number): { value: string; label: string }[] => {
     const current = detail.medicineId ? inventoryDirectory[detail.medicineId] : undefined;
-    const base = inventoryQuery.trim()
+    const query = inventoryQuery.trim();
+    const base = query.length >= 2
       ? (inventorySearchData?.inventory ?? [])
-      : Object.values(inventoryDirectory);
+      : Object.values(inventoryDirectory).filter((inv) =>
+          query.length === 0 ||
+          `${inv.medicine.name} ${inv.medicine.presentation ?? ''}`
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+        );
     const allInventory = current && !base.some((inv) => inv.medicine.id === current.medicine.id)
       ? [...base, current]
       : base;
@@ -801,7 +889,11 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     handleMedicineDetailChange={handleMedicineDetailChange}
                     onCreateMedicine={openCreateMedicine}
                     onSearch={setMedicineQuery}
-                    searching={isSearchingMedicines || medicineQuery.trim() !== debouncedMedicineQuery.trim()}
+                    searching={
+                      isSearchingMedicines ||
+                      (debouncedMedicineQuery.trim().length >= 2 &&
+                        medicineQuery.trim() !== debouncedMedicineQuery.trim())
+                    }
                     onOpenChange={(isOpen) => { if (isOpen) resetMedicineSearch(); }}
                     onMedicineChange={handleMedicineSelectEntry}
                     errors={rowErrors[detail.rowKey]}
@@ -823,7 +915,11 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     handleMedicineDetailChange={handleMedicineDetailChange}
                     onCreateMedicine={openCreateMedicine}
                     onSearch={setInventoryQuery}
-                    searching={isSearchingInventory || inventoryQuery.trim() !== debouncedInventoryQuery.trim()}
+                    searching={
+                      isSearchingInventory ||
+                      (debouncedInventoryQuery.trim().length >= 2 &&
+                        inventoryQuery.trim() !== debouncedInventoryQuery.trim())
+                    }
                     onOpenChange={(isOpen) => { if (isOpen) resetInventorySearch(); }}
                     errors={rowErrors[detail.rowKey]}
                   />
@@ -974,7 +1070,7 @@ const DonationDetailFormEntry = ({
             <FormAutocompleteV2
               label="Medicina"
               appendTo='body'
-              placeholder="Nombre de la medicina"
+              placeholder="Nombre de la medicina (mín. 2 letras)"
               data={filteredOptions(detail, index)}
               valueDefault={detail.medicineId}
               onChange={(value) =>
@@ -1129,7 +1225,7 @@ const DonationDetailFormExit = ({
           <FormAutocompleteV2
             label="Medicina"
             appendTo='body'
-            placeholder="Nombre de la medicina"
+            placeholder="Nombre de la medicina (mín. 2 letras)"
             data={filteredOptions(detail, index)}
             valueDefault={detail.medicineId}
             onChange={(value) => changeMedicine(value)}

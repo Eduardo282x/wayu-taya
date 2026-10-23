@@ -6,7 +6,7 @@ import {
     InventorySummaryQueryParams,
     MoveMedicineFormData,
 } from "@/services/inventory/inventory.interface"
-import { getInventory, getInventoryHistorial, getInventoryPage, getInventorySummary, moveInventoryStorage } from "@/services/inventory/inventory.service"
+import { getInventoryHistorial, getInventoryPage, getInventorySummary, moveInventoryStorage } from "@/services/inventory/inventory.service"
 import { getInventoryAlerts } from "@/services/inventory/inventory.alert.service"
 import { useInventoryStore } from "./inventoryStore"
 import { useIsAuthenticated } from "@/store/auth.store"
@@ -15,6 +15,7 @@ export const inventoryKeys = {
     all: ["inventory"] as const,
     list: (params: InventoryQueryParams) => ["inventory", "list", params] as const,
     search: (name: string) => ["inventory", "search", name] as const,
+    byMedicine: (medicineId: number) => ["inventory", "by-medicine", medicineId] as const,
     summary: (params: InventorySummaryQueryParams) => ["inventory", "summary", params] as const,
     /** Clave base del historial: invalida todas las paginas por prefijo. */
     history: ["inventory", "history"] as const,
@@ -40,7 +41,8 @@ export const useAllInventoryQuery = (enabled = true) => {
 
     return useQuery({
         queryKey: inventoryKeys.all,
-        queryFn: getInventory,
+        // Lista inicial acotada: el resto se resuelve por búsqueda o por id.
+        queryFn: () => getInventoryPage({ page: 1, size: 100 }),
         enabled: enabled && isAuthenticated,
         staleTime: Infinity,
         gcTime: 30 * 60 * 1000,
@@ -70,7 +72,7 @@ export const useInventorySearchQuery = (name: string) => {
     return useQuery({
         queryKey: inventoryKeys.search(name),
         queryFn: () => getInventoryPage(params),
-        enabled: isAuthenticated && name.trim().length > 0,
+        enabled: isAuthenticated && name.trim().length >= 2,
         staleTime: 60 * 1000,
     })
 }
