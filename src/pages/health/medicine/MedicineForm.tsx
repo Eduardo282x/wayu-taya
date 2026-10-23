@@ -74,19 +74,17 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
   const handleFormSubmit = async (formData: MedicineBody) => {
     setSubmitting(true);
 
-    let success = false;
     try {
-      success = (await onSubmit(formData)) === true;
+      const success = (await onSubmit(formData)) === true;
+      if (!success) return;
+
+      reset({ ...baseMedicine, ...initialValues });
+      onOpenChange(false);
     } catch {
-      success = false;
+      // La petición falló: se mantiene el formulario abierto con los datos.
     } finally {
       setSubmitting(false);
     }
-
-    if (!success) return;
-
-    reset({ ...baseMedicine, ...initialValues });
-    onOpenChange(false);
   };
 
   return (
