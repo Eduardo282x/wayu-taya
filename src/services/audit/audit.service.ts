@@ -12,6 +12,8 @@ export const getAudit = async (params?: AuditQueryParams): Promise<PaginatedAudi
     if (params?.entity) queryParams.entity = params.entity;
     if (params?.action) queryParams.action = params.action;
     if (params?.userId != null) queryParams.userId = params.userId;
+    if (params?.from) queryParams.from = `${params.from}T00:00:00.000`;
+    if (params?.to) queryParams.to = `${params.to}T23:59:59.999`;
 
     const response = await getDataApi<PaginatedAuditContent>(auditUrl, { params: queryParams });
 

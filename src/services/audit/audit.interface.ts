@@ -1,9 +1,15 @@
 import { PaginationMeta, PaginationQuery } from "../base.interface";
 
+export type AuditAction = "CREATE" | "UPDATE" | "DELETE";
+
+export const AUDIT_ACTIONS: AuditAction[] = ["CREATE", "UPDATE", "DELETE"];
+
 export interface AuditQueryParams extends PaginationQuery {
     entity?: string;
-    action?: string;
+    action?: AuditAction;
     userId?: number;
+    from?: string;
+    to?: string;
 }
 
 export interface AuditUser {
@@ -19,7 +25,7 @@ export interface AuditLog {
     entity: string;
     entityId?: number | null;
     userId?: number | null;
-    user?: AuditUser | null;
+    username?: string | null;
     before?: unknown;
     after?: unknown;
     description?: string;
@@ -32,6 +38,22 @@ export interface PaginatedAuditContent {
 }
 
 /** Entidades del modulo Salud que se pueden auditar. */
+
+export const Audit_Actions_Options: {label: string, value: AuditAction}[] = [
+    {
+        label: 'Creación',
+        value: 'CREATE'
+    },
+    {
+        label: 'Actualización',
+        value: 'UPDATE'
+    },
+    {
+        label: 'Eliminación',
+        value: 'DELETE'
+    }
+];
+
 export type Entities = 'Donation' | 'Inventory' | 'Medicine'
 
 export const Audit_Entities_Options: {label: string, value: Entities}[] = [
@@ -46,6 +68,5 @@ export const Audit_Entities_Options: {label: string, value: Entities}[] = [
     {
         label: 'Medicinas',
         value: 'Medicine'
-    },
-
-]
+    }
+];

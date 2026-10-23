@@ -9,6 +9,20 @@ const ACTION_STYLES: Record<string, string> = {
     DELETE: "bg-red-200 text-red-800",
 };
 
+const TRANSLATE: Record<string, string> = {
+    CREATE: 'Creación',
+    UPDATE: 'Edición',
+    DELETE: 'Eliminacion',
+}
+
+const TRANSLATE_ENTITY: Record<string, string> = {
+    DetDonation: 'Detalle de donación',
+    Donation: 'Donación',
+    HistoryInventory: 'Historial de inventario',
+    Inventory: 'Inventario',
+    Medicine: 'Medicina/Producto',
+}
+
 export const auditColumns: Column[] = [
     {
         label: "Fecha",
@@ -27,9 +41,8 @@ export const auditColumns: Column[] = [
         column: "user",
         visible: true,
         isIcon: false,
-        element: (data: AuditLog) =>
-            data.user ? `${data.user.name} ${data.user.lastName}` : "-",
-        className: () => 'max-w-60 w-60 overflow-hidden text-ellipsis',
+        element: (data: AuditLog) => data.username,
+        className: () => 'max-w-60 overflow-hidden text-ellipsis',
     },
     {
         label: "Acción",
@@ -38,7 +51,7 @@ export const auditColumns: Column[] = [
         isIcon: false,
         element: (data: AuditLog) => (
             <p className={`px-2 py-1 rounded-full text-xs text-center font-medium ${ACTION_STYLES[data.action] ?? "bg-gray-200 text-gray-800"}`}>
-                {data.action}
+                {TRANSLATE[data.action]}
             </p>
         ),
     },
@@ -47,15 +60,15 @@ export const auditColumns: Column[] = [
         column: "entity",
         visible: true,
         isIcon: false,
-        element: (data: AuditLog) => data.entity,
+        element: (data: AuditLog) => TRANSLATE_ENTITY[data.entity],
     },
-    {
-        label: "ID",
-        column: "entityId",
-        visible: true,
-        isIcon: false,
-        element: (data: AuditLog) => (data.entityId != null ? String(data.entityId) : "-"),
-    },
+    // {
+    //     label: "ID",
+    //     column: "entityId",
+    //     visible: true,
+    //     isIcon: false,
+    //     element: (data: AuditLog) => (data.entityId != null ? String(data.entityId) : "-"),
+    // },
     {
         label: "Descripción",
         column: "description",
