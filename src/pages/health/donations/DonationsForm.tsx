@@ -299,24 +299,25 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     setMedicineFormOpen(true);
   }
 
-  const handleCreateMedicine = async (formData: MedicineBody) => {
+  const handleCreateMedicine = async (formData: MedicineBody): Promise<boolean> => {
     try {
       const response = await createMedicine.mutateAsync(formData);
       const created = response?.data;
       if (!response?.success || !created) {
         setAlert(true);
         setMessage(apiMessage(response, 'No se pudo crear la medicina.'));
-        return;
+        return false;
       }
       setCreatedMedicines((prev) => [...prev, created]);
       if (medicineFormIndex !== null) {
         setMedicineIdOnRow(medicineFormIndex, created.id);
       }
-      setMedicineFormOpen(false);
       setMedicineFormIndex(null);
+      return true;
     } catch {
       setAlert(true);
       setMessage('Error inesperado al crear la medicina.');
+      return false;
     }
   }
 
@@ -758,7 +759,10 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         createdMedicines={createdMedicines}
         categories={categoriesData?.categories ?? []}
         forms={formsData?.forms ?? []}
-        onCreateMedicine={async (formData) => (await createMedicine.mutateAsync(formData)).data}
+        onCreateMedicine={async (formData) => {
+          const response = await createMedicine.mutateAsync(formData);
+          return response?.success ? response.data : null;
+        }}
         onApply={handleApplyUpload}
       />
 

@@ -71,18 +71,17 @@ export const Medicine = () => {
     setIsAddFormOpen(true)
   }
 
-  const handleMedicineSubmit = async (formData: MedicineBody) => {
+  const handleMedicineSubmit = async (formData: MedicineBody): Promise<boolean> => {
     try {
       const response = medicineSelected
         ? await updateMedicine.mutateAsync({ id: medicineSelected.id, data: formData })
         : await createMedicine.mutateAsync(formData)
 
-      // El interceptor ya notifica exito/error. Solo se cierra el dialogo en exito.
-      if (response?.success) {
-        setIsAddFormOpen(false)
-      }
+      // El interceptor ya notifica exito/error. MedicineForm cierra y limpia solo en exito.
+      return response?.success === true
     } catch {
       // El interceptor notifica el error; no se cierra el dialogo.
+      return false
     }
   }
 

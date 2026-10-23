@@ -373,12 +373,12 @@ export const DonationUploadDialog = ({
     setMedicineFormOpen(true)
   }
 
-  const handleCreateMedicine = async (formData: MedicineBody) => {
+  const handleCreateMedicine = async (formData: MedicineBody): Promise<boolean> => {
     try {
       const created = await onCreateMedicine(formData)
       if (!created) {
         setAlert("No se pudo crear la medicina.")
-        return
+        return false
       }
       setNewsCreated((prev) => [...prev, created])
       setRows((prev) =>
@@ -394,11 +394,12 @@ export const DonationUploadDialog = ({
           }
         })
       )
-      setMedicineFormOpen(false)
       setMedicineFormRow(null)
       setAlert("")
+      return true
     } catch {
       setAlert("Error inesperado al crear la medicina.")
+      return false
     }
   }
 

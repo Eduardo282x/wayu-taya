@@ -14,7 +14,7 @@ interface MedicineFormProps {
   ignoreHeader: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: MedicineBody) => void;
+  onSubmit: (data: MedicineBody) => Promise<boolean> | boolean;
   medicineData: IMedicine | null;
   /** Valores iniciales para precargar el formulario cuando no se edita (`medicineData` null). */
   initialValues?: Partial<MedicineBody>;
@@ -24,12 +24,15 @@ interface MedicineFormProps {
 
 export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, onOpenChange, onSubmit, medicineData, initialValues, categories, forms }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">("medicamento");
+  const [submitting, setSubmitting] = useState(false);
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<MedicineBody>({
     defaultValues: baseMedicine,
   });
 
   useEffect(() => {
+    if (!open) return;
+
     if (medicineData) {
       reset({
         name: medicineData.name,
@@ -68,8 +71,21 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
     }
   };
 
-  const handleFormSubmit = (formData: MedicineBody) => {
-    onSubmit(formData);
+  const handleFormSubmit = async (formData: MedicineBody) => {
+    setSubmitting(true);
+
+    let success = false;
+    try {
+      success = (await onSubmit(formData)) === true;
+    } catch {
+      success = false;
+    } finally {
+      setSubmitting(false);
+    }
+
+    if (!success) return;
+
+    reset({ ...baseMedicine, ...initialValues });
     onOpenChange(false);
   };
 
@@ -284,8 +300,9 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
               variant="animated"
               className="p-3 w-[25%] h-[90%] bg-linear-to-r from-blue-800 to-[#58c0e9]"
               type="submit"
+              disabled={submitting}
             >
-              <BiCartAdd className="self-center size-5" /> {medicineData ? "Guardar" : "Agregar"}
+              <BiCartAdd className="self-center size-5" /> {submitting ? "Guardando..." : medicineData ? "Guardar" : "Agregar"}
             </Button>
           </div>
         </form>
