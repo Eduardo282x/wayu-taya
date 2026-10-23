@@ -32,4 +32,20 @@ export interface PaginatedAuditContent {
 }
 
 /** Entidades del modulo Salud que se pueden auditar. */
-export const AUDIT_ENTITIES = ["Donation", "Inventory", "Medicine"] as const;
+export type Entities = 'Donation' | 'Inventory' | 'Medicine'
+
+export const Audit_Entities_Options: {label: string, value: Entities}[] = [
+    {
+        label: 'Donaciones',
+        value: 'Donation'
+    },
+    {
+        label: 'Inventario',
+        value: 'Inventory'
+    },
+    {
+        label: 'Medicinas',
+        value: 'Medicine'
+    },
+
+]

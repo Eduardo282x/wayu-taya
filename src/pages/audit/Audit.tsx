@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FaClipboardList } from "react-icons/fa"
 import { auditColumns } from "./audit.data"
 import { useAuditQuery } from "./audit.hook"
-import { AUDIT_ENTITIES } from "@/services/audit/audit.interface"
+import { Audit_Entities_Options } from "@/services/audit/audit.interface"
 
 const ALL = "all"
 
@@ -44,9 +44,9 @@ export const Audit = () => {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value={ALL}>Todas las entidades</SelectItem>
-                        {AUDIT_ENTITIES.map((item) => (
-                            <SelectItem key={item} value={item}>
-                                {item}
+                        {Audit_Entities_Options.map((item, index) => (
+                            <SelectItem key={`${index}-${item.value}`} value={item.value}>
+                                {item.value}
                             </SelectItem>
                         ))}
                     </SelectContent>
