@@ -16,7 +16,7 @@ import { DonationTypeForm } from "./donations.data"
 import { IInventory } from "@/services/inventory/inventory.interface"
 import { useInventorySearchQuery } from "../inventory/inventory.hook"
 import { formatDate, formatDateForInput } from "@/utils/formatters"
-import { apiMessage } from "@/services/api-error"
+import { apiMessage, getFieldErrors, getRequestId } from "@/services/api-error"
 import { IoMdAdd } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
@@ -60,9 +60,12 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const defaultDate = formatDateForInput(today); // "YYYY-MM-DD" en calendario local
   const [alert, setAlert] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
+  const [rowErrors, setRowErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState<boolean>(false);
   const [medicineFormOpen, setMedicineFormOpen] = useState<boolean>(false);
   const [medicineFormIndex, setMedicineFormIndex] = useState<number | null>(null);
+  const [medicineFormError, setMedicineFormError] = useState<string>('');
+  const [medicineFieldErrors, setMedicineFieldErrors] = useState<Record<string, string>>({});
   const [createdMedicines, setCreatedMedicines] = useState<IMedicine[]>([]);
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
   const [inventoryWarningOpen, setInventoryWarningOpen] = useState<boolean>(false);
@@ -186,6 +189,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   useEffect(() => {
     setAlert(false);
     setMessage('');
+    setRowErrors({});
     setInventoryWarningOpen(false);
     setPendingDonation(null);
 
@@ -221,6 +225,13 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       }
     }
   }, [donation, reset, setValue])
+
+  useEffect(() => {
+    if (donation || stores.length === 0) return;
+    if (!Number(getValues('storeId'))) {
+      setValue('storeId', defaultStoreId);
+    }
+  }, [donation, stores, defaultStoreId, getValues, setValue]);
 
   const handleMedicineDetailChange = (index: number, field: DonationTypeForm, value: string | number, indexDet?: number) => {
     setMedicineDetails((prev) => {
@@ -281,6 +292,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
   const handleApplyUpload = (uploaded: DonationMedicine[]) => {
     const defaultStorageId = getDefaultStorageId();
+    setRowErrors({});
+    setAlert(false);
+    setMessage('');
     setMedicineDetails(
       uploaded.map((item, index) => ({
         ...item,
@@ -295,6 +309,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }
 
   const openCreateMedicine = (index: number) => {
+    setMedicineFormError('');
+    setMedicineFieldErrors({});
     setMedicineFormIndex(index);
     setMedicineFormOpen(true);
   }
@@ -304,17 +320,27 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       const response = await createMedicine.mutateAsync(formData);
       const created = response?.data;
       if (!response?.success || !created) {
+        const requestId = getRequestId(response);
+        const errorMessage = `${apiMessage(
+          response,
+          'No se pudo crear la medicina.',
+        )}${requestId ? ` (Referencia: ${requestId})` : ''}`;
+        setMedicineFormError(errorMessage);
+        setMedicineFieldErrors(getFieldErrors(response));
         setAlert(true);
-        setMessage(apiMessage(response, 'No se pudo crear la medicina.'));
+        setMessage(errorMessage);
         return false;
       }
       setCreatedMedicines((prev) => [...prev, created]);
       if (medicineFormIndex !== null) {
         setMedicineIdOnRow(medicineFormIndex, created.id);
       }
+      setMedicineFormError('');
+      setMedicineFieldErrors({});
       setMedicineFormIndex(null);
       return true;
     } catch {
+      setMedicineFormError('Error inesperado al crear la medicina.');
       setAlert(true);
       setMessage('Error inesperado al crear la medicina.');
       return false;
@@ -324,37 +350,41 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   const hasDonationDetailsChanged = () => {
     if (!donation) return false;
 
-    const normalizeDate = (value: Date | string) => {
-      return formatDateForInput(value);
-    };
+    const normalizeDate = (value: Date | string) => formatDateForInput(value);
 
-    const currentDetails = medicineDetails.map((item) => ({
-      medicineId: item.medicineId,
-      detailCount: item.details.length,
-      expirationDate: normalizeDate(item.expirationDate),
-      details: item.details.map((det) => ({
-        amount: det.amount,
-        storageId: det.storageId,
-        lote: det.lote ?? '',
-        benefited: det.benefited ?? 1,
-      })),
-    }));
+    // Las filas vacías (las que se agregan automáticamente al enfocar) no
+    // cuentan como cambio: antes hacían que cualquier edición reprocesara el
+    // inventario completo.
+    const currentDetails = medicineDetails
+      .filter((item) => item.medicineId)
+      .map((item) => ({
+        medicineId: item.medicineId,
+        expirationDate: normalizeDate(item.expirationDate),
+        details: item.details.map((det) => ({
+          amount: det.amount,
+          storageId: det.storageId,
+          lote: (det.lote ?? '').trim(),
+          benefited: det.benefited ?? 1,
+        })),
+      }));
 
     const originalDetails = donation.detDonation?.map((det) => ({
       medicineId: det.medicine?.id ?? det.medicineId,
-      detailCount: 1,
       expirationDate: normalizeDate(det.expirationDate),
-      details: [{ amount: det.amount, storageId: det.storageId || 0, lote: det.lote ?? '', benefited: det.benefited ?? 1 }],
+      details: [{
+        amount: det.amount,
+        storageId: det.storageId || 0,
+        lote: (det.lote ?? '').trim(),
+        benefited: det.benefited ?? 1,
+      }],
     })) ?? [];
 
     return JSON.stringify(currentDetails) !== JSON.stringify(originalDetails);
   };
 
   /**
-   * Un cambio afecta al inventario cuando se modifican los elementos de la
-   * donación, cuando cambia el almacén de una Entrada o cuando se cambia el
-   * tipo (Entrada <-> Salida). Cambios de cabecera como proveedor, institución,
-   * control o fecha no reprocesan el inventario por sí solos.
+   * Un cambio afecta al inventario cuando se modifican los elementos, el
+   * almacén, el tipo, el lote de cabecera o la fecha.
    */
   const hasInventoryAffectingChanges = (data: DonationBody): boolean => {
     if (!donation) return false;
@@ -363,9 +393,111 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     const typeChanged = data.type !== donation.type;
     const storeChanged =
       data.type === 'Entrada' &&
-      Number(getValues('storeId')) !== Number(donation.detDonation?.[0]?.storageId ?? 0);
+      Number(getValues('storeId')) !==
+        Number(donation.detDonation?.[0]?.storageId ?? 0);
+    const loteChanged = (data.lote ?? '').trim() !== (donation.lote ?? '').trim();
+    const dateChanged =
+      formatDateForInput(data.date) !== formatDateForInput(donation.date);
 
-    return detailsChanged || typeChanged || storeChanged;
+    return (
+      detailsChanged || typeChanged || storeChanged || loteChanged || dateChanged
+    );
+  };
+
+  /** Valida filas antes de tocar la API y devuelve errores por fila. */
+  const validateDonationForm = (data: DonationBody): boolean => {
+    const errors: Record<string, string[]> = {};
+    const addError = (key: string, text: string) => {
+      errors[key] = [...(errors[key] ?? []), text];
+    };
+
+    if (!(data.controlNumber ?? '').trim()) {
+      addError('__form', 'El número de control es obligatorio.');
+    }
+    if (!(data.lote ?? '').trim()) {
+      addError('__form', 'El lote es obligatorio.');
+    }
+    if (!data.date || Number.isNaN(new Date(data.date).getTime())) {
+      addError('__form', 'La fecha de la donación es obligatoria y válida.');
+    }
+    if (!stores.length) {
+      addError('__form', 'No hay almacenes disponibles.');
+    }
+    if (data.type === 'Entrada' && !Number(getValues('storeId'))) {
+      addError('__form', 'Selecciona un almacén para la entrada.');
+    }
+
+    const rows = medicineDetails.filter(
+      (row) =>
+        row.medicineId ||
+        Number(row.details?.[0]?.amount) > 0 ||
+        (row.details?.[0]?.lote ?? '').trim().length > 0,
+    );
+
+    if (rows.length === 0) {
+      addError('__form', 'Agrega al menos una medicina a la donación.');
+    }
+
+    const seen = new Set<string>();
+    rows.forEach((row, index) => {
+      const key = row.rowKey;
+      const detail = row.details?.[0];
+      const amount = Number(detail?.amount);
+      const label = `Fila ${index + 1}`;
+
+      if (!row.medicineId) {
+        addError(
+          key,
+          `${label}: escribe y selecciona una medicina de la lista.`,
+        );
+      }
+      if (!Number.isInteger(amount) || amount <= 0) {
+        addError(key, `${label}: la cantidad debe ser un entero mayor a 0.`);
+      }
+      if (
+        !row.expirationDate ||
+        Number.isNaN(new Date(row.expirationDate).getTime())
+      ) {
+        addError(key, `${label}: la fecha de vencimiento no es válida.`);
+      }
+      if (data.type === 'Salida' && !Number(detail?.storageId)) {
+        addError(key, `${label}: selecciona un almacén con stock.`);
+      }
+
+      if (row.medicineId) {
+        const storageId =
+          data.type === 'Entrada'
+            ? Number(getValues('storeId'))
+            : Number(detail?.storageId);
+        const dedupeKey = `${row.medicineId}|${storageId}|${(detail?.lote ?? '').trim().toLowerCase()}`;
+        if (seen.has(dedupeKey)) {
+          addError(
+            key,
+            `${label}: esta medicina, almacén y lote ya están en otra fila.`,
+          );
+        }
+        seen.add(dedupeKey);
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setRowErrors(errors);
+      const firstMessages = Object.entries(errors)
+        .filter(([key]) => key === '__form')
+        .flatMap(([, value]) => value);
+      const rowMessage = Object.entries(errors)
+        .filter(([key]) => key !== '__form')
+        .flatMap(([, value]) => value)[0];
+      setAlert(true);
+      setMessage(
+        [...firstMessages, rowMessage].filter(Boolean).join(' ') ||
+          'Revisa los datos marcados antes de guardar.',
+      );
+      return false;
+    }
+
+    setRowErrors({});
+    return true;
   };
 
   const persistDonation = async (parseData: DonationBody) => {
@@ -386,6 +518,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
     reset();
     setMedicineDetails([createEmptyMedicine(1), createEmptyMedicine(2)]);
+    setRowErrors({});
     setAlert(false);
     setMessage('');
   }
@@ -404,28 +537,30 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }
 
   const onSubmit = async (data: DonationBody) => {
-    if (data.lote == '' || data.date == '') {
-      setAlert(true)
-      setMessage('Alguno de los campos esta vacio.')
+    setAlert(false);
+    setMessage('');
+
+    if (!validateDonationForm(data)) {
       return;
     }
 
     const parseMedicineDetails = medicineDetails
-      .filter(item => item.medicineId)
-      .map(item =>
-        item.details.map(det => {
-          return {
-            ...item,
-            ...det
-          }
-        }).flat()
-      ).flat()
+      .filter((item) => item.medicineId)
+      .map((item) =>
+        item.details.map((det) => ({
+          ...item,
+          ...det,
+        })),
+      )
+      .flat();
 
-    const globalStoreId = Number(getValues('storeId')) || defaultStoreId;
+    const globalStoreId = Number(getValues('storeId'));
 
     if (data.type === 'Entrada' && !globalStoreId) {
       setAlert(true);
-      setMessage('No hay almacenes disponibles. Registra un almacén antes de continuar.');
+      setMessage(
+        'Selecciona un almacén de entrada. Si la lista está vacía, registra un almacén primero.',
+      );
       return;
     }
 
@@ -433,27 +568,25 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       providerId: data.providerId == 0 ? null : Number(data.providerId),
       institutionId: data.institutionId == 0 ? null : Number(data.institutionId),
       type: data.type,
-      lote: data.lote,
-      controlNumber: data.controlNumber,
+      lote: (data.lote ?? '').trim(),
+      controlNumber: (data.controlNumber ?? '').trim(),
       date: new Date(data.date),
       changeDonDetails: donation ? hasInventoryAffectingChanges(data) : false,
-      medicines: parseMedicineDetails.map(det => {
-        return {
-          medicineId: det.medicineId == 0 ? undefined : Number(det.medicineId),
-          amount: Number(det.amount),
-          benefited: det.benefited ?? 1,
-          storageId: data.type === 'Entrada'
-            ? globalStoreId
-            : (Number(det.storageId) || defaultStoreId),
-          lote: det.lote ?? undefined,
-          expirationDate: new Date(det.expirationDate),
-        }
-      }),
+      medicines: parseMedicineDetails.map((det) => ({
+        medicineId: det.medicineId == 0 ? undefined : Number(det.medicineId),
+        amount: Number(det.amount),
+        benefited: Number(det.benefited ?? 1),
+        storageId: data.type === 'Entrada'
+          ? globalStoreId
+          : Number(det.storageId),
+        lote: (det.lote ?? '').trim() || undefined,
+        expirationDate: new Date(det.expirationDate),
+      })),
     };
 
     if (parseData.medicines.some((med) => !med.storageId)) {
       setAlert(true);
-      setMessage('Selecciona un almacén para cada medicina.');
+      setMessage('Selecciona un almacén con stock para cada medicina de salida.');
       return;
     }
 
@@ -671,6 +804,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     searching={isSearchingMedicines || medicineQuery.trim() !== debouncedMedicineQuery.trim()}
                     onOpenChange={(isOpen) => { if (isOpen) resetMedicineSearch(); }}
                     onMedicineChange={handleMedicineSelectEntry}
+                    errors={rowErrors[detail.rowKey]}
                   />
                 </div>
               ))
@@ -691,6 +825,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     onSearch={setInventoryQuery}
                     searching={isSearchingInventory || inventoryQuery.trim() !== debouncedInventoryQuery.trim()}
                     onOpenChange={(isOpen) => { if (isOpen) resetInventorySearch(); }}
+                    errors={rowErrors[detail.rowKey]}
                   />
                 </div>
               ))
@@ -746,6 +881,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
             onOpenChange={setMedicineFormOpen}
             onSubmit={handleCreateMedicine}
             medicineData={null}
+            submitError={medicineFormError}
+            fieldErrors={medicineFieldErrors}
             categories={categoriesData?.categories ?? []}
             forms={formsData?.forms ?? []}
           />
@@ -761,7 +898,15 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
         forms={formsData?.forms ?? []}
         onCreateMedicine={async (formData) => {
           const response = await createMedicine.mutateAsync(formData);
-          return response?.success ? response.data : null;
+          const created = response?.success ? response.data : null;
+          if (created) {
+            setCreatedMedicines((prev) =>
+              prev.some((medicine) => medicine.id === created.id)
+                ? prev
+                : [...prev, created],
+            );
+          }
+          return created;
         }}
         onApply={handleApplyUpload}
       />
@@ -791,6 +936,7 @@ interface DonationDetailFormEntryProps {
   searching?: boolean;
   onOpenChange?: (open: boolean) => void;
   onMedicineChange?: (index: number, medicineId: number) => void;
+  errors?: string[];
 }
 const DonationDetailFormEntry = ({
   removeMedicineDetail,
@@ -803,7 +949,8 @@ const DonationDetailFormEntry = ({
   onSearch,
   searching,
   onOpenChange,
-  onMedicineChange
+  onMedicineChange,
+  errors
 }: DonationDetailFormEntryProps) => {
   return (
     <div className="border border-gray-400 rounded-lg p-2 bg-white relative ">
@@ -881,6 +1028,13 @@ const DonationDetailFormEntry = ({
           onChange={(e) => handleMedicineDetailChange(index, "expirationDate", e.target.value)}
         />
       </div>
+      {errors && errors.length > 0 && (
+        <ul className="mt-1 space-y-0.5 text-xs text-red-600">
+          {errors.map((error, errorIndex) => (
+            <li key={errorIndex}>• {error}</li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
@@ -901,7 +1055,8 @@ const DonationDetailFormExit = ({
   handleMedicineDetailChange,
   onSearch,
   searching,
-  onOpenChange
+  onOpenChange,
+  errors
 }: DonationDetailFormExitProps) => {
 
   const [medicineSelected, setMedicineSelected] = useState<IInventory | null>(null);
@@ -914,17 +1069,18 @@ const DonationDetailFormExit = ({
   }, [detail.medicineId, inventory]);
 
   const selectedStore = medicineSelected?.stores.find(store => store.id === rowStoreId);
-  const availableStock = medicineSelected
-    ? selectedStore?.amount ?? medicineSelected.totalStock ?? 0
-    : 0;
+  const availableStock = selectedStore?.amount ?? 0;
   const availableStores = medicineSelected
     ? medicineSelected.stores.filter(s => (s.amount ?? 0) > 0)
     : stores;
-  const storeOptions = (availableStores.length > 0 ? availableStores : stores)
-    .map(store => ({
-      label: `${store.name} - ${store.amount ?? 0} unidades`,
-      value: store.id.toString(),
-    }));
+  const storeOptions = availableStores.map(store => ({
+    label: `${store.name} - ${(store as { amount?: number }).amount ?? 0} unidades`,
+    value: store.id.toString(),
+  }));
+  const noStock =
+    Boolean(medicineSelected) &&
+    (medicineSelected?.stores?.length ?? 0) > 0 &&
+    (medicineSelected?.stores ?? []).every(store => (store.amount ?? 0) <= 0);
   const changeMedicine = (value: string) => {
 
     const setInventory = inventory.find(item => item.medicine.id == Number(value));
@@ -1032,6 +1188,18 @@ const DonationDetailFormExit = ({
           readOnly
         />
       </div>
+      {noStock && (
+        <p className="mt-2 text-xs font-semibold text-red-600">
+          Esta medicina no tiene stock disponible en ningún almacén.
+        </p>
+      )}
+      {errors && errors.length > 0 && (
+        <ul className="mt-1 space-y-0.5 text-xs text-red-600">
+          {errors.map((error, errorIndex) => (
+            <li key={errorIndex}>• {error}</li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

@@ -15,6 +15,7 @@ export interface ApiErrorDetail {
     error?: string;
     statusCode?: number;
     detail?: string;
+    requestId?: string | null;
 }
 
 /**
@@ -30,6 +31,7 @@ export interface ApiValidationError {
     message?: string;
     errors?: ValidationFieldError[];
     statusCode?: number;
+    requestId?: string | null;
 }
 
 /**

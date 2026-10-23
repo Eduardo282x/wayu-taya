@@ -3,7 +3,12 @@ import toast from "react-hot-toast";
 
 import { Snackbar } from "@/components/snackbar/Snackbar";
 import { api } from "@/services/api.service";
-import { isRefreshableError, isTerminalSessionError } from "@/services/api-error";
+import {
+    getTransportErrorMessage,
+    isRefreshableError,
+    isTerminalSessionError,
+    SERVER_ERROR_MESSAGE,
+} from "@/services/api-error";
 import { clearSessionSilently, refreshAccessToken, SESSION_EXPIRED_EVENT } from "@/services/auth/session";
 import { getSession } from "@/store/auth.store";
 import type { BaseResponse } from "@/services/base.interface";
@@ -12,7 +17,11 @@ import type { BaseResponse } from "@/services/base.interface";
  * Extende la config de axios con una marca propia para no reintentar dos veces
  * la misma peticion.
  */
-type RetriableConfig = InternalAxiosRequestConfig & { _retried?: boolean };
+type RetriableConfig = InternalAxiosRequestConfig & {
+    _retried?: boolean;
+    /** El formulario que originó la petición ya muestra el error inline. */
+    silent?: boolean;
+};
 
 /**
  * Rutas que nunca disparan refresh, ni aunque digan "Token invalido o
@@ -39,16 +48,26 @@ const notifySuccess = (response: { config?: { method?: string }; data?: unknown 
 };
 
 const notifyError = (error: AxiosError) => {
+    const config = error.config as RetriableConfig | undefined;
+    if (config?.silent) return;
+
     const status = error.response?.status;
     const body = error.response?.data as BaseResponse<unknown> | undefined;
+    const message = isValidMessage(body?.message)
+        ? body.message
+        : !error.response
+          ? getTransportErrorMessage(error.code, false)
+          : status && status >= 500
+            ? SERVER_ERROR_MESSAGE
+            : "";
 
-    if (!isValidMessage(body?.message)) return;
+    if (!message) return;
 
     // Un 429 merece una parada visible y larga, sin reintentos: el limite se
     // agrava si se insiste. Los 401/403 tambien se avisan siempre, incluso en
     // GET, porque son accionables.
     if (status === 429) {
-        toast.custom(<Snackbar success={false} message={body.message} />, {
+        toast.custom(<Snackbar success={false} message={message} />, {
             duration: 6000,
             position: "top-right",
         });
@@ -56,7 +75,7 @@ const notifyError = (error: AxiosError) => {
     }
 
     if (status === 401 || status === 403) {
-        toast.custom(<Snackbar success={false} message={body.message} />, {
+        toast.custom(<Snackbar success={false} message={message} />, {
             duration: 4000,
             position: "top-right",
         });
@@ -65,7 +84,7 @@ const notifyError = (error: AxiosError) => {
 
     if (!["post", "put", "delete"].includes(error.config?.method ?? "")) return;
 
-    toast.error(body.message, { duration: 1500, position: "top-right" });
+    toast.error(message, { duration: 2500, position: "top-right" });
 };
 
 let registered = false;

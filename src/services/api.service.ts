@@ -1,8 +1,16 @@
 import axios, { AxiosRequestConfig } from "axios";
 import type { ApiErrorData, BaseResponse } from "./base.interface";
+import {
+    getTransportErrorMessage,
+    SERVER_ERROR_MESSAGE,
+    TIMEOUT_ERROR_MESSAGE,
+} from "./api-error";
 
 export const api = axios.create({
     baseURL: `${import.meta.env.VITE_API_URL}/api`,
+    // Un poco más que el timeout transaccional del backend (60s) para que el
+    // servidor alcance a responder con un mensaje claro.
+    timeout: 90_000,
     // El backend tiene `credentials: false` y solo acepta las cabeceras
     // Content-Type y Authorization. NUNCA activar withCredentials ni enviar
     // cookies: la sesion vive en la cabecera Authorization.
@@ -19,29 +27,65 @@ export const api = axios.create({
  */
 const getApiError = (error: unknown): BaseResponse<ApiErrorData> => {
     if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const requestIdHeader =
+            error.response?.headers?.["x-request-id"] ??
+            error.response?.headers?.["X-Request-Id"];
+        const requestId =
+            typeof requestIdHeader === "string" && requestIdHeader.trim()
+                ? requestIdHeader.trim()
+                : null;
         const body = error.response?.data as BaseResponse<ApiErrorData> | undefined;
 
         if (body && typeof body === "object" && "success" in body && "data" in body) {
+            const isServerError = (status ?? body.statusCode ?? 0) >= 500;
+            const message =
+                isServerError && !body.message?.trim()
+                    ? SERVER_ERROR_MESSAGE
+                    : body.message?.trim() ||
+                      (status === 408 || error.code === "ECONNABORTED"
+                          ? TIMEOUT_ERROR_MESSAGE
+                          : getTransportErrorMessage(error.code, true));
+
+            const existingData =
+                body.data && typeof body.data === "object"
+                    ? (body.data as Record<string, unknown>)
+                    : {};
+
             return {
                 success: body.success ?? false,
-                statusCode: body.statusCode ?? error.response?.status ?? 500,
-                message: body.message || error.message || "Error de servidor",
-                data: body.data ?? null,
+                statusCode: body.statusCode ?? status ?? 500,
+                message,
+                data: {
+                    ...existingData,
+                    requestId:
+                        (existingData.requestId as string | null | undefined) ??
+                        requestId,
+                } as ApiErrorData,
             };
         }
 
+        const isTimeout = error.code === "ECONNABORTED" || error.code === "ETIMEDOUT";
+        const message = !error.response
+            ? getTransportErrorMessage(error.code, false)
+            : isTimeout
+              ? TIMEOUT_ERROR_MESSAGE
+              : status && status >= 500
+                ? SERVER_ERROR_MESSAGE
+                : error.message || "Error de servidor";
+
         return {
             success: false,
-            statusCode: error.response?.status ?? 500,
-            message: error.message || "Error de servidor",
-            data: null,
+            statusCode: status ?? 500,
+            message,
+            data: requestId ? { requestId } : null,
         };
     }
 
     return {
         success: false,
         statusCode: 500,
-        message: "Error inesperado",
+        message: "No se pudo completar la operación. No se guardó nada; intenta de nuevo.",
         data: null,
     };
 };
@@ -74,9 +118,11 @@ export const getDataFileApi = (endpoint: string, config?: AxiosRequestConfig) =>
         });
 };
 
-export const postDataApi = async <T, R>(url: string, data: T): Promise<BaseResponse<R | null>> => {
+export type ApiRequestOptions = AxiosRequestConfig & { silent?: boolean };
+
+export const postDataApi = async <T, R>(url: string, data: T, config?: ApiRequestOptions): Promise<BaseResponse<R | null>> => {
     try {
-        const res = await api.post<BaseResponse<R>>(url, data).then((response) => response.data);
+        const res = await api.post<BaseResponse<R>>(url, data, config).then((response) => response.data);
         return res;
     } catch (error: unknown) {
         return asEnvelope<R>(error);
@@ -101,18 +147,18 @@ export const postDataFileApi = (endpoint: string, data: unknown) => {
         .catch((err) => err.response?.data ?? new Blob());
 };
 
-export const putDataApi = async <T, R>(endpoint: string, data: T): Promise<BaseResponse<R | null>> => {
+export const putDataApi = async <T, R>(endpoint: string, data: T, config?: ApiRequestOptions): Promise<BaseResponse<R | null>> => {
     try {
-        const response = await api.put<BaseResponse<R>>(endpoint, data);
+        const response = await api.put<BaseResponse<R>>(endpoint, data, config);
         return response.data;
     } catch (error: unknown) {
         return asEnvelope<R>(error);
     }
 };
 
-export const deleteDataApi = async <R>(endpoint: string): Promise<BaseResponse<R | null>> => {
+export const deleteDataApi = async <R>(endpoint: string, config?: ApiRequestOptions): Promise<BaseResponse<R | null>> => {
     try {
-        const response = await api.delete<BaseResponse<R>>(`${endpoint}`);
+        const response = await api.delete<BaseResponse<R>>(`${endpoint}`, config);
         return response.data;
     } catch (error: unknown) {
         return asEnvelope<R>(error);

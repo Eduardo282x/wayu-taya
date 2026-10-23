@@ -16,6 +16,7 @@ import { formatDate } from "@/utils/formatters"
 import { formatNumberWithDots } from "@/hooks/formaters"
 import { useDonationsQuery, useLotesQuery, useDonationsSummaryQuery, useCreateDonationMutation, useUpdateDonationMutation, useDeleteDonationMutation } from "./donations.hook"
 import { useDonationStore } from "./donationStore"
+import { getRequestId } from "@/services/api-error"
 import { useStoresQuery } from "@/pages/health/store/store.hook"
 import { useAllInventoryQuery } from "@/pages/health/inventory/inventory.hook"
 import { useAllMedicinesQuery } from "@/pages/health/medicine/medicine.hook"
@@ -117,7 +118,13 @@ export const Donations = () => {
       }
 
       if (!response.success) {
-        return { success: false, message: response.message };
+        const requestId = getRequestId(response);
+        return {
+          success: false,
+          message: requestId
+            ? `${response.message} (Referencia: ${requestId})`
+            : response.message,
+        };
       }
 
       handleCloseDialog();

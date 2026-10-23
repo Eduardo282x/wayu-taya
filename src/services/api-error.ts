@@ -140,8 +140,52 @@ export const getThrottleSeconds = (message: string | undefined | null, fallbackS
     return Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : fallbackSeconds;
 };
 
+export const NETWORK_ERROR_MESSAGE =
+    "No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.";
+export const TIMEOUT_ERROR_MESSAGE =
+    "La operación tardó demasiado. No se guardó nada; intenta de nuevo.";
+export const SERVER_ERROR_MESSAGE =
+    "Ocurrió un error en el servidor. No se guardó nada; intenta de nuevo.";
+export const UNKNOWN_ERROR_MESSAGE =
+    "No se pudo completar la operación. No se guardó nada; intenta de nuevo.";
+
+/** Mensaje legible para errores que no llegaron a tener respuesta de la API. */
+export const getTransportErrorMessage = (
+    code?: string | null,
+    hasResponse = true,
+): string => {
+    if (!hasResponse) {
+        if (code === "ECONNABORTED" || code === "ETIMEDOUT") {
+            return TIMEOUT_ERROR_MESSAGE;
+        }
+        return NETWORK_ERROR_MESSAGE;
+    }
+    return UNKNOWN_ERROR_MESSAGE;
+};
+
+/** `requestId` del sobre de error, para mostrar una referencia al usuario. */
+export const getRequestId = (
+    response: BaseResponse<unknown> | null | undefined,
+): string | null => {
+    const data = response?.data as
+        | { requestId?: string | null }
+        | null
+        | undefined;
+    return data?.requestId ?? null;
+};
+
 /** El mensaje de la API ya viene localizado: se muestra tal cual. */
 export const apiMessage = (response: BaseResponse<unknown> | null | undefined, fallback = "Ocurrió un error inesperado"): string => {
     const message = response?.message?.trim();
     return message && message.length > 0 ? message : fallback;
+};
+
+/** Mensaje final para el usuario, con referencia de soporte si existe. */
+export const apiMessageWithReference = (
+    response: BaseResponse<unknown> | null | undefined,
+    fallback = UNKNOWN_ERROR_MESSAGE,
+): string => {
+    const message = apiMessage(response, fallback);
+    const requestId = getRequestId(response);
+    return requestId ? `${message} (Referencia: ${requestId})` : message;
 };

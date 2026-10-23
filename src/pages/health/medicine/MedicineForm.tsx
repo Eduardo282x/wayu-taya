@@ -20,13 +20,17 @@ interface MedicineFormProps {
   initialValues?: Partial<MedicineBody>;
   categories: Category[];
   forms: Form[];
+  /** Mensaje del backend cuando el guardado falla (se mantiene abierto). */
+  submitError?: string;
+  /** Errores de validación por campo devueltos por la API. */
+  fieldErrors?: Record<string, string>;
 }
 
-export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, onOpenChange, onSubmit, medicineData, initialValues, categories, forms }) => {
+export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, onOpenChange, onSubmit, medicineData, initialValues, categories, forms, submitError, fieldErrors }) => {
   const [currentTab, setCurrentTab] = useState<"medicamento" | "producto">("medicamento");
   const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<MedicineBody>({
+  const { register, handleSubmit, reset, setValue, watch, setError, clearErrors, formState: { errors } } = useForm<MedicineBody>({
     defaultValues: baseMedicine,
   });
 
@@ -56,6 +60,17 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
       setCurrentTab(initialValues?.medicine === false ? "producto" : "medicamento")
     }
   }, [open, reset, medicineData, initialValues]);
+
+  useEffect(() => {
+    if (!open) return;
+    clearErrors();
+    Object.entries(fieldErrors ?? {}).forEach(([field, message]) => {
+      setError(field as keyof MedicineBody, {
+        type: "server",
+        message,
+      });
+    });
+  }, [open, fieldErrors, setError, clearErrors]);
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value as "medicamento" | "producto");
@@ -131,6 +146,15 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({ ignoreHeader, open, 
             Producto
           </TabsTrigger>
         </TabsList>
+
+        {submitError && (
+          <p
+            role="alert"
+            className="mx-4 mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-700"
+          >
+            {submitError}
+          </p>
+        )}
 
         <form
           onSubmit={handleSubmit(handleFormSubmit)}

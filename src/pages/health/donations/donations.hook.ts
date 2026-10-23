@@ -52,7 +52,7 @@ export const useCreateDonationMutation = () => {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: (data: DonationBody) => postDonation(data),
+        mutationFn: (data: DonationBody) => postDonation(data, { silent: true }),
         onSuccess: (response) => {
             if (response.success) {
                 queryClient.invalidateQueries({ queryKey: donationsKeys.all })
@@ -66,7 +66,7 @@ export const useUpdateDonationMutation = () => {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: ({ id, data }: { id: number; data: DonationBody }) => putDonation(id, data),
+        mutationFn: ({ id, data }: { id: number; data: DonationBody }) => putDonation(id, data, { silent: true }),
         onSuccess: (response) => {
             if (response.success) {
                 queryClient.invalidateQueries({ queryKey: donationsKeys.all })

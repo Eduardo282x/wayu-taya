@@ -1,4 +1,4 @@
-import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, putDataApi } from "../api.service";
+import { deleteDataApi, getDataApi, getDataFileApi, postDataApi, putDataApi, type ApiRequestOptions } from "../api.service";
 import { DonationBody, DonationSummary, DonationSummaryQueryParams, DonationsQueryParams, IDonations, LotesContent, PaginatedDonationsContent } from "./donations.interface";
 import { BaseResponse } from "../base.interface";
 
@@ -68,12 +68,12 @@ export const getDonationsExcelTemplate = () => {
     return getDataFileApi(`${donationsUrl}/template`);
 }
 
-export const postDonation = async (data: DonationBody): Promise<BaseResponse<IDonations | null>> => {
-    return postDataApi<DonationBody, IDonations>(donationsUrl, data);
+export const postDonation = async (data: DonationBody, options?: ApiRequestOptions): Promise<BaseResponse<IDonations | null>> => {
+    return postDataApi<DonationBody, IDonations>(donationsUrl, data, options);
 }
 
-export const putDonation = async (id: number, data: DonationBody): Promise<BaseResponse<IDonations | null>> => {
-    return putDataApi<DonationBody, IDonations>(`${donationsUrl}/${id}`, data);
+export const putDonation = async (id: number, data: DonationBody, options?: ApiRequestOptions): Promise<BaseResponse<IDonations | null>> => {
+    return putDataApi<DonationBody, IDonations>(`${donationsUrl}/${id}`, data, options);
 }
 
 export const deleteDonation = async (id: number): Promise<BaseResponse<IDonations | null>> => {

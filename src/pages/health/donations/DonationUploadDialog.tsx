@@ -108,6 +108,7 @@ export const DonationUploadDialog = ({
   const [remoteMedicines, setRemoteMedicines] = useState<IMedicine[]>([])
   const [medicineFormOpen, setMedicineFormOpen] = useState(false)
   const [medicineFormRow, setMedicineFormRow] = useState<number | null>(null)
+  const [medicineFormError, setMedicineFormError] = useState("")
   const [alert, setAlert] = useState<string>("")
 
   const knownMedicines = useMemo(() => {
@@ -140,6 +141,7 @@ export const DonationUploadDialog = ({
     setFileName("")
     setPasteContent("")
     setAlert("")
+    setMedicineFormError("")
   }
 
   const downloadTemplate = async () => {
@@ -369,6 +371,7 @@ export const DonationUploadDialog = ({
     row.status === "valid" && row.medicineId != null
 
   const openCreateMedicine = (row: ValidatedRow) => {
+    setMedicineFormError("")
     setMedicineFormRow(row.rowNumber)
     setMedicineFormOpen(true)
   }
@@ -377,6 +380,7 @@ export const DonationUploadDialog = ({
     try {
       const created = await onCreateMedicine(formData)
       if (!created) {
+        setMedicineFormError("No se pudo crear la medicina.")
         setAlert("No se pudo crear la medicina.")
         return false
       }
@@ -395,9 +399,11 @@ export const DonationUploadDialog = ({
         })
       )
       setMedicineFormRow(null)
+      setMedicineFormError("")
       setAlert("")
       return true
     } catch {
+      setMedicineFormError("Error inesperado al crear la medicina.")
       setAlert("Error inesperado al crear la medicina.")
       return false
     }
@@ -728,6 +734,7 @@ export const DonationUploadDialog = ({
             onSubmit={handleCreateMedicine}
             medicineData={null}
             initialValues={medicineFormInitialValues}
+            submitError={medicineFormError}
             categories={categories}
             forms={forms}
           />
