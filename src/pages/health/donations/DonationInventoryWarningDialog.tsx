@@ -94,11 +94,11 @@ export const DonationInventoryWarningDialog = ({
                       className="border-b border-amber-100 last:border-0"
                     >
                       <td className="py-1 pr-3">
-                        {medicineNames.get(outflow.medicineId) ?? `Medicina #${outflow.medicineId}`}
+                        {medicineNames.get(outflow.medicineId) ?? 'Medicina no disponible'}
                       </td>
                       <td className="py-1 pr-3">{outflow.lote || "-"}</td>
                       <td className="py-1 pr-3">
-                        {storeNames.get(outflow.storeId) ?? `Almacén #${outflow.storeId}`}
+                        {storeNames.get(outflow.storeId) ?? 'Almacén no disponible'}
                       </td>
                       <td className="py-1 pr-3 text-right">{formatNumberWithDots(outflow.salidas)}</td>
                       <td className="py-1 pr-3 text-right">{formatNumberWithDots(outflow.transferencias)}</td>

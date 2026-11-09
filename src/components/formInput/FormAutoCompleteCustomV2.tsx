@@ -36,9 +36,14 @@ interface AutoCompleteProps {
   onSearch?: (query: string) => void
   loading?: boolean
   onOpenChange?: (open: boolean) => void
+  /**
+   * Texto a mostrar cuando el valor seleccionado no está en `data`.
+   * Evita que el componente caiga al valor crudo (por ejemplo, un id).
+   */
+  fallbackLabel?: string
 }
 
-export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo, freeText, disabled, overlay, onSearch, loading, onOpenChange }) => {
+export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeholder, onChange, valueDefault, resetValues, holdOpen, multiple, dataSelected, appendTo, freeText, disabled, overlay, onSearch, loading, onOpenChange, fallbackLabel }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string | number>(valueDefault ? valueDefault : "");
   const [inputValue, setInputValue] = useState<string>("");
@@ -219,7 +224,9 @@ export const FormAutocompleteV2: FC<AutoCompleteProps> = ({ label, data, placeho
         >
           <span className="-ml-2">
             {value
-              ? data.find((option) => option.value.toString() === value)?.label ?? value.toString()
+              ? data.find((option) => option.value.toString() === value)?.label
+                ?? fallbackLabel
+                ?? value.toString()
               : placeholder}
           </span>
           <div className="absolute top-[2.15rem] right-1 bg-white">

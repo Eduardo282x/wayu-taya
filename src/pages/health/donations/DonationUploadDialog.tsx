@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import * as XLSX from "xlsx"
+import toast from "react-hot-toast"
 import {
   StyledDialog,
   StyledDialogContent,
@@ -417,6 +418,14 @@ export const DonationUploadDialog = ({
     if (selected.length === 0) {
       setAlert("No hay filas válidas aplicables. Revisa el preview.")
       return
+    }
+
+    const omitted = rows.length - selected.length;
+    if (omitted > 0) {
+      toast(
+        `Se aplicaron ${selected.length} de ${rows.length} filas. ${omitted} no se incluyeron por errores o medicinas nuevas sin crear.`,
+        { icon: '⚠️', duration: 6000 },
+      );
     }
 
     const applied: DonationMedicineImportRow[] = selected.map((row, index) => ({

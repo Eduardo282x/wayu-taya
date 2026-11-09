@@ -87,6 +87,10 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
                             value: provider.id.toString(),
                             label: provider.name,
                         }))}
+                        fallbackLabel={
+                            providers.find(provider => provider.id === filters.providerId)?.name ??
+                            (filters.providerId ? 'Proveedor no disponible' : undefined)
+                        }
                         onChange={(value) => setFilter('providerId', value ? Number(value) : null)}
                     />
                     :
@@ -99,6 +103,10 @@ export const DonationFilters = ({ providers, institutions, lotes }: IDonationFil
                             value: institution.id.toString(),
                             label: institution.name,
                         }))}
+                        fallbackLabel={
+                            institutions.find(institution => institution.id === filters.institutionId)?.name ??
+                            (filters.institutionId ? 'Institución no disponible' : undefined)
+                        }
                         onChange={(value) => setFilter('institutionId', value ? Number(value) : null)}
                     />
                 }

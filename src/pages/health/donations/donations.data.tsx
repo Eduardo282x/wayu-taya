@@ -32,7 +32,8 @@ export const donationsColumns: Column[] = [
         column: "provider.name",
         visible: true,
         isIcon: false,
-        element: (data: IDonations) => data.provider ? `${data.provider.name}` : `${data.institution.name}`,
+        element: (data: IDonations) =>
+            data.provider?.name ?? data.institution?.name ?? '-',
         className: () => 'w-100 max-w-100 text-ellipsis overflow-hidden'
     },
     {
@@ -112,7 +113,9 @@ export const detDonationsColumns: Column[] = [
         isIcon: false,
         element: (data: DetDonation) => (
             <div className="w-100 max-w-100 truncate text-ellipsis overflow-hidden">
-                {data.medicine.name} {data.medicine.presentation}
+                {data.medicine
+                    ? `${data.medicine.name} ${data.medicine.presentation ?? ''}`.trim()
+                    : 'Medicina no disponible'}
             </div>
         ),
         disabledClassName: true,

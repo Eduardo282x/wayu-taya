@@ -44,6 +44,8 @@ type DonationMedicineRow = DonationMedicine & {
   medicine?: IMedicine;
 };
 
+type InventoryQueryStatus = 'loading' | 'loaded' | 'error';
+
 const createRowKey = (): string =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
@@ -279,6 +281,25 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedInventorySignature]);
 
+  /**
+   * Estado de la consulta dirigida por medicina. Permite distinguir entre
+   * "cargando inventario", "sin inventario" y "error de carga" en la fila de
+   * Salida, en vez de mostrar almacenes con 0 unidades sin explicación.
+   */
+  const inventoryStatusById = new Map<number, InventoryQueryStatus>();
+  selectedInventoryQueries.forEach((query, index) => {
+    const medicineId = selectedInventoryIds[index];
+    if (!medicineId) return;
+    inventoryStatusById.set(
+      medicineId,
+      query.isLoading || query.isFetching
+        ? 'loading'
+        : query.isError
+          ? 'error'
+          : 'loaded',
+    );
+  });
+
   /** Almacen por defecto derivado de datos reales (nunca un id fijo). */
   const defaultStoreId = stores[0]?.id ?? 0;
 
@@ -335,6 +356,17 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
   }, [donation, stores, defaultStoreId, getValues, setValue]);
 
   const handleMedicineDetailChange = (index: number, field: DonationTypeForm, value: string | number, indexDet?: number) => {
+    // Al corregir una fila, su error deja de estar vigente.
+    const rowKey = medicineDetails[index]?.rowKey;
+    if (rowKey) {
+      setRowErrors((prev) => {
+        if (!prev[rowKey]) return prev;
+        const next = { ...prev };
+        delete next[rowKey];
+        return next;
+      });
+    }
+
     setMedicineDetails((prev) => {
       const updated = prev.map((detail, i) => {
         if (i !== index) return detail;
@@ -379,15 +411,36 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     })
   }
 
-  const setMedicineIdOnRow = (index: number, medicineId: number) => {
+  const setMedicineOnRow = (index: number, medicine: IMedicine) => {
+    const rowKey = medicineDetails[index]?.rowKey;
     setMedicineDetails((prev) =>
-      prev.map((detail, i) => (i === index ? { ...detail, medicineId } : detail))
+      prev.map((detail, i) =>
+        i === index
+          ? { ...detail, medicineId: medicine.id, medicine }
+          : detail
+      )
     );
+    if (rowKey) {
+      setRowErrors((prev) => {
+        if (!prev[rowKey]) return prev;
+        const next = { ...prev };
+        delete next[rowKey];
+        return next;
+      });
+    }
   }
 
   const handleMedicineSelectEntry = (index: number, medicineId: number) => {
-    handleMedicineDetailChange(index, "medicineId", medicineId);
-    const medicine = medicineDirectory[medicineId];
+    const medicine =
+      medicineDirectory[medicineId] ??
+      medicineSearchData?.medicines.find((item) => item.id === medicineId) ??
+      inventoryById.get(medicineId)?.medicine;
+
+    if (medicine) {
+      setMedicineOnRow(index, medicine);
+    } else {
+      handleMedicineDetailChange(index, "medicineId", medicineId);
+    }
     handleMedicineDetailChange(index, "lote", medicine?.lote ?? "", 0);
   }
 
@@ -450,7 +503,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       }
       setCreatedMedicines((prev) => [...prev, created]);
       if (medicineFormIndex !== null) {
-        setMedicineIdOnRow(medicineFormIndex, created.id);
+        setMedicineOnRow(medicineFormIndex, created);
       }
       setMedicineFormError('');
       setMedicineFieldErrors({});
@@ -560,7 +613,19 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       const key = row.rowKey;
       const detail = row.details?.[0];
       const amount = Number(detail?.amount);
-      const label = `Fila ${index + 1}`;
+      const benefited = Number(detail?.benefited ?? 1);
+      const rowMedicine =
+        row.medicine ??
+        (row.medicineId ? medicineDirectory[row.medicineId] : undefined) ??
+        (row.medicineId
+          ? inventoryById.get(row.medicineId)?.medicine
+          : undefined);
+      const visualIndex = medicineDetails.indexOf(row) + 1;
+      const label = rowMedicine
+        ? `${rowMedicine.name}${
+            rowMedicine.presentation ? ` (${rowMedicine.presentation})` : ''
+          }`
+        : `Fila ${visualIndex || index + 1}`;
 
       if (!row.medicineId) {
         addError(
@@ -571,6 +636,18 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       if (!Number.isInteger(amount) || amount <= 0) {
         addError(key, `${label}: la cantidad debe ser un entero mayor a 0.`);
       }
+      if (data.type === 'Salida' && (!Number.isInteger(benefited) || benefited < 1)) {
+        addError(
+          key,
+          `${label}: los beneficiados deben ser un entero mayor o igual a 1.`,
+        );
+      }
+      if (data.type === 'Entrada' && (!Number.isInteger(benefited) || benefited < 0)) {
+        addError(
+          key,
+          `${label}: los beneficiados deben ser un entero mayor o igual a 0.`,
+        );
+      }
       if (
         !row.expirationDate ||
         Number.isNaN(new Date(row.expirationDate).getTime())
@@ -579,6 +656,32 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       }
       if (data.type === 'Salida' && !Number(detail?.storageId)) {
         addError(key, `${label}: selecciona un almacén con stock.`);
+      }
+      if (
+        data.type === 'Salida' &&
+        row.medicineId &&
+        Number(detail?.storageId) > 0 &&
+        Number.isInteger(amount) &&
+        amount > 0
+      ) {
+        const inventory = inventoryById.get(Number(row.medicineId));
+        const selectedStore = inventory?.stores.find(
+          (store) => store.id === Number(detail?.storageId),
+        );
+        if (inventory && !selectedStore) {
+          addError(
+            key,
+            `${label}: el almacén seleccionado no tiene inventario para esta medicina.`,
+          );
+        } else if (
+          selectedStore &&
+          amount > (selectedStore.amount ?? 0)
+        ) {
+          addError(
+            key,
+            `${label}: solo hay ${selectedStore.amount ?? 0} unidades disponibles en ${selectedStore.name}.`,
+          );
+        }
       }
 
       if (row.medicineId) {
@@ -617,6 +720,48 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
     return true;
   };
 
+  const resolveMedicineLabel = (medicineId: number): string | undefined => {
+    const rowMedicine = medicineDetails.find(
+      (row) => Number(row.medicineId) === medicineId,
+    )?.medicine;
+    return (
+      rowMedicine?.name ??
+      medicineDirectory[medicineId]?.name ??
+      inventoryById.get(medicineId)?.medicine.name
+    );
+  };
+
+  const resolveStoreLabel = (storeId: number): string | undefined =>
+    stores.find((store) => store.id === storeId)?.name;
+
+  /**
+   * Red de seguridad: aunque el backend ya envía nombres, si algún mensaje
+   * antiguo trae un id numérico se reemplaza por el nombre que el formulario
+   * conoce. Nunca se muestra un id interno al usuario.
+   */
+  const humanizeDonationError = (message: string): string => {
+    if (!message) return message;
+
+    return message
+      .replace(/\bmedicina(?: con id)?\s+(\d+)/gi, (_match, rawId: string) => {
+        const name = resolveMedicineLabel(Number(rawId));
+        return name ? `medicina ${name}` : 'medicina seleccionada';
+      })
+      .replace(/\bMedicina ID:\s*(\d+)/gi, (_match, rawId: string) => {
+        const name = resolveMedicineLabel(Number(rawId));
+        return name ? `Medicina: ${name}` : 'Medicina seleccionada';
+      })
+      .replace(/\balmacén\s+(\d+)/gi, (_match, rawId: string) => {
+        const name = resolveStoreLabel(Number(rawId));
+        return name ? `almacén ${name}` : 'almacén seleccionado';
+      })
+      .replace(/\bAlmacén ID:\s*(\d+)/gi, (_match, rawId: string) => {
+        const name = resolveStoreLabel(Number(rawId));
+        return name ? `Almacén: ${name}` : 'Almacén seleccionado';
+      })
+      .replace(/\bmedicamento #(\d+)/gi, 'fila $1');
+  };
+
   const persistDonation = async (parseData: DonationBody) => {
     let result: SaveDonationResult;
     setSaving(true);
@@ -629,7 +774,11 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
 
     if (!result.success) {
       setAlert(true);
-      setMessage(result.message || 'Error al guardar la donación.');
+      setMessage(
+        humanizeDonationError(
+          result.message || 'Error al guardar la donación.',
+        ),
+      );
       return;
     }
 
@@ -862,6 +1011,13 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                       value: provider.id.toString(),
                       label: provider.name,
                     }))}
+                    fallbackLabel={
+                      donation?.provider?.name ??
+                      (providers.length === 0 &&
+                      Number(getValues('providerId')) > 0
+                        ? 'Proveedor no disponible'
+                        : undefined)
+                    }
                     onChange={(value) => setValue('providerId', Number(value))}
                   />
                   :
@@ -874,6 +1030,13 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                       value: institution.id.toString(),
                       label: institution.name,
                     }))}
+                    fallbackLabel={
+                      donation?.institution?.name ??
+                      (institutions.length === 0 &&
+                      Number(getValues('institutionId')) > 0
+                        ? 'Institución no disponible'
+                        : undefined)
+                    }
                     onChange={(value) => setValue('institutionId', Number(value))}
                   />
                 }
@@ -969,6 +1132,8 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
                     index={index}
                     detail={detail}
                     inventoryById={inventoryById}
+                    inventoryStatusById={inventoryStatusById}
+                    onMedicineResolved={setMedicineOnRow}
                     stores={stores}
                     medicineDetails={medicineDetails}
                     handleMedicineDetailChange={handleMedicineDetailChange}
@@ -1132,6 +1297,13 @@ const DonationDetailFormEntry = ({
               placeholder="Nombre de la medicina (mín. 2 letras)"
               data={filteredOptions(detail, index)}
               valueDefault={detail.medicineId}
+              fallbackLabel={
+                detail.medicine
+                  ? `${detail.medicine.name} ${detail.medicine.presentation ?? ''}`.trim()
+                  : detail.medicineId
+                    ? 'Medicina no disponible'
+                    : undefined
+              }
               onChange={(value) =>
                 onMedicineChange
                   ? onMedicineChange(index, Number(value))
@@ -1163,6 +1335,8 @@ const DonationDetailFormEntry = ({
           label="Cantidad"
           id={`amount-${index}`}
           type="number"
+          min={1}
+          step={1}
           value={detail.details?.[0]?.amount?.toString() ?? '0'}
           onChange={(e) => handleMedicineDetailChange(index, "amount", Number.parseInt(e.target.value) || 0, 0)}
           placeholder="Cantidad"
@@ -1197,6 +1371,8 @@ const DonationDetailFormEntry = ({
 
 interface DonationDetailFormExitProps extends DonationDetailFormEntryProps {
   inventoryById: Map<number, IInventory>;
+  inventoryStatusById: Map<number, InventoryQueryStatus>;
+  onMedicineResolved: (index: number, medicine: IMedicine) => void;
   stores: IStore[];
 }
 const DonationDetailFormExit = ({
@@ -1206,6 +1382,8 @@ const DonationDetailFormExit = ({
   medicineDetails,
   detail,
   inventoryById,
+  inventoryStatusById,
+  onMedicineResolved,
   stores,
   handleMedicineDetailChange,
   onSearch,
@@ -1217,6 +1395,12 @@ const DonationDetailFormExit = ({
   const medicineSelected = detail.medicineId
     ? inventoryById.get(detail.medicineId) ?? null
     : null;
+  const inventoryStatus = detail.medicineId
+    ? inventoryStatusById.get(detail.medicineId)
+    : undefined;
+  const inventoryLoading = inventoryStatus === 'loading' && !medicineSelected;
+  const inventoryError = inventoryStatus === 'error' && !medicineSelected;
+  const noInventoryData = inventoryStatus === 'loaded' && !medicineSelected;
   const rowStoreId = Number(detail.details?.[0]?.storageId) || 0;
 
   // La consulta dirigida por medicina puede resolver despues de elegir la
@@ -1249,8 +1433,13 @@ const DonationDetailFormExit = ({
 
   const selectedStore = medicineSelected?.stores.find(store => store.id === rowStoreId);
   const availableStock = selectedStore?.amount ?? 0;
+  const selectedStoreWithoutStock = Boolean(
+    medicineSelected && selectedStore && (selectedStore.amount ?? 0) <= 0,
+  );
   const availableStores = medicineSelected
-    ? medicineSelected.stores.filter(s => (s.amount ?? 0) > 0)
+    ? medicineSelected.stores.filter(
+        (s) => (s.amount ?? 0) > 0 || s.id === rowStoreId,
+      )
     : stores;
   const storeOptions = availableStores.map(store => ({
     label: `${store.name} - ${(store as { amount?: number }).amount ?? 0} unidades`,
@@ -1261,14 +1450,27 @@ const DonationDetailFormExit = ({
     (medicineSelected?.stores?.length ?? 0) > 0 &&
     (medicineSelected?.stores ?? []).every(store => (store.amount ?? 0) <= 0);
   const changeMedicine = (value: string) => {
-    const setInventory = inventoryById.get(Number(value));
-    handleMedicineDetailChange(index, "medicineId", Number(value));
+    const medicineId = Number(value);
+    const setInventory = inventoryById.get(medicineId);
+    const resolvedMedicine =
+      setInventory?.medicine ??
+      (detail.medicineId === medicineId ? detail.medicine : undefined);
+
+    if (resolvedMedicine) {
+      onMedicineResolved(index, resolvedMedicine);
+    } else {
+      handleMedicineDetailChange(index, "medicineId", medicineId);
+    }
+
     if (!setInventory) {
       // La consulta dirigida aun no resuelve la medicina: se limpia el
       // almacen/lote anterior para que el efecto los complete al llegar.
-      handleMedicineDetailChange(index, "storageId", 0, 0);
-      handleMedicineDetailChange(index, "lote", '', 0);
-      handleMedicineDetailChange(index, "expirationDate", '');
+      // Si es la misma medicina ya seleccionada, se conserva lo que tenga.
+      if (detail.medicineId !== medicineId) {
+        handleMedicineDetailChange(index, "storageId", 0, 0);
+        handleMedicineDetailChange(index, "lote", '', 0);
+        handleMedicineDetailChange(index, "expirationDate", '');
+      }
       return;
     }
 
@@ -1282,12 +1484,41 @@ const DonationDetailFormExit = ({
     handleMedicineDetailChange(index, "expirationDate", lote?.expirationDate ? formatDateForInput(lote.expirationDate) : '')
   }
 
+  const changeStore = (value: string) => {
+    const storageId = Number(value);
+    handleMedicineDetailChange(index, "storageId", storageId, 0);
+
+    // El lote y el vencimiento pertenecen al almacén: no deben quedar los del
+    // almacén anterior. Si el nuevo almacén no tiene lotes, se limpian.
+    const lote = medicineSelected?.lotes.find(
+      (item) => item.storeId === storageId,
+    );
+    handleMedicineDetailChange(index, "lote", lote?.name ?? '', 0);
+    handleMedicineDetailChange(
+      index,
+      "expirationDate",
+      lote?.expirationDate ? formatDateForInput(lote.expirationDate) : '',
+    );
+  }
+
   const changeLote = (loteName: string) => {
     handleMedicineDetailChange(index, "lote", loteName, 0);
     const lote = medicineSelected?.lotes.find(
       lo => lo.name === loteName && (!rowStoreId || lo.storeId === rowStoreId)
     );
     handleMedicineDetailChange(index, "expirationDate", lote?.expirationDate ? formatDateForInput(lote.expirationDate) : '');
+  }
+
+  const currentLote = detail.details?.[0]?.lote;
+  const lotOptions = medicineSelected
+    ? medicineSelected.lotes
+        .filter((lo) => !rowStoreId || lo.storeId === rowStoreId)
+        .map((lo) => ({ label: lo.name, value: lo.name.toString() }))
+    : [];
+  // Si el lote guardado ya no viene en el inventario, se mantiene visible para
+  // que el select no quede en blanco mientras el usuario decide.
+  if (currentLote && !lotOptions.some((option) => option.value === currentLote)) {
+    lotOptions.unshift({ label: currentLote, value: currentLote });
   }
 
   return (
@@ -1314,6 +1545,13 @@ const DonationDetailFormExit = ({
             placeholder="Nombre de la medicina (mín. 2 letras)"
             data={filteredOptions(detail, index)}
             valueDefault={detail.medicineId}
+            fallbackLabel={
+              detail.medicine
+                ? `${detail.medicine.name} ${detail.medicine.presentation ?? ''}`.trim()
+                : detail.medicineId
+                  ? 'Medicina no disponible'
+                  : undefined
+            }
             onChange={(value) => changeMedicine(value)}
             onSearch={onSearch}
             loading={searching}
@@ -1325,12 +1563,14 @@ const DonationDetailFormExit = ({
           id={`storageId-${index}`}
           value={rowStoreId}
           options={storeOptions}
-          onChange={(e) => handleMedicineDetailChange(index, "storageId", Number(e.target.value), 0)}
+          onChange={(e) => changeStore(e.target.value)}
         />
         <FormInputCustom
           label={medicineSelected ? `Cantidad (${availableStock} items)` : "Cantidad"}
           id={`amount-${index}`}
           type="number"
+          min={1}
+          step={1}
           value={detail.details?.[0]?.amount?.toString() ?? '0'}
           onChange={(e) =>
             handleMedicineDetailChange(index, "amount", Number(e.target.value), 0)
@@ -1340,12 +1580,7 @@ const DonationDetailFormExit = ({
         <FormSelectCustom
           label="Lote"
           id={`lote-${index}`}
-          options={medicineSelected ? medicineSelected.lotes
-            .filter(lo => !rowStoreId || lo.storeId === rowStoreId)
-            .map(lo => ({
-              label: lo.name,
-              value: lo.name.toString(),
-            })) : []}
+          options={lotOptions}
           value={detail.details?.[0]?.lote}
           onChange={(e) =>
             changeLote(e.target.value)
@@ -1355,6 +1590,8 @@ const DonationDetailFormExit = ({
           label="Beneficiados"
           id={`benefited-${index}`}
           type="number"
+          min={1}
+          step={1}
           value={detail.details?.[0]?.benefited?.toString() ?? '1'}
           onChange={(e) =>
             handleMedicineDetailChange(index, "benefited", Number(e.target.value), 0)
@@ -1373,6 +1610,26 @@ const DonationDetailFormExit = ({
       {noStock && (
         <p className="mt-2 text-xs font-semibold text-red-600">
           Esta medicina no tiene stock disponible en ningún almacén.
+        </p>
+      )}
+      {!noStock && selectedStoreWithoutStock && (
+        <p className="mt-2 text-xs font-semibold text-amber-600">
+          El almacén seleccionado no tiene stock para esta medicina.
+        </p>
+      )}
+      {inventoryLoading && (
+        <p className="mt-2 text-xs font-semibold text-gray-500">
+          Cargando inventario...
+        </p>
+      )}
+      {inventoryError && (
+        <p className="mt-2 text-xs font-semibold text-red-600">
+          No se pudo cargar el inventario de esta medicina. Intenta de nuevo.
+        </p>
+      )}
+      {noInventoryData && (
+        <p className="mt-2 text-xs font-semibold text-red-600">
+          No hay inventario registrado para esta medicina.
         </p>
       )}
       {errors && errors.length > 0 && (

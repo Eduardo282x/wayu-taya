@@ -384,7 +384,9 @@ const DonationMobileCard = ({ donation, actionTable }: DonationMobileCardProps) 
               {donation.detDonation.map((det) => (
                 <div key={det.id} className="p-3 text-sm border-b-blue-800 border-b-2">
                   <p className="font-medium text-gray-800">
-                    {det.medicine.name} {det.medicine.presentation}
+                    {det.medicine
+                      ? `${det.medicine.name} ${det.medicine.presentation ?? ''}`.trim()
+                      : 'Medicina no disponible'}
                   </p>
                   <div className="mt-1 grid grid-cols-3 gap-2 text-xs">
                     <div>
