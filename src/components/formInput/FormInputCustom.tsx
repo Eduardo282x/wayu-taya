@@ -85,6 +85,18 @@ const parseAnyToDate = (value: unknown): Date | undefined => {
       return Number.isNaN(date.getTime()) ? undefined : date;
     }
 
+    // Las fechas de calendario (YYYY-MM-DD) se interpretan como locales para
+    // que el calendario seleccione el mismo día que muestra el input.
+    const isoDateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (isoDateOnly) {
+      const date = new Date(
+        Number(isoDateOnly[1]),
+        Number(isoDateOnly[2]) - 1,
+        Number(isoDateOnly[3]),
+      );
+      return Number.isNaN(date.getTime()) ? undefined : date;
+    }
+
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? undefined : parsed;
   }

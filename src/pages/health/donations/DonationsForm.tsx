@@ -341,7 +341,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
               lote: det.lote ?? '',
               benefited: det.benefited ?? 1,
             }],
-            expirationDate: new Date(det.expirationDate)
+            expirationDate: formatDateForInput(det.expirationDate)
           })),
         )
       }
@@ -836,7 +836,9 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
       type: data.type,
       lote: (data.lote ?? '').trim(),
       controlNumber: (data.controlNumber ?? '').trim(),
-      date: new Date(data.date),
+      // Se envía como fecha de calendario (YYYY-MM-DD). El backend la
+      // convierte a medianoche UTC y la base la guarda como fecha sin hora.
+      date: formatDateForInput(data.date),
       changeDonDetails: donation ? hasInventoryAffectingChanges(data) : false,
       medicines: parseMedicineDetails.map((det) => ({
         medicineId: det.medicineId == 0 ? undefined : Number(det.medicineId),
@@ -846,7 +848,7 @@ export const DonationsForm = ({ donation, providers, stores, inventory, medicine
           ? globalStoreId
           : Number(det.storageId),
         lote: (det.lote ?? '').trim() || undefined,
-        expirationDate: new Date(det.expirationDate),
+        expirationDate: formatDateForInput(det.expirationDate),
       })),
     };
 

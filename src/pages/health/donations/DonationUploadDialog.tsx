@@ -20,7 +20,7 @@ import { getMedicinesPage } from "@/services/medicine/medicine.service"
 import { DonationMedicine } from "@/services/donations/donations.interface"
 import { IMedicine, MedicineBody, Category, Form } from "@/services/medicine/medicine.interface"
 import { MedicineForm } from "../medicine/MedicineForm"
-import { formatDateForInput } from "@/utils/formatters"
+import { formatDate, formatDateForInput } from "@/utils/formatters"
 import { donationImportRowSchema } from "@/lib/import-schemas"
 
 type RowStatus = "valid" | "warning" | "error"
@@ -237,7 +237,16 @@ export const DonationUploadDialog = ({
     if (parts.length === 3) {
       const [a, b, c] = parts
       if (a.length === 4) return `${a}-${b.padStart(2, "0")}-${c.padStart(2, "0")}`
-      if (c.length === 4) return `${c}-${a.padStart(2, "0")}-${b.padStart(2, "0")}`
+      if (c.length === 4) {
+        const first = Number(a)
+        const second = Number(b)
+        // Si un componente supera 12, el formato es inequívoco. Si ambos
+        // pueden ser mes, se prefiere DD/MM/AAAA por la región.
+        const isMonthFirst = second > 12 && first <= 12
+        return isMonthFirst
+          ? `${c}-${a.padStart(2, "0")}-${b.padStart(2, "0")}`
+          : `${c}-${b.padStart(2, "0")}-${a.padStart(2, "0")}`
+      }
     }
     return str
   }
@@ -495,7 +504,13 @@ export const DonationUploadDialog = ({
       column: "fechaExpiracion",
       visible: true,
       className: (row: ValidatedRow) => rowBg(row),
-      element: (row: ValidatedRow) => <span>{row.fechaExpiracion || "-"}</span>,
+      element: (row: ValidatedRow) => (
+        <span>
+          {row.fechaExpiracion
+            ? formatDate(row.fechaExpiracion) || row.fechaExpiracion
+            : "-"}
+        </span>
+      ),
     },
     {
       label: "Estado",
@@ -554,7 +569,7 @@ export const DonationUploadDialog = ({
     'Completa una fila por cada medicina en la hoja "Donacion".',
     'En la columna "Medicina" usa el formato "Nombre - Presentación" (ej: Amoxicilina - Suspensión 250mg/5ml), tal como viene en la plantilla.',
     'La columna "Cantidad" debe ser un número entero mayor a 0.',
-    'El formato de "Fecha de Expiración" es AAAA-MM-DD (ej: 2027-12-31).',
+    'Usa el formato DD/MM/AAAA (ej: 31/12/2027) o una celda de fecha de Excel.',
     'Si escribes una medicina que no existe, deberás completar sus datos con el botón "Crear" para poder incluirla.',
     'Revisa la vista previa antes de aplicar los cambios al formulario.',
   ]
