@@ -25,6 +25,9 @@ import { donationImportRowSchema } from "@/lib/import-schemas"
 type RowStatus = "valid" | "warning" | "error"
 type ImportMode = "file" | "paste"
 
+/** Fila aplicada al formulario con la medicina ya resuelta (nombre/presentacion). */
+export type DonationMedicineImportRow = DonationMedicine & { medicine?: IMedicine }
+
 interface ParsedRow {
   medicina: string
   cantidad: string
@@ -52,7 +55,7 @@ interface DonationUploadDialogProps {
   categories: Category[]
   forms: Form[]
   onCreateMedicine: (data: MedicineBody) => Promise<IMedicine | null>
-  onApply: (rows: DonationMedicine[]) => void
+  onApply: (rows: DonationMedicineImportRow[]) => void
 }
 
 const HEADERS = ["Medicina", "Cantidad", "Lote", "Fecha de Expiración"]
@@ -416,9 +419,12 @@ export const DonationUploadDialog = ({
       return
     }
 
-    const applied: DonationMedicine[] = selected.map((row, index) => ({
+    const applied: DonationMedicineImportRow[] = selected.map((row, index) => ({
       id: index + 1,
       medicineId: row.medicineId as number,
+      // Se envia resuelta para que el formulario pinte el nombre aunque la
+      // medicina no venga en la lista inicial de 100.
+      medicine: knownMedicines.find((med) => med.id === row.medicineId),
       details: [
         {
           amount: Number(row.cantidad) || 0,
